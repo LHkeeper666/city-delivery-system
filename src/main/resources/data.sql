@@ -10,7 +10,7 @@ INSERT INTO cdms_user (
     create_time
 ) VALUES (
     'admin',
-    '123456',      -- 测试阶段可用明文，生产建议用加密（如BCrypt）
+    '{noop}1234',      -- 测试阶段可用明文，生产建议用加密（如BCrypt）
     0,             -- 角色：0=admin
     '13800000000',
     0,             -- 启用
