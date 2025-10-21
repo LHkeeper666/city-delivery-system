@@ -81,4 +81,10 @@
         SELECT <include refid="Base_Column_List" />
         FROM cdms_user
     </select>
+
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" />
+        FROM cdms_user
+        WHERE username = #{ username,jdbcType=VARCHAR }
+    </select>
 </mapper>
