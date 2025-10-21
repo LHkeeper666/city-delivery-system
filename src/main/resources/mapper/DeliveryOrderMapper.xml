@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thirdgroup.cdms.mapper.DeliveryOrderMapper">
+    <resultMap id="BaseResultMap" type="com.thirdgroup.cdms.entity.DeliveryOrder">
+        <id column="order_id" property="orderId" jdbcType="VARCHAR" />
+        <result column="sender_name" property="senderName" jdbcType="VARCHAR" />
+        <result column="sender_phone" property="senderPhone" jdbcType="VARCHAR" />
+        <result column="sender_address" property="senderAddress" jdbcType="VARCHAR" />
+        <result column="consignee_name" property="consigneeName" jdbcType="VARCHAR" />
+        <result column="consignee_phone" property="consigneePhone" jdbcType="VARCHAR" />
+        <result column="consignee_address" property="consigneeAddress" jdbcType="VARCHAR" />
+        <result column="goods_type" property="goodsType" jdbcType="VARCHAR" />
+        <result column="weight" property="weight" jdbcType="DECIMAL" />
+        <result column="volume" property="volume" jdbcType="DECIMAL" />
+        <result column="delivery_fee" property="deliveryFee" jdbcType="DECIMAL" />
+        <result column="expected_mins" property="expectedMins" jdbcType="INTEGER" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="TINYINT" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="creator_id" property="creatorId" jdbcType="BIGINT" />
+        <result column="deliveryman_id" property="deliverymanId" jdbcType="BIGINT" />
+        <result column="complete_time" property="completeTime" jdbcType="TIMESTAMP" />
+        <result column="cancel_time" property="cancelTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        order_id, sender_name, sender_phone, sender_address, consignee_name, consignee_phone, consignee_address, goods_type, weight, volume, delivery_fee, expected_mins, remark, status, create_time, creator_id, deliveryman_id, complete_time, cancel_time
+    </sql>
+
+    <insert id="insert" parameterType="com.thirdgroup.cdms.entity.DeliveryOrder">
+        INSERT INTO cdms_delivery_order (
+            order_id, sender_name, sender_phone, sender_address, consignee_name, consignee_phone, consignee_address, goods_type, weight, volume, delivery_fee, expected_mins, remark, status, create_time, creator_id, deliveryman_id, complete_time, cancel_time
+        )
+        VALUES (
+            #{ orderId,jdbcType=VARCHAR },
+            #{ senderName,jdbcType=VARCHAR },
+            #{ senderPhone,jdbcType=VARCHAR },
+            #{ senderAddress,jdbcType=VARCHAR },
+            #{ consigneeName,jdbcType=VARCHAR },
+            #{ consigneePhone,jdbcType=VARCHAR },
+            #{ consigneeAddress,jdbcType=VARCHAR },
+            #{ goodsType,jdbcType=VARCHAR },
+            #{ weight,jdbcType=DECIMAL },
+            #{ volume,jdbcType=DECIMAL },
+            #{ deliveryFee,jdbcType=DECIMAL },
+            #{ expectedMins,jdbcType=INTEGER },
+            #{ remark,jdbcType=VARCHAR },
+            #{ status,jdbcType=TINYINT },
+            #{ createTime,jdbcType=TIMESTAMP },
+            #{ creatorId,jdbcType=BIGINT },
+            #{ deliverymanId,jdbcType=BIGINT },
+            #{ completeTime,jdbcType=TIMESTAMP },
+            #{ cancelTime,jdbcType=TIMESTAMP }
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM cdms_delivery_order
+        WHERE order_id = #{ orderId,jdbcType=VARCHAR }
+    </delete>
+
+    <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.entity.DeliveryOrder">
+        UPDATE cdms_delivery_order
+        SET
+            sender_name = #{ senderName,jdbcType=VARCHAR },
+            sender_phone = #{ senderPhone,jdbcType=VARCHAR },
+            sender_address = #{ senderAddress,jdbcType=VARCHAR },
+            consignee_name = #{ consigneeName,jdbcType=VARCHAR },
+            consignee_phone = #{ consigneePhone,jdbcType=VARCHAR },
+            consignee_address = #{ consigneeAddress,jdbcType=VARCHAR },
+            goods_type = #{ goodsType,jdbcType=VARCHAR },
+            weight = #{ weight,jdbcType=DECIMAL },
+            volume = #{ volume,jdbcType=DECIMAL },
+            delivery_fee = #{ deliveryFee,jdbcType=DECIMAL },
+            expected_mins = #{ expectedMins,jdbcType=INTEGER },
+            remark = #{ remark,jdbcType=VARCHAR },
+            status = #{ status,jdbcType=TINYINT },
+            create_time = #{ createTime,jdbcType=TIMESTAMP },
+            creator_id = #{ creatorId,jdbcType=BIGINT },
+            deliveryman_id = #{ deliverymanId,jdbcType=BIGINT },
+            complete_time = #{ completeTime,jdbcType=TIMESTAMP },
+            cancel_time = #{ cancelTime,jdbcType=TIMESTAMP }
+        WHERE order_id = #{ orderId,jdbcType=VARCHAR }
+    </update>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM cdms_delivery_order
+        WHERE order_id = #{ orderId,jdbcType=VARCHAR }
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM cdms_delivery_order
+    </select>
+</mapper>

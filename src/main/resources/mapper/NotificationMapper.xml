@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thirdgroup.cdms.mapper.NotificationMapper">
+    <resultMap id="BaseResultMap" type="com.thirdgroup.cdms.entity.Notification">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="deliveryman_id" property="deliverymanId" jdbcType="BIGINT" />
+        <result column="content" property="content" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="TINYINT" />
+        <result column="is_read" property="isRead" jdbcType="TINYINT" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="sms_sent" property="smsSent" jdbcType="TINYINT" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, deliveryman_id, content, type, is_read, create_time, sms_sent
+    </sql>
+
+    <insert id="insert" parameterType="com.thirdgroup.cdms.entity.Notification">
+        INSERT INTO cdms_notification (
+            id, deliveryman_id, content, type, is_read, create_time, sms_sent
+        )
+        VALUES (
+            #{ id,jdbcType=VARCHAR },
+            #{ deliverymanId,jdbcType=BIGINT },
+            #{ content,jdbcType=VARCHAR },
+            #{ type,jdbcType=TINYINT },
+            #{ isRead,jdbcType=TINYINT },
+            #{ createTime,jdbcType=TIMESTAMP },
+            #{ smsSent,jdbcType=TINYINT }
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM cdms_notification
+        WHERE id = #{ id,jdbcType=VARCHAR }
+    </delete>
+
+    <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.entity.Notification">
+        UPDATE cdms_notification
+        SET
+            deliveryman_id = #{ deliverymanId,jdbcType=BIGINT },
+            content = #{ content,jdbcType=VARCHAR },
+            type = #{ type,jdbcType=TINYINT },
+            is_read = #{ isRead,jdbcType=TINYINT },
+            create_time = #{ createTime,jdbcType=TIMESTAMP },
+            sms_sent = #{ smsSent,jdbcType=TINYINT }
+        WHERE id = #{ id,jdbcType=VARCHAR }
+    </update>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM cdms_notification
+        WHERE id = #{ id,jdbcType=VARCHAR }
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM cdms_notification
+    </select>
+</mapper>

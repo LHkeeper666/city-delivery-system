@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thirdgroup.cdms.mapper.DeliveryTraceMapper">
+    <resultMap id="BaseResultMap" type="com.thirdgroup.cdms.entity.DeliveryTrace">
+        <id column="trace_id" property="traceId" jdbcType="BIGINT" />
+        <result column="order_id" property="orderId" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="TINYINT" />
+        <result column="operator_id" property="operatorId" jdbcType="BIGINT" />
+        <result column="operate_time" property="operateTime" jdbcType="TIMESTAMP" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        trace_id, order_id, status, operator_id, operate_time, remark
+    </sql>
+
+    <insert id="insert" parameterType="com.thirdgroup.cdms.entity.DeliveryTrace">
+        INSERT INTO cdms_delivery_trace (
+            trace_id, order_id, status, operator_id, operate_time, remark
+        )
+        VALUES (
+            #{ traceId,jdbcType=BIGINT },
+            #{ orderId,jdbcType=VARCHAR },
+            #{ status,jdbcType=TINYINT },
+            #{ operatorId,jdbcType=BIGINT },
+            #{ operateTime,jdbcType=TIMESTAMP },
+            #{ remark,jdbcType=VARCHAR }
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM cdms_delivery_trace
+        WHERE trace_id = #{ traceId,jdbcType=BIGINT }
+    </delete>
+
+    <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.entity.DeliveryTrace">
+        UPDATE cdms_delivery_trace
+        SET
+            order_id = #{ orderId,jdbcType=VARCHAR },
+            status = #{ status,jdbcType=TINYINT },
+            operator_id = #{ operatorId,jdbcType=BIGINT },
+            operate_time = #{ operateTime,jdbcType=TIMESTAMP },
+            remark = #{ remark,jdbcType=VARCHAR }
+        WHERE trace_id = #{ traceId,jdbcType=BIGINT }
+    </update>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM cdms_delivery_trace
+        WHERE trace_id = #{ traceId,jdbcType=BIGINT }
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM cdms_delivery_trace
+    </select>
+</mapper>

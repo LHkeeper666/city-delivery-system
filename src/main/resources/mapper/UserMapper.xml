@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thirdgroup.cdms.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="com.thirdgroup.cdms.entity.User">
+        <id column="user_id" property="userId" jdbcType="BIGINT" />
+        <result column="username" property="username" jdbcType="VARCHAR" />
+        <result column="password" property="password" jdbcType="VARCHAR" />
+        <result column="role" property="role" jdbcType="TINYINT" />
+        <result column="phone_no" property="phoneNo" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="TINYINT" />
+        <result column="work_status" property="workStatus" jdbcType="TINYINT" />
+        <result column="fail_count" property="failCount" jdbcType="INTEGER" />
+        <result column="last_login_time" property="lastLoginTime" jdbcType="TIMESTAMP" />
+        <result column="last_login_ip" property="lastLoginIp" jdbcType="VARCHAR" />
+        <result column="last_login_success" property="lastLoginSuccess" jdbcType="TINYINT" />
+        <result column="last_login_remark" property="lastLoginRemark" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="creator_id" property="creatorId" jdbcType="BIGINT" />
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        user_id, username, password, role, phone_no, status, work_status, fail_count, last_login_time, last_login_ip, last_login_success, last_login_remark, create_time, creator_id, update_time
+    </sql>
+
+    <insert id="insert" parameterType="com.thirdgroup.cdms.entity.User">
+        INSERT INTO cdms_user (
+            user_id, username, password, role, phone_no, status, work_status, fail_count, last_login_time, last_login_ip, last_login_success, last_login_remark, create_time, creator_id, update_time
+        )
+        VALUES (
+            #{ userId,jdbcType=BIGINT },
+            #{ username,jdbcType=VARCHAR },
+            #{ password,jdbcType=VARCHAR },
+            #{ role,jdbcType=TINYINT },
+            #{ phoneNo,jdbcType=VARCHAR },
+            #{ status,jdbcType=TINYINT },
+            #{ workStatus,jdbcType=TINYINT },
+            #{ failCount,jdbcType=INTEGER },
+            #{ lastLoginTime,jdbcType=TIMESTAMP },
+            #{ lastLoginIp,jdbcType=VARCHAR },
+            #{ lastLoginSuccess,jdbcType=TINYINT },
+            #{ lastLoginRemark,jdbcType=VARCHAR },
+            #{ createTime,jdbcType=TIMESTAMP },
+            #{ creatorId,jdbcType=BIGINT },
+            #{ updateTime,jdbcType=TIMESTAMP }
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM cdms_user
+        WHERE user_id = #{ userId,jdbcType=BIGINT }
+    </delete>
+
+    <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.entity.User">
+        UPDATE cdms_user
+        SET
+            username = #{ username,jdbcType=VARCHAR },
+            password = #{ password,jdbcType=VARCHAR },
+            role = #{ role,jdbcType=TINYINT },
+            phone_no = #{ phoneNo,jdbcType=VARCHAR },
+            status = #{ status,jdbcType=TINYINT },
+            work_status = #{ workStatus,jdbcType=TINYINT },
+            fail_count = #{ failCount,jdbcType=INTEGER },
+            last_login_time = #{ lastLoginTime,jdbcType=TIMESTAMP },
+            last_login_ip = #{ lastLoginIp,jdbcType=VARCHAR },
+            last_login_success = #{ lastLoginSuccess,jdbcType=TINYINT },
+            last_login_remark = #{ lastLoginRemark,jdbcType=VARCHAR },
+            create_time = #{ createTime,jdbcType=TIMESTAMP },
+            creator_id = #{ creatorId,jdbcType=BIGINT },
+            update_time = #{ updateTime,jdbcType=TIMESTAMP }
+        WHERE user_id = #{ userId,jdbcType=BIGINT }
+    </update>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM cdms_user
+        WHERE user_id = #{ userId,jdbcType=BIGINT }
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM cdms_user
+    </select>
+</mapper>
