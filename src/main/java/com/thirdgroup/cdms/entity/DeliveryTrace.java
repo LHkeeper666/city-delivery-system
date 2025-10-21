@@ -39,5 +39,4 @@ public class DeliveryTrace {
      * remark
      */
     private String remark;
-
 }

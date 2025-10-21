@@ -27,7 +27,7 @@ CREATE TABLE cdms.cdms_user (
 
     FOREIGN KEY (creator_id) REFERENCES cdms_user(user_id),
 
-    CHECK (role IN (0,1)),
+        CHECK (role IN (0,1)),
     CHECK (status IN (0,1,2)),
     CHECK (work_status IN (0,1,2))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表（含上次登录信息）';

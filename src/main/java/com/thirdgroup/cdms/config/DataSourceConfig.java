@@ -22,6 +22,7 @@ import javax.sql.DataSource;
 @Configuration
 @ComponentScan(basePackages = {
         "com.thirdgroup.cdms.service"
+//        ,"com.thirdgroup.cdms.mapper"
 })
 @MapperScan("com.thirdgroup.cdms.mapper")
 public class DataSourceConfig {
@@ -51,7 +52,7 @@ public class DataSourceConfig {
     public DataSource dataSource() {
         DruidDataSource ds = new DruidDataSource();
         ds.setDriverClassName("org.h2.Driver");
-        ds.setUrl("jdbc:h2:mem:cdms;DB_CLOSE_DELAY=-1;MODE=MySQL;DATABASE_TO_UPPER=false    ");
+        ds.setUrl("jdbc:h2:mem:cdms;DB_CLOSE_DELAY=-1;MODE=MySQL;DATABASE_TO_UPPER=false");
         ds.setUsername("sa");
         ds.setPassword("");
 
@@ -94,6 +95,8 @@ public class DataSourceConfig {
                 new org.apache.ibatis.session.Configuration();
         configuration.setMapUnderscoreToCamelCase(true);
         configuration.setLogImpl(org.apache.ibatis.logging.stdout.StdOutImpl.class);
+
+        factory.setConfiguration(configuration);
 
         return factory.getObject();
     }
