@@ -32,7 +32,7 @@ CREATE TABLE cdms_user (
 -- ============================================
 -- 配送订单表：delivery_order
 -- ============================================
-CREATE TABLE delivery_order (
+CREATE TABLE cdms_delivery_order (
     order_id VARCHAR(30) PRIMARY KEY,
 
     sender_name VARCHAR(50) NOT NULL,
@@ -57,8 +57,8 @@ CREATE TABLE delivery_order (
     complete_time TIMESTAMP,
     cancel_time TIMESTAMP,
 
-    FOREIGN KEY (creator_id) REFERENCES user(user_id),
-    FOREIGN KEY (deliveryman_id) REFERENCES user(user_id),
+    FOREIGN KEY (creator_id) REFERENCES cdms_user(user_id),
+    FOREIGN KEY (deliveryman_id) REFERENCES cdms_user(user_id),
 
     CHECK (status IN (0,1,2,3,4,5))
 );
@@ -66,7 +66,7 @@ CREATE TABLE delivery_order (
 -- ============================================
 -- 配送追踪表：delivery_trace
 -- ============================================
-CREATE TABLE delivery_trace (
+CREATE TABLE cdms_delivery_trace (
     trace_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     order_id VARCHAR(30) NOT NULL,
     status TINYINT DEFAULT 0,
@@ -74,8 +74,8 @@ CREATE TABLE delivery_trace (
     operate_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     remark VARCHAR(255),
 
-    FOREIGN KEY (order_id) REFERENCES delivery_order(order_id),
-    FOREIGN KEY (operator_id) REFERENCES user(user_id),
+    FOREIGN KEY (order_id) REFERENCES cdms_delivery_order(order_id),
+    FOREIGN KEY (operator_id) REFERENCES cdms_user(user_id),
 
     CHECK (status IN (0,1,2,3,4,5))
 );
@@ -83,7 +83,7 @@ CREATE TABLE delivery_trace (
 -- ============================================
 -- 通知表：notification
 -- ============================================
-CREATE TABLE notification (
+CREATE TABLE cdms_notification (
     id VARCHAR(32) PRIMARY KEY,
     deliveryman_id BIGINT NOT NULL,
     content VARCHAR(500) NOT NULL,
@@ -92,7 +92,7 @@ CREATE TABLE notification (
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     sms_sent TINYINT NOT NULL DEFAULT 0,
 
-    FOREIGN KEY (deliveryman_id) REFERENCES user(user_id)
+    FOREIGN KEY (deliveryman_id) REFERENCES cdms_user(user_id)
       ON UPDATE CASCADE
       ON DELETE CASCADE,
 
@@ -104,7 +104,7 @@ CREATE TABLE notification (
 -- ============================================
 -- 操作日志表：operation_log
 -- ============================================
-CREATE TABLE operation_log (
+CREATE TABLE cdms_operation_log (
     log_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     operator_id BIGINT NOT NULL,
     operation_type VARCHAR(50) NOT NULL,
@@ -112,13 +112,13 @@ CREATE TABLE operation_log (
     operation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     result VARCHAR(100),
 
-    FOREIGN KEY (operator_id) REFERENCES user(user_id)
+    FOREIGN KEY (operator_id) REFERENCES cdms_user(user_id)
 );
 
 -- ============================================
 -- 第三方接口密钥表：api_key
 -- ============================================
-CREATE TABLE api_key (
+CREATE TABLE cdms_api_key (
     key_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     app_name VARCHAR(100) NOT NULL,
     api_key VARCHAR(100) NOT NULL UNIQUE,

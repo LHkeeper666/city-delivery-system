@@ -2,7 +2,7 @@ CREATE SCHEMA IF NOT EXISTS cdms;
 -- =========================
 -- 用户表：user
 -- =========================
-CREATE TABLE cdms.user (
+CREATE TABLE cdms.cdms_user (
     user_id        BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '用户ID',
     username       VARCHAR(50) NOT NULL UNIQUE COMMENT '用户名（唯一）',
     password       VARCHAR(255) NOT NULL COMMENT '加密后的密码',
@@ -25,7 +25,7 @@ CREATE TABLE cdms.user (
     creator_id     BIGINT DEFAULT NULL COMMENT '创建人ID（管理员）',
     update_time    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
 
-    FOREIGN KEY (creator_id) REFERENCES user(user_id),
+    FOREIGN KEY (creator_id) REFERENCES cdms_user(user_id),
 
     CHECK (role IN (0,1)),
     CHECK (status IN (0,1,2)),
@@ -35,7 +35,7 @@ CREATE TABLE cdms.user (
 -- =========================
 -- 配送订单表：delivery_order
 -- =========================
-CREATE TABLE cdms.delivery_order (
+CREATE TABLE cdms.cdms_delivery_order (
     order_id         VARCHAR(30) PRIMARY KEY COMMENT '订单编号',
 
     sender_name      VARCHAR(50) NOT NULL COMMENT '寄件人姓名',
@@ -60,8 +60,8 @@ CREATE TABLE cdms.delivery_order (
     complete_time    DATETIME DEFAULT NULL COMMENT '完成时间',
     cancel_time      DATETIME DEFAULT NULL COMMENT '取消时间',
 
-    FOREIGN KEY (creator_id) REFERENCES user(user_id),
-    FOREIGN KEY (deliveryman_id) REFERENCES user(user_id),
+    FOREIGN KEY (creator_id) REFERENCES cdms_user(user_id),
+    FOREIGN KEY (deliveryman_id) REFERENCES cdms_user(user_id),
 
     CHECK (status IN (0,1,2,3,4,5))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='配送订单表';
@@ -69,31 +69,31 @@ CREATE TABLE cdms.delivery_order (
 -- =========================
 -- 配送追踪表：delivery_trace
 -- =========================
-CREATE TABLE cdms.delivery_trace (
+CREATE TABLE cdms.cdms_delivery_trace (
     trace_id        BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '追踪记录ID',
     order_id        VARCHAR(30) NOT NULL COMMENT '配送单编号',
     status           TINYINT DEFAULT 0 COMMENT '订单状态：0-待接单，1-已接单待取货，2-配送中，3-已完成，4-已取消, 5-放弃待审核',
     operator_id     BIGINT NOT NULL COMMENT '操作人（管理员或配送员）',
     operate_time    DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '操作时间',
     remark          VARCHAR(255) DEFAULT NULL COMMENT '状态变更说明',
-    FOREIGN KEY (order_id) REFERENCES delivery_order(order_id),
-    FOREIGN KEY (operator_id) REFERENCES user(user_id),
+    FOREIGN KEY (order_id) REFERENCES cdms_delivery_order(order_id),
+    FOREIGN KEY (operator_id) REFERENCES cdms_user(user_id),
     CHECK (status IN (0,1,2,3,4,5))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='配送单状态追踪表';
 
 -- =========================
 -- 通知表：notification
 -- =========================
-CREATE TABLE cdms.notification (
+CREATE TABLE cdms.cdms_notification (
     id                VARCHAR(32) PRIMARY KEY COMMENT '通知ID（格式：NT + 日期 + 序号）',
-    deliveryman_id   VARCHAR(32) NOT NULL COMMENT '配送员ID（外键，关联 delivery_man.id）',
+    deliveryman_id    BIGINT NOT NULL COMMENT '配送员ID（外键，关联 delivery_man.id）',
     content           VARCHAR(500) NOT NULL COMMENT '通知内容（如：您的放弃订单申请已通过，订单已重回待接单池）',
     type              TINYINT NOT NULL COMMENT '通知类型（0 = 管理员操作通知，1 = 订单状态通知）',
     is_read           TINYINT NOT NULL DEFAULT 0 COMMENT '是否已读（0 = 未读，1 = 已读）',
     create_time       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间（默认当前时间）',
     sms_sent          TINYINT NOT NULL DEFAULT 0 COMMENT '是否发送短信（0 = 未发送，1 = 已发送）',
 
-    FOREIGN KEY (deliveryman_id) REFERENCES delivery_man(id)
+    FOREIGN KEY (deliveryman_id) REFERENCES cdms_user(user_id)
        ON UPDATE CASCADE
        ON DELETE CASCADE,
 
@@ -105,20 +105,20 @@ CREATE TABLE cdms.notification (
 -- =========================
 -- 操作日志表：operation_log（选做）
 -- =========================
-CREATE TABLE cdms.operation_log (
+CREATE TABLE cdms.cdms_operation_log (
     log_id           BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '操作日志ID',
     operator_id      BIGINT NOT NULL COMMENT '操作者ID（管理员）',
     operation_type   VARCHAR(50) NOT NULL COMMENT '操作类型，如CREATE_USER、DELETE_ORDER',
     operation_obj    VARCHAR(100) DEFAULT NULL COMMENT '被操作对象标识，如user_id或order_id',
     operation_time   DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '操作时间',
     result           VARCHAR(100) DEFAULT NULL COMMENT '结果描述，如成功/失败原因',
-    FOREIGN KEY (operator_id) REFERENCES user(user_id)
+    FOREIGN KEY (operator_id) REFERENCES cdms_user(user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统操作日志表';
 
 -- =========================
 -- 第三方接口密钥表：api_key（选做）
 -- =========================
-CREATE TABLE cdms.api_key (
+CREATE TABLE cdms.cdms_api_key (
     key_id        BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT 'API密钥ID',
     app_name      VARCHAR(100) NOT NULL COMMENT '应用名称',
     api_key       VARCHAR(100) NOT NULL UNIQUE COMMENT '接口密钥',
