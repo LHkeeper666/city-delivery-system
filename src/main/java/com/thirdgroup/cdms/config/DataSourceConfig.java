@@ -4,6 +4,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -20,18 +21,18 @@ import javax.sql.DataSource;
  */
 @Configuration
 @ComponentScan(basePackages = {
-        "com.thirdgroup.cdms.service",
-        "com.thirdgroup.cdms.mapper"
+        "com.thirdgroup.cdms.service"
 })
+@MapperScan("com.thirdgroup.cdms.mapper")
 public class DataSourceConfig {
 
 //    @Bean
 //    public DataSource dataSource() {
 //        DruidDataSource ds = new DruidDataSource();
 //        ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
-//        ds.setUrl("jdbc:mysql://localhost:3306/city_delivery?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai");
+//        ds.setUrl("jdbc:mysql://localhost:3306/cdms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai");
 //        ds.setUsername("root");
-//        ds.setPassword("123456");
+//        ds.setPassword("new_password");
 //
 //        // ========== 连接池配置 ==========
 //        ds.setInitialSize(5);    // 初始连接数
@@ -50,7 +51,7 @@ public class DataSourceConfig {
     public DataSource dataSource() {
         DruidDataSource ds = new DruidDataSource();
         ds.setDriverClassName("org.h2.Driver");
-        ds.setUrl("jdbc:h2:mem:cdms;DB_CLOSE_DELAY=-1;MODE=MySQL");
+        ds.setUrl("jdbc:h2:mem:cdms;DB_CLOSE_DELAY=-1;MODE=MySQL;DATABASE_TO_UPPER=false    ");
         ds.setUsername("sa");
         ds.setPassword("");
 
@@ -65,8 +66,11 @@ public class DataSourceConfig {
     @Bean
     public DataSourceInitializer dataSourceInitializer(DataSource dataSource) {
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+
         populator.addScript(new ClassPathResource("schema.sql")); // 确保路径正确
-//        populator.addScript(new ClassPathResource("data.sql"));
+
+        populator.addScript(new ClassPathResource("data.sql"));
+
         DataSourceInitializer initializer = new DataSourceInitializer();
         initializer.setDataSource(dataSource);
         initializer.setDatabasePopulator(populator);
