@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.thirdgroup.cdms.mapper.DeliveryTraceMapper">
-    <resultMap id="BaseResultMap" type="com.thirdgroup.cdms.entity.DeliveryTrace">
+    <resultMap id="BaseResultMap" type="com.thirdgroup.cdms.model.DeliveryTrace">
         <id column="trace_id" property="traceId" jdbcType="BIGINT" />
         <result column="order_id" property="orderId" jdbcType="VARCHAR" />
         <result column="status" property="status" jdbcType="TINYINT" />
@@ -14,7 +14,7 @@
         trace_id, order_id, status, operator_id, operate_time, remark
     </sql>
 
-    <insert id="insert" parameterType="com.thirdgroup.cdms.entity.DeliveryTrace">
+    <insert id="insert" parameterType="com.thirdgroup.cdms.model.DeliveryTrace">
         INSERT INTO cdms_delivery_trace (
             trace_id, order_id, status, operator_id, operate_time, remark
         )
@@ -33,7 +33,7 @@
         WHERE trace_id = #{ traceId,jdbcType=BIGINT }
     </delete>
 
-    <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.entity.DeliveryTrace">
+    <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.model.DeliveryTrace">
         UPDATE cdms_delivery_trace
         SET
             order_id = #{ orderId,jdbcType=VARCHAR },

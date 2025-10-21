@@ -1,5 +1,5 @@
 
-package com.thirdgroup.cdms.entity;
+package com.thirdgroup.cdms.model;
 
 import lombok.Data;
 import java.util.Date;

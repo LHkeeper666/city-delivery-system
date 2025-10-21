@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.thirdgroup.cdms.mapper.DeliveryOrder">
-    <resultMap id="BaseResultMap" type="com.thirdgroup.cdms.entity.DeliveryOrder">
+<mapper namespace="com.thirdgroup.cdms.mapper.DeliveryOrderMapper">
+    <resultMap id="BaseResultMap" type="com.thirdgroup.cdms.model.DeliveryOrder">
         <id column="order_id" property="orderId" jdbcType="VARCHAR" />
         <result column="sender_name" property="senderName" jdbcType="VARCHAR" />
         <result column="sender_phone" property="senderPhone" jdbcType="VARCHAR" />
@@ -27,7 +27,7 @@
         order_id, sender_name, sender_phone, sender_address, consignee_name, consignee_phone, consignee_address, goods_type, weight, volume, delivery_fee, expected_mins, remark, status, create_time, creator_id, deliveryman_id, complete_time, cancel_time
     </sql>
 
-    <insert id="insert" parameterType="com.thirdgroup.cdms.entity.DeliveryOrder">
+    <insert id="insert" parameterType="com.thirdgroup.cdms.model.DeliveryOrder">
         INSERT INTO cdms_delivery_order (
             order_id, sender_name, sender_phone, sender_address, consignee_name, consignee_phone, consignee_address, goods_type, weight, volume, delivery_fee, expected_mins, remark, status, create_time, creator_id, deliveryman_id, complete_time, cancel_time
         )
@@ -59,7 +59,7 @@
         WHERE order_id = #{ orderId,jdbcType=VARCHAR }
     </delete>
 
-    <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.entity.DeliveryOrder">
+    <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.model.DeliveryOrder">
         UPDATE cdms_delivery_order
         SET
             sender_name = #{ senderName,jdbcType=VARCHAR },

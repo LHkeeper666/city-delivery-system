@@ -1,7 +1,7 @@
 
 package com.thirdgroup.cdms.mapper;
 
-import com.thirdgroup.cdms.entity.ApiKey;
+import com.thirdgroup.cdms.model.ApiKey;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 

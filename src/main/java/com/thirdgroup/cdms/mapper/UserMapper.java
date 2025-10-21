@@ -1,7 +1,7 @@
 
 package com.thirdgroup.cdms.mapper;
 
-import com.thirdgroup.cdms.entity.User;
+import com.thirdgroup.cdms.model.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 

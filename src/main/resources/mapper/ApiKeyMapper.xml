@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.thirdgroup.cdms.mapper.ApiKeyMapper">
-    <resultMap id="BaseResultMap" type="com.thirdgroup.cdms.entity.ApiKey">
+    <resultMap id="BaseResultMap" type="com.thirdgroup.cdms.model.ApiKey">
         <id column="key_id" property="keyId" jdbcType="BIGINT" />
         <result column="app_name" property="appName" jdbcType="VARCHAR" />
         <result column="api_key" property="apiKey" jdbcType="VARCHAR" />
@@ -13,7 +13,7 @@
         key_id, app_name, api_key, status, create_time
     </sql>
 
-    <insert id="insert" parameterType="com.thirdgroup.cdms.entity.ApiKey">
+    <insert id="insert" parameterType="com.thirdgroup.cdms.model.ApiKey">
         INSERT INTO cdms_api_key (
             key_id, app_name, api_key, status, create_time
         )
@@ -31,7 +31,7 @@
         WHERE key_id = #{ keyId,jdbcType=BIGINT }
     </delete>
 
-    <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.entity.ApiKey">
+    <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.model.ApiKey">
         UPDATE cdms_api_key
         SET
             app_name = #{ appName,jdbcType=VARCHAR },

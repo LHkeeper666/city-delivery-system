@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.thirdgroup.cdms.mapper.NotificationMapper">
-    <resultMap id="BaseResultMap" type="com.thirdgroup.cdms.entity.Notification">
+    <resultMap id="BaseResultMap" type="com.thirdgroup.cdms.model.Notification">
         <id column="id" property="id" jdbcType="VARCHAR" />
         <result column="deliveryman_id" property="deliverymanId" jdbcType="BIGINT" />
         <result column="content" property="content" jdbcType="VARCHAR" />
@@ -15,7 +15,7 @@
         id, deliveryman_id, content, type, is_read, create_time, sms_sent
     </sql>
 
-    <insert id="insert" parameterType="com.thirdgroup.cdms.entity.Notification">
+    <insert id="insert" parameterType="com.thirdgroup.cdms.model.Notification">
         INSERT INTO cdms_notification (
             id, deliveryman_id, content, type, is_read, create_time, sms_sent
         )
@@ -35,7 +35,7 @@
         WHERE id = #{ id,jdbcType=VARCHAR }
     </delete>
 
-    <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.entity.Notification">
+    <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.model.Notification">
         UPDATE cdms_notification
         SET
             deliveryman_id = #{ deliverymanId,jdbcType=BIGINT },

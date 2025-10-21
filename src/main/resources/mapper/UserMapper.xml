@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.thirdgroup.cdms.mapper.UserMapper">
-    <resultMap id="BaseResultMap" type="com.thirdgroup.cdms.entity.User">
+    <resultMap id="BaseResultMap" type="com.thirdgroup.cdms.model.User">
         <id column="user_id" property="userId" jdbcType="BIGINT" />
         <result column="username" property="username" jdbcType="VARCHAR" />
         <result column="password" property="password" jdbcType="VARCHAR" />
@@ -23,7 +23,7 @@
         user_id, username, password, role, phone_no, status, work_status, fail_count, last_login_time, last_login_ip, last_login_success, last_login_remark, create_time, creator_id, update_time
     </sql>
 
-    <insert id="insert" parameterType="com.thirdgroup.cdms.entity.User">
+    <insert id="insert" parameterType="com.thirdgroup.cdms.model.User">
         INSERT INTO cdms_user (
             user_id, username, password, role, phone_no, status, work_status, fail_count, last_login_time, last_login_ip, last_login_success, last_login_remark, create_time, creator_id, update_time
         )
@@ -51,7 +51,7 @@
         WHERE user_id = #{ userId,jdbcType=BIGINT }
     </delete>
 
-    <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.entity.User">
+    <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.model.User">
         UPDATE cdms_user
         SET
             username = #{ username,jdbcType=VARCHAR },

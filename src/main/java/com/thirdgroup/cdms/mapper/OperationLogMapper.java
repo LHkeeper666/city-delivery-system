@@ -1,7 +1,7 @@
 
 package com.thirdgroup.cdms.mapper;
 
-import com.thirdgroup.cdms.entity.OperationLog;
+import com.thirdgroup.cdms.model.OperationLog;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
