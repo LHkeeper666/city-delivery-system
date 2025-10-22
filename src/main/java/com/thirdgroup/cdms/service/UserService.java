@@ -1,6 +1,6 @@
 package com.thirdgroup.cdms.service;
 
-import com.thirdgroup.cdms.entity.User;
+import com.thirdgroup.cdms.model.User;
 
 /**
  * user 表的 Service

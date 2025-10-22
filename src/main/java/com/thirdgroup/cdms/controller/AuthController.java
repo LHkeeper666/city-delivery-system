@@ -1,6 +1,6 @@
 package com.thirdgroup.cdms.controller;
 
-import com.thirdgroup.cdms.entity.User;
+import com.thirdgroup.cdms.model.User;
 import com.thirdgroup.cdms.exception.LoginException;
 import com.thirdgroup.cdms.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
