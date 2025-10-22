@@ -1,4 +1,4 @@
-package com.thirdgroup.cdms.util;
+package com.thirdgroup.cdms.utils;
 
 public class Result<T> {
     // 状态码：200=成功，400=参数错误，500=服务器错误等

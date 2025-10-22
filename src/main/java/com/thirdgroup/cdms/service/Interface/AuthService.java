@@ -1,4 +1,4 @@
-package com.thirdgroup.cdms.service;
+package com.thirdgroup.cdms.service.Interface;
 
 import com.thirdgroup.cdms.model.User;
 import com.thirdgroup.cdms.exception.LoginException;

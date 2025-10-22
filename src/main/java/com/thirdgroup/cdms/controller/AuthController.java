@@ -2,7 +2,7 @@ package com.thirdgroup.cdms.controller;
 
 import com.thirdgroup.cdms.model.User;
 import com.thirdgroup.cdms.exception.LoginException;
-import com.thirdgroup.cdms.service.AuthService;
+import com.thirdgroup.cdms.service.Interface.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

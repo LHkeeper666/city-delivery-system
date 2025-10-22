@@ -1,4 +1,4 @@
-package com.thirdgroup.cdms.enums;
+package com.thirdgroup.cdms.model.enums;
 
 /**
  * 账号状态枚举类

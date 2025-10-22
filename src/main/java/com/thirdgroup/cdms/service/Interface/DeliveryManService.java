@@ -1,7 +1,7 @@
 package com.thirdgroup.cdms.service.Interface;
 
 import com.thirdgroup.cdms.model.DeliveryOrder;
-import com.thirdgroup.cdms.util.Result;
+import com.thirdgroup.cdms.utils.Result;
 
 import java.util.List;
 
