@@ -13,6 +13,31 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     @Override
+    public User login(String username, String password) {
+        return null;
+    }
+
+    @Override
+    public User getUserById(Long userId) {
+        return null;
+    }
+
+    @Override
+    public Long createUser(User user) {
+        return 0L;
+    }
+
+    @Override
+    public void updateStatus(Long userId, Integer status) {
+
+    }
+
+    @Override
+    public boolean updatePassword(Long userId, String oldPwd, String newPwd) {
+        return false;
+    }
+
+    @Override
     public User findByUsername(String username) {
         return userMapper.selectByUsername(username);
     }

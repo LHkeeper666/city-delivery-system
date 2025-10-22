@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
-//可能push的时候有一个文件也叫usermapper
+
 @Mapper
 public interface UserMapper {
     int insert(User record);
