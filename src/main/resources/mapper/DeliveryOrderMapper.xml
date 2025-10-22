@@ -95,7 +95,7 @@
     </select><!--    后面区分一下select count-->
 
     <!-- 分页查询当前页数据 -->
-    <select id="selectPage" resultType="DeliveryOrder">
+    <select id="selectPage" resultType="com.thirdgroup.cdms.model.DeliveryOrder">
         SELECT * FROM delivery_order
         <where>
             <!-- 动态条件：状态筛选 -->

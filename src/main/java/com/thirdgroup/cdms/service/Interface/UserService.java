@@ -26,6 +26,9 @@ public interface UserService {
      */
     User findByUsername(String username);
 
+    static User findById(long id) {
+        return null;
+    }
 
 
 }
