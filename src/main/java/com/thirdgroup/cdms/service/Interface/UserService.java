@@ -17,10 +17,7 @@ public interface UserService {
     void updateStatus(Long userId, Integer status);
     // 修改密码（支持所有用户自我修改）
     boolean updatePassword(Long userId, String oldPwd, String newPwd);
-    /**
-     * 根据用户名查找用户信息
-     */
-    //
+
     /**
      * 根据用户名查找用户信息
      */
@@ -30,5 +27,8 @@ public interface UserService {
         return null;
     }
 
-
+    /**
+     * 更新登录相关的用户信息
+     */
+    void updateLoginInfo(Long userId, int failCount, String ip, boolean success, String remark);
 }

@@ -17,5 +17,5 @@ public interface AuthService {
      * @param password 密码
      * @return 相应的 user 实体
      */
-    User login(String username, String password) throws LoginException;
+    User login(String username, String password, String ip) throws LoginException;
 }

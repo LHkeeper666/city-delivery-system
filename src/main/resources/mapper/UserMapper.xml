@@ -87,4 +87,15 @@
         FROM cdms_user
         WHERE username = #{ username,jdbcType=VARCHAR }
     </select>
+
+    <update id="updateLoginInfoById">
+        UPDATE cdms_user
+        SET
+            fail_count = #{failCount, jdbcType=INTEGER},
+            last_login_ip = #{ip, jdbcType=VARCHAR},
+            last_login_success = #{success, jdbcType=TINYINT},
+            last_login_remark = #{remark, jdbcType=VARCHAR},
+            last_login_time = NOW()
+        WHERE user_id = #{userId, jdbcType=BIGINT}
+    </update>
 </mapper>

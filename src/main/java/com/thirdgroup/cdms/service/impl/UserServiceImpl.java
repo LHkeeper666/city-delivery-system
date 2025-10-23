@@ -41,4 +41,9 @@ public class UserServiceImpl implements UserService {
     public User findByUsername(String username) {
         return userMapper.selectByUsername(username);
     }
+
+    @Override
+    public void updateLoginInfo(Long userId, int failCount, String ip, boolean success, String remark) {
+        userMapper.updateLoginInfoById(userId, failCount, ip, success, remark);
+    }
 }
