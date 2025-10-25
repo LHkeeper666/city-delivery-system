@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thirdgroup.cdms.mapper.DeliverymanMapper">
+    <!-- 通用查询：查所有字段,这里需要重构，没有写完 -->
+    <sql id="BaseColumnList">
+        id, name, phone, password, status, avatar, balance, create_time
+    </sql>
+
+    <!-- 根据ID查外卖员 -->
+    <select id="selectById" resultType="com.thirdgroup.cdms.model.Deliveryman">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM cdms_user
+        WHERE id = #{id}
+    </select>
+
+    <!-- 根据手机号查外卖员（登录用） -->
+    <select id="selectByPhone" resultType="com.thirdgroup.cdms.model.Deliveryman">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM cdms_user
+        WHERE phone = #{phone}
+    </select>
+
+    <!-- 更新外卖员状态 -->
+    <update id="updateStatus">
+        UPDATE cdms_user
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 更新外卖员信息（个人中心用，只更姓名、头像） -->
+    <update id="updateProfile">
+        UPDATE cdms_user
+        <set>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="avatar != null and avatar != ''">avatar = #{avatar},</if>
+            <if test="phone != null and phone != ''">phone = #{phone},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 更新余额（完成订单加收益） -->
+    <update id="updateBalance">
+        UPDATE cdms_user
+        SET balance = balance + #{addProfit}
+        WHERE id = #{id}
+    </update>
+</mapper>

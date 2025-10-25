@@ -1,14 +1,26 @@
 package com.thirdgroup.cdms.service.Interface;
 
 import com.thirdgroup.cdms.model.DeliveryOrder;
+import com.thirdgroup.cdms.model.enums.OrderStatus;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
+/**
+ * 订单Service接口：定义订单相关业务
+ */
 public interface OrderService {
-    // 根据订单号查询订单详情（供管理员和配送员查看）
-    DeliveryOrder getOrderByNo(String orderId);
-    // 更新订单状态（通用方法，被接单、完成、取消等操作调用）
-    int updateOrderStatus(String orderId, Integer status, LocalDateTime time);
-    // 生成唯一订单号（规则：前缀+时间戳+随机数）
-    String generateOrderNo();
+    // 1. 获取待接单订单列表
+    List<DeliveryOrder> getPendingOrders();
+
+    // 2. 接单：给订单分配外卖员，更新订单状态
+    boolean acceptOrder(Integer orderId, Integer courierId);
+
+    // 3. 更新订单状态（确认取餐/送达）
+    boolean updateOrderStatus(Integer orderId, OrderStatus targetStatus);
+
+    // 4. 获取外卖员的配送中订单
+    List<DeliveryOrder> getDeliveringByCourierId(Integer courierId);
+
+    // 5. 根据ID查订单
+    DeliveryOrder getById(Integer orderId);
 }

@@ -30,5 +30,8 @@ public enum OrderStatus {
             if (status.code == code) return status;
         }
         throw new IllegalArgumentException("未知订单状态: " + code);
+        /**
+         * 这个比return null好一些
+         */
     }
 }

@@ -35,6 +35,9 @@ CREATE TABLE cdms.cdms_user (
 -- =========================
 -- 配送订单表：delivery_order
 -- =========================
+/**
+  这里我建议补充一个距离distance比较好
+ */
 CREATE TABLE cdms.cdms_delivery_order (
     order_id         VARCHAR(30) PRIMARY KEY COMMENT '订单编号',
 
