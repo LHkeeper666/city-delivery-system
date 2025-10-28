@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.thirdgroup.cdms.mapper.DeliveryOrderMapper">
+    <!-- 基础结果集：仅映射数据库存在的字段 -->
     <resultMap id="BaseResultMap" type="com.thirdgroup.cdms.model.DeliveryOrder">
         <id column="order_id" property="orderId" jdbcType="VARCHAR" />
         <result column="sender_name" property="senderName" jdbcType="VARCHAR" />
@@ -25,85 +26,100 @@
         <result column="cancel_time" property="cancelTime" jdbcType="TIMESTAMP" />
     </resultMap>
 
+    <!-- 基础字段列表：仅包含数据库存在的字段 -->
     <sql id="Base_Column_List">
-        order_id, sender_name, sender_phone, sender_address, consignee_name, consignee_phone, consignee_address, goods_type, weight, volume, delivery_fee, expected_mins, remark, status, create_time, creator_id, deliveryman_id, complete_time, cancel_time
+        order_id, sender_name, sender_phone, sender_address, consignee_name, consignee_phone,
+        consignee_address, goods_type, weight, volume, delivery_fee, platform_income,
+        deliveryman_income, expected_mins, remark, status, create_time, creator_id,
+        deliveryman_id, complete_time, cancel_time
     </sql>
 
+    <!-- 新增订单 -->
     <insert id="insert" parameterType="com.thirdgroup.cdms.model.DeliveryOrder">
         INSERT INTO cdms_delivery_order (
-            order_id, sender_name, sender_phone, sender_address, consignee_name, consignee_phone, consignee_address, goods_type, weight, volume, delivery_fee, expected_mins, remark, status, create_time, creator_id, deliveryman_id, complete_time, cancel_time
-        )
-        VALUES (
-            #{ orderId,jdbcType=VARCHAR },
-            #{ senderName,jdbcType=VARCHAR },
-            #{ senderPhone,jdbcType=VARCHAR },
-            #{ senderAddress,jdbcType=VARCHAR },
-            #{ consigneeName,jdbcType=VARCHAR },
-            #{ consigneePhone,jdbcType=VARCHAR },
-            #{ consigneeAddress,jdbcType=VARCHAR },
-            #{ goodsType,jdbcType=VARCHAR },
-            #{ weight,jdbcType=DECIMAL },
-            #{ volume,jdbcType=DECIMAL },
-            #{ deliveryFee,jdbcType=DECIMAL },
-            #{ expectedMins,jdbcType=INTEGER },
-            #{ remark,jdbcType=VARCHAR },
-            #{ status,jdbcType=TINYINT },
-            #{ createTime,jdbcType=TIMESTAMP },
-            #{ creatorId,jdbcType=BIGINT },
-            #{ deliverymanId,jdbcType=BIGINT },
-            #{ completeTime,jdbcType=TIMESTAMP },
-            #{ cancelTime,jdbcType=TIMESTAMP }
-        )
+            order_id, sender_name, sender_phone, sender_address, consignee_name, consignee_phone,
+            consignee_address, goods_type, weight, volume, delivery_fee, platform_income,
+            deliveryman_income, expected_mins, remark, status, create_time, creator_id,
+            deliveryman_id, complete_time, cancel_time
+        ) VALUES (
+                     #{orderId,jdbcType=VARCHAR},
+                     #{senderName,jdbcType=VARCHAR},
+                     #{senderPhone,jdbcType=VARCHAR},
+                     #{senderAddress,jdbcType=VARCHAR},
+                     #{consigneeName,jdbcType=VARCHAR},
+                     #{consigneePhone,jdbcType=VARCHAR},
+                     #{consigneeAddress,jdbcType=VARCHAR},
+                     #{goodsType,jdbcType=VARCHAR},
+                     #{weight,jdbcType=DECIMAL},
+                     #{volume,jdbcType=DECIMAL},
+                     #{deliveryFee,jdbcType=DECIMAL},
+                     #{platformIncome,jdbcType=DECIMAL},
+                     #{deliverymanIncome,jdbcType=DECIMAL},
+                     #{expectedMins,jdbcType=INTEGER},
+                     #{remark,jdbcType=VARCHAR},
+                     #{status,jdbcType=TINYINT},
+                     #{createTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+                     #{creatorId,jdbcType=BIGINT},
+                     #{deliverymanId,jdbcType=BIGINT},
+                     #{completeTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+                     #{cancelTime,jdbcType=TIMESTAMP,javaType=java.util.Date}
+                 )
     </insert>
 
+    <!-- 删除订单 -->
     <delete id="deleteByPrimaryKey">
         DELETE FROM cdms_delivery_order
         WHERE order_id = #{ orderId,jdbcType=VARCHAR }
     </delete>
 
+    <!-- 更新订单 -->
     <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.model.DeliveryOrder">
         UPDATE cdms_delivery_order
         SET
-            sender_name = #{ senderName,jdbcType=VARCHAR },
-            sender_phone = #{ senderPhone,jdbcType=VARCHAR },
-            sender_address = #{ senderAddress,jdbcType=VARCHAR },
-            consignee_name = #{ consigneeName,jdbcType=VARCHAR },
-            consignee_phone = #{ consigneePhone,jdbcType=VARCHAR },
-            consignee_address = #{ consigneeAddress,jdbcType=VARCHAR },
-            goods_type = #{ goodsType,jdbcType=VARCHAR },
-            weight = #{ weight,jdbcType=DECIMAL },
-            volume = #{ volume,jdbcType=DECIMAL },
-            delivery_fee = #{ deliveryFee,jdbcType=DECIMAL },
-            expected_mins = #{ expectedMins,jdbcType=INTEGER },
-            remark = #{ remark,jdbcType=VARCHAR },
-            status = #{ status,jdbcType=TINYINT },
-            create_time = #{ createTime,jdbcType=TIMESTAMP },
-            creator_id = #{ creatorId,jdbcType=BIGINT },
-            deliveryman_id = #{ deliverymanId,jdbcType=BIGINT },
-            complete_time = #{ completeTime,jdbcType=TIMESTAMP },
-            cancel_time = #{ cancelTime,jdbcType=TIMESTAMP }
-        WHERE order_id = #{ orderId,jdbcType=VARCHAR }
+            sender_name = #{senderName,jdbcType=VARCHAR},
+            sender_phone = #{senderPhone,jdbcType=VARCHAR},
+            sender_address = #{senderAddress,jdbcType=VARCHAR},
+            consignee_name = #{consigneeName,jdbcType=VARCHAR},
+            consignee_phone = #{consigneePhone,jdbcType=VARCHAR},
+            consignee_address = #{consigneeAddress,jdbcType=VARCHAR},
+            goods_type = #{goodsType,jdbcType=VARCHAR},
+            weight = #{weight,jdbcType=DECIMAL},
+            volume = #{volume,jdbcType=DECIMAL},
+            delivery_fee = #{deliveryFee,jdbcType=DECIMAL},
+            platform_income = #{platformIncome,jdbcType=DECIMAL},
+            deliveryman_income = #{deliverymanIncome,jdbcType=DECIMAL},
+            expected_mins = #{expectedMins,jdbcType=INTEGER},
+            remark = #{remark,jdbcType=VARCHAR},
+            status = #{status,jdbcType=TINYINT},
+            create_time = #{createTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+            creator_id = #{creatorId,jdbcType=BIGINT},
+            deliveryman_id = #{deliverymanId,jdbcType=BIGINT},
+            complete_time = #{completeTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+            cancel_time = #{cancelTime,jdbcType=TIMESTAMP,javaType=java.util.Date}
+        WHERE order_id = #{orderId,jdbcType=VARCHAR}
     </update>
 
+    <!-- 按主键查订单 -->
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
-        SELECT <include refid="Base_Column_List" />
+        SELECT <include refid="Base_Column_List"/>
         FROM cdms_delivery_order
-        WHERE order_id = #{ orderId,jdbcType=VARCHAR }
+        WHERE order_id = #{orderId,jdbcType=VARCHAR}
     </select>
 
+    <!-- 查询所有订单 -->
     <select id="selectAll" resultMap="BaseResultMap">
-        SELECT <include refid="Base_Column_List" />
+        SELECT <include refid="Base_Column_List"/>
         FROM cdms_delivery_order
-    </select><!--    后面区分一下select count-->
+        ORDER BY create_time DESC
+    </select>
 
-    <!-- 分页查询当前页数据 -->
-    <select id="selectPageByDeliveryman" resultType="com.thirdgroup.cdms.model.DeliveryOrder">
-        SELECT * FROM delivery_order
+    <!-- 分页查询配送员的订单列表 -->
+    <select id="selectPageByDeliveryman" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM cdms_delivery_order
         <where>
-            deliveryman_id = #{id}
-            <!-- 动态条件：状态筛选 -->
-            <if test="status != null">AND status = #{status}</if>
-            <!-- 动态条件：关键词搜索（订单号/收件人姓名） -->
+            deliveryman_id = #{userId,jdbcType=BIGINT}
+            <if test="status != null">AND status = #{status,jdbcType=TINYINT}</if>
             <if test="keyword != null and keyword != ''">
                 AND (order_id LIKE CONCAT('%', #{keyword}, '%')
                 OR consignee_name LIKE CONCAT('%', #{keyword}, '%'))
@@ -175,16 +191,70 @@
             <!-- 模糊搜索关键词 -->
             <if test="keyword != null and keyword != ''">
                 AND (
-                o.order_id LIKE CONCAT('%', #{keyword}, '%')
-                OR o.sender_name LIKE CONCAT('%', #{keyword}, '%')
-                OR o.sender_phone LIKE CONCAT('%', #{keyword}, '%')
-                OR o.consignee_name LIKE CONCAT('%', #{keyword}, '%')
-                OR o.consignee_phone LIKE CONCAT('%', #{keyword}, '%')
-                OR o.sender_address LIKE CONCAT('%', #{keyword}, '%')
-                OR o.consignee_address LIKE CONCAT('%', #{keyword}, '%')
-                OR u.username LIKE CONCAT('%', #{keyword}, '%')
+                    o.order_id LIKE CONCAT('%', #{keyword}, '%')
+                    OR o.sender_name LIKE CONCAT('%', #{keyword}, '%')
+                    OR o.sender_phone LIKE CONCAT('%', #{keyword}, '%')
+                    OR o.consignee_name LIKE CONCAT('%', #{keyword}, '%')
+                    OR o.consignee_phone LIKE CONCAT('%', #{keyword}, '%')
+                    OR o.sender_address LIKE CONCAT('%', #{keyword}, '%')
+                    OR o.consignee_address LIKE CONCAT('%', #{keyword}, '%')
+                    OR u.username LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
         </where>
+    </select>
+    <!-- 分页查询订单 -->
+    <select id="selectPage" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM cdms_delivery_order
+        <where>
+            <if test="status != null">AND status = #{status,jdbcType=TINYINT}</if>
+            <if test="keyword != null and keyword != ''">
+                AND (order_id LIKE #{keyword,jdbcType=VARCHAR}
+                OR sender_name LIKE #{keyword,jdbcType=VARCHAR}
+                OR consignee_name LIKE #{keyword,jdbcType=VARCHAR})
+            </if>
+        </where>
+        ORDER BY create_time DESC
+        LIMIT #{start,jdbcType=INTEGER}, #{size,jdbcType=INTEGER}
+    </select>
+    <!-- 查询当前外卖员的在途订单 -->
+    <select id="selectMyOrders" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM cdms_delivery_order
+        WHERE
+        deliveryman_id = #{userId,jdbcType=BIGINT}
+        AND status = 1
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 按状态和配送员查询 -->
+    <select id="selectByStatusAndDeliveryman" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM cdms_delivery_order
+        WHERE
+        deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
+        AND status = #{status,jdbcType=TINYINT}
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 查询待接单订单 -->
+    <select id="selectPendingOrders" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM cdms_delivery_order
+        WHERE
+        status = #{status,jdbcType=TINYINT}
+        AND deliveryman_id IS NULL
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 兼容历史方法 -->
+    <select id="selectDeliveringByCourierId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM cdms_delivery_order
+        WHERE
+        deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
+        AND status = #{status,jdbcType=TINYINT}
+        ORDER BY create_time DESC
     </select>
 </mapper>

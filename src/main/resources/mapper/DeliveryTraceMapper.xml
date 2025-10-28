@@ -14,45 +14,45 @@
         trace_id, order_id, status, operator_id, operate_time, remark
     </sql>
 
-    <insert id="insert" parameterType="com.thirdgroup.cdms.model.DeliveryTrace">
+    <!-- 修正：trace_id 是自增主键，无需手动插入 -->
+    <insert id="insert" parameterType="com.thirdgroup.cdms.model.DeliveryTrace" useGeneratedKeys="true" keyProperty="traceId">
         INSERT INTO cdms_delivery_trace (
-            trace_id, order_id, status, operator_id, operate_time, remark
-        )
-        VALUES (
-            #{ traceId,jdbcType=BIGINT },
-            #{ orderId,jdbcType=VARCHAR },
-            #{ status,jdbcType=TINYINT },
-            #{ operatorId,jdbcType=BIGINT },
-            #{ operateTime,jdbcType=TIMESTAMP },
-            #{ remark,jdbcType=VARCHAR }
-        )
+            order_id, status, operator_id, operate_time, remark
+        ) VALUES (
+                     #{orderId,jdbcType=VARCHAR},
+                     #{status,jdbcType=TINYINT},
+                     #{operatorId,jdbcType=BIGINT},
+                     #{operateTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+                     #{remark,jdbcType=VARCHAR}
+                 )
     </insert>
 
     <delete id="deleteByPrimaryKey">
         DELETE FROM cdms_delivery_trace
-        WHERE trace_id = #{ traceId,jdbcType=BIGINT }
+        WHERE trace_id = #{traceId,jdbcType=BIGINT}
     </delete>
 
     <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.model.DeliveryTrace">
         UPDATE cdms_delivery_trace
         SET
-            order_id = #{ orderId,jdbcType=VARCHAR },
-            status = #{ status,jdbcType=TINYINT },
-            operator_id = #{ operatorId,jdbcType=BIGINT },
-            operate_time = #{ operateTime,jdbcType=TIMESTAMP },
-            remark = #{ remark,jdbcType=VARCHAR }
-        WHERE trace_id = #{ traceId,jdbcType=BIGINT }
+            order_id = #{orderId,jdbcType=VARCHAR},
+            status = #{status,jdbcType=TINYINT},
+            operator_id = #{operatorId,jdbcType=BIGINT},
+            operate_time = #{operateTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+            remark = #{remark,jdbcType=VARCHAR}
+        WHERE trace_id = #{traceId,jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List" />
         FROM cdms_delivery_trace
-        WHERE trace_id = #{ traceId,jdbcType=BIGINT }
+        WHERE trace_id = #{traceId,jdbcType=BIGINT}
     </select>
 
     <select id="selectAll" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List" />
         FROM cdms_delivery_trace
+        ORDER BY operate_time DESC
     </select>
 <!--    <select id="selectByOrderId" resultType="com.thirdgroup.cdms.model.DeliveryTrace"-->
 <!--            parameterType="java.lang.String"></select>-->

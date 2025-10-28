@@ -2,56 +2,54 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
-    <title>外卖员登录 - 城市配送系统</title>
-    <!-- 引入Bootstrap样式，优化移动端适配 -->
+    <title>外卖员登录</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .login-container { max-width: 400px; margin: 80px auto; padding: 20px; border: 1px solid #eee; border-radius: 8px; }
-        .error提示 { color: #d9534f; margin-top: 10px; display: <c:if test="${not empty errorMsg}">block</c:if><c:if test="${empty errorMsg}">none</c:if>; }
+        .login-box { width: 300px; margin: 100px auto; padding: 20px; border: 1px solid #ddd; }
+        .error { color: red; margin: 10px 0; }
     </style>
 </head>
 <body>
-<div class="container login-container">
-    <h3 class="text-center">外卖员登录</h3>
-    <!-- 登录表单：提交到CourierLoginServlet处理 -->
-    <form action="${pageContext.request.contextPath}/courier/login" method="post" class="mt-3">
-        <!-- 账号输入框 -->
+<div class="login-box">
+    <h2 class="text-center">外卖员登录</h2>
+
+    <!-- 登录错误提示 -->
+    <c:if test="${param.error == '1'}">
+        <div class="error text-center">手机号或密码错误，请重新输入</div>
+    </c:if>
+
+    <form method="post" action="${pageContext.request.contextPath}/deliveryman/login">
         <div class="form-group">
-            <label for="courierId">外卖员ID</label>
-            <input type="text" id="courierId" name="courierId" class="form-control"
-                   value="${cookie.courierId.value}" required placeholder="请输入您的工号">
+            <label>手机号</label>
+            <input type="tel" name="phone" class="form-control"
+                   placeholder="请输入登录手机号" required>
         </div>
-        <!-- 密码输入框 -->
         <div class="form-group">
-            <label for="password">密码</label>
-            <input type="password" id="password" name="password" class="form-control" required placeholder="请输入密码">
+            <label>密码</label>
+            <input type="password" name="password" class="form-control"
+                   placeholder="请输入密码" required>
         </div>
-        <!-- 验证码 -->
-        <div class="form-group">
-            <div class="row">
-                <div class="col-xs-7">
-                    <input type="text" name="verifyCode" class="form-control" required placeholder="请输入验证码">
-                </div>
-                <div class="col-xs-5">
-                    <!-- 验证码图片：点击刷新 -->
-                    <img src="${pageContext.request.contextPath}/verifyCode"
-                         alt="验证码" style="cursor: pointer;" onclick="this.src='${pageContext.request.contextPath}/verifyCode?'+Math.random()">
-                </div>
-            </div>
-        </div>
-        <!-- 错误提示 -->
-        <div class="error提示 text-center">${errorMsg}</div>
-        <!-- 登录按钮 -->
         <button type="submit" class="btn btn-primary btn-block">登录</button>
-        <!-- 忘记密码链接 -->
         <div class="text-center mt-2">
-            <a href="${pageContext.request.contextPath}/courier/forgotPassword.jsp">忘记密码？</a>
+            <a href="${pageContext.request.contextPath}/deliveryman/toForgotPassword">忘记密码？</a>
+            <span style="margin: 0 10px;">|</span>
+            <a href="${pageContext.request.contextPath}/deliveryman/toRegister">还没账号？去注册</a>
         </div>
     </form>
 </div>
 
-<!-- 引入BootstrapJS，支持表单验证等交互 -->
-<script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
+<script>
+    // 自动填充上次登录的手机号（可选功能）
+    window.onload = function() {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            const [name, value] = cookie.trim().split('=');
+            if (name === 'deliverymanPhone') {
+                document.querySelector('input[name="phone"]').value = decodeURIComponent(value);
+                break;
+            }
+        }
+    };
+</script>
 </body>
 </html>

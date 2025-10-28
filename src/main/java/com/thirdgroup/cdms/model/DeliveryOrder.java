@@ -1,17 +1,12 @@
-
 package com.thirdgroup.cdms.model;
 
 import com.thirdgroup.cdms.model.enums.OrderStatus;
 import lombok.Data;
-import java.util.Date;
 import java.math.BigDecimal;
+import java.util.Date;
 
-/**
- * DeliveryOrder entity
- */
 @Data
 public class DeliveryOrder {
-
     private String orderId;
     private String senderName;
     private String senderPhone;
@@ -28,11 +23,12 @@ public class DeliveryOrder {
     private Integer expectedMins;
     private String remark;
     private Integer status;
-    private Date createTime;
+    private Date createTime;  // 仅保留数据库存在的时间字段
     private Long creatorId;
     private Long deliverymanId;
-    private Date completeTime;
-    private Date cancelTime;
+    private Date completeTime;  // 仅保留数据库存在的时间字段
+    private Date cancelTime;    // 仅保留数据库存在的时间字段
+
     // 辅助方法：转订单状态枚举
     public OrderStatus getStatusEnum() {
         return OrderStatus.fromCode(this.status);

@@ -4,26 +4,51 @@ import com.thirdgroup.cdms.model.DeliveryOrder;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Date;
 import java.util.List;
 
 /**
- * 订单Mapper：操作delivery_order表
+ * 订单Mapper：操作cdms_delivery_order表
  */
 @Mapper
 public interface OrderMapper {
-    // 1. 查待接单订单（按距离排序，给工作台用）
-    List<DeliveryOrder> selectPendingOrders(int code);
+    // 查待接单订单（状态=0+未分配外卖员）
+    List<DeliveryOrder> selectPendingOrders(@Param("status") int status);
 
-    // 2. 按外卖员ID查配送中订单（给工作台用）
-    List<DeliveryOrder> selectDeliveringByCourierId(@Param("courierId") Integer courierId);
+    // 根据外卖员ID和状态查询订单
+    List<DeliveryOrder> selectByStatusAndDeliveryman(
+            @Param("deliverymanId") Long deliverymanId,
+            @Param("status") int status
+    );
 
-    // 3. 接单：更新订单的courier_id、status、accept_time
-    int acceptOrder(@Param("orderId") Integer orderId, @Param("courierId") Integer courierId, @Param("status") Integer status);
+    // 查外卖员的配送中订单（兼容历史方法）
+    List<DeliveryOrder> selectDeliveringByCourierId(
+            @Param("deliverymanId") Long deliverymanId,
+            @Param("status") int status
+    );
 
-    // 4. 更新订单状态（确认取餐/送达/取消）
-    int updateStatus(@Param("orderId") Integer orderId, @Param("status") Integer status, @Param("time") Date time);
+    // 接单：更新订单（不涉及不存在的字段）
+    int acceptOrder(
+            @Param("orderId") Long orderId,
+            @Param("deliverymanId") Long deliverymanId,
+            @Param("targetStatus") int targetStatus,
+            @Param("oldStatus") int oldStatus
+    );
 
-    // 5. 根据ID查订单（地图页显示订单详情用）
-    DeliveryOrder selectById(@Param("orderId") Integer orderId);
+    // 更新订单状态
+    int updateStatus(
+            @Param("orderId") Long orderId,
+            @Param("targetStatus") int targetStatus,
+            @Param("updateTime") java.util.Date updateTime
+    );
+
+    // 根据ID查订单
+    DeliveryOrder selectById(@Param("orderId") Long orderId);
+
+    // 分页查询订单
+    List<DeliveryOrder> selectPage(
+            @Param("status") Integer status,
+            @Param("keyword") String keyword,
+            @Param("start") int start,
+            @Param("size") int size
+    );
 }

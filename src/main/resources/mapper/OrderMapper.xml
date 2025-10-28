@@ -1,55 +1,132 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.thirdgroup.cdms.mapper.OrderMapper">
-    <sql id="BaseColumnList">
-        id, order_no, shop_name, shop_address, shop_phone,
-        user_address, user_phone, profit, distance, status,
-        courier_id, create_time, accept_time, complete_time
+    <!-- 基础结果集：仅映射数据库存在的字段 -->
+    <resultMap id="BaseResultMap" type="com.thirdgroup.cdms.model.DeliveryOrder">
+        <id column="order_id" property="orderId" jdbcType="VARCHAR" />
+        <result column="sender_name" property="senderName" jdbcType="VARCHAR" />
+        <result column="sender_phone" property="senderPhone" jdbcType="VARCHAR" />
+        <result column="sender_address" property="senderAddress" jdbcType="VARCHAR" />
+        <result column="consignee_name" property="consigneeName" jdbcType="VARCHAR" />
+        <result column="consignee_phone" property="consigneePhone" jdbcType="VARCHAR" />
+        <result column="consignee_address" property="consigneeAddress" jdbcType="VARCHAR" />
+        <result column="goods_type" property="goodsType" jdbcType="VARCHAR" />
+        <result column="weight" property="weight" jdbcType="DECIMAL" />
+        <result column="volume" property="volume" jdbcType="DECIMAL" />
+        <result column="delivery_fee" property="deliveryFee" jdbcType="DECIMAL" />
+        <result column="platform_income" property="platformIncome" jdbcType="DECIMAL" />
+        <result column="deliveryman_income" property="deliverymanIncome" jdbcType="DECIMAL" />
+        <result column="expected_mins" property="expectedMins" jdbcType="INTEGER" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="TINYINT" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="creator_id" property="creatorId" jdbcType="BIGINT" />
+        <result column="deliveryman_id" property="deliverymanId" jdbcType="BIGINT" />
+        <result column="complete_time" property="completeTime" jdbcType="TIMESTAMP" />
+        <result column="cancel_time" property="cancelTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <!-- 基础字段列表：仅包含数据库存在的字段 -->
+    <sql id="Base_Column_List">
+        order_id, sender_name, sender_phone, sender_address, consignee_name, consignee_phone,
+        consignee_address, goods_type, weight, volume, delivery_fee, platform_income,
+        deliveryman_income, expected_mins, remark, status, create_time, creator_id,
+        deliveryman_id, complete_time, cancel_time
     </sql>
 
-    <!-- 1. 查待接单订单（status=0，按距离升序） -->
-    <select id="selectPendingOrders" resultType="com.thirdgroup.cdms.model.DeliveryOrder">
-        SELECT
-        <include refid="BaseColumnList"/>
-        FROM delivery_order
-        WHERE status = #{status, jdbcType=INTEGER}
-        ORDER BY distance ASC
-    </select>
+    <!-- 新增订单 -->
+    <insert id="insert" parameterType="com.thirdgroup.cdms.model.DeliveryOrder">
+        INSERT INTO cdms_delivery_order (
+            order_id, sender_name, sender_phone, sender_address, consignee_name, consignee_phone,
+            consignee_address, goods_type, weight, volume, delivery_fee, platform_income,
+            deliveryman_income, expected_mins, remark, status, create_time, creator_id,
+            deliveryman_id, complete_time, cancel_time
+        ) VALUES (
+                     #{orderId,jdbcType=VARCHAR},
+                     #{senderName,jdbcType=VARCHAR},
+                     #{senderPhone,jdbcType=VARCHAR},
+                     #{senderAddress,jdbcType=VARCHAR},
+                     #{consigneeName,jdbcType=VARCHAR},
+                     #{consigneePhone,jdbcType=VARCHAR},
+                     #{consigneeAddress,jdbcType=VARCHAR},
+                     #{goodsType,jdbcType=VARCHAR},
+                     #{weight,jdbcType=DECIMAL},
+                     #{volume,jdbcType=DECIMAL},
+                     #{deliveryFee,jdbcType=DECIMAL},
+                     #{platformIncome,jdbcType=DECIMAL},
+                     #{deliverymanIncome,jdbcType=DECIMAL},
+                     #{expectedMins,jdbcType=INTEGER},
+                     #{remark,jdbcType=VARCHAR},
+                     #{status,jdbcType=TINYINT},
+                     #{createTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+                     #{creatorId,jdbcType=BIGINT},
+                     #{deliverymanId,jdbcType=BIGINT},
+                     #{completeTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+                     #{cancelTime,jdbcType=TIMESTAMP,javaType=java.util.Date}
+                 )
+    </insert>
 
-    <!-- 2. 查外卖员的配送中订单（status=1） -->
-    <select id="selectDeliveringByCourierId" resultType="com.thirdgroup.cdms.model.DeliveryOrder">
-        SELECT
-        <include refid="BaseColumnList"/>
-        FROM delivery_order
-        WHERE courier_id = #{courierId}
-        AND status = #{status, jdbcType=INTEGER}
-    </select>
+    <!-- 更新订单 -->
+    <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.model.DeliveryOrder">
+        UPDATE cdms_delivery_order
+        SET
+            sender_name = #{senderName,jdbcType=VARCHAR},
+            sender_phone = #{senderPhone,jdbcType=VARCHAR},
+            sender_address = #{senderAddress,jdbcType=VARCHAR},
+            consignee_name = #{consigneeName,jdbcType=VARCHAR},
+            consignee_phone = #{consigneePhone,jdbcType=VARCHAR},
+            consignee_address = #{consigneeAddress,jdbcType=VARCHAR},
+            goods_type = #{goodsType,jdbcType=VARCHAR},
+            weight = #{weight,jdbcType=DECIMAL},
+            volume = #{volume,jdbcType=DECIMAL},
+            delivery_fee = #{deliveryFee,jdbcType=DECIMAL},
+            platform_income = #{platformIncome,jdbcType=DECIMAL},
+            deliveryman_income = #{deliverymanIncome,jdbcType=DECIMAL},
+            expected_mins = #{expectedMins,jdbcType=INTEGER},
+            remark = #{remark,jdbcType=VARCHAR},
+            status = #{status,jdbcType=TINYINT},
+            create_time = #{createTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+            creator_id = #{creatorId,jdbcType=BIGINT},
+            deliveryman_id = #{deliverymanId,jdbcType=BIGINT},
+            complete_time = #{completeTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+            cancel_time = #{cancelTime,jdbcType=TIMESTAMP,javaType=java.util.Date}
+        WHERE order_id = #{orderId,jdbcType=VARCHAR}
+    </update>
 
-    <!-- 3. 接单：更新订单的外卖员ID、状态、接单时间 -->
+    <!-- 接单：仅更新数据库存在的字段 -->
     <update id="acceptOrder">
-        UPDATE delivery_order
+        UPDATE cdms_delivery_order
         SET
-        courier_id = #{courierId},
-        status = #{status},
-        accept_time = NOW()
-        WHERE id = #{orderId}
-        AND status = #{pendingStatus, jdbcType=INTEGER} <!-- 防重复接单：只更待接单状态的订单 -->
+            deliveryman_id = #{deliverymanId,jdbcType=BIGINT},
+            status = #{targetStatus,jdbcType=TINYINT}
+        WHERE order_id = #{orderId,jdbcType=VARCHAR}
+          AND status = #{oldStatus,jdbcType=TINYINT}
+          AND deliveryman_id IS NULL
     </update>
 
-    <!-- 4. 更新订单状态（确认取餐/送达） -->
-    <update id="updateStatus">
-        UPDATE delivery_order
-        SET
-        status = #{status},
-        <if test="status == 2">complete_time = #{time}</if> <!-- 已完成：更新完成时间 -->
-        WHERE id = #{orderId}
-    </update>
+    <!-- 按主键查订单 -->
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM cdms_delivery_order
+        WHERE order_id = #{orderId,jdbcType=VARCHAR}
+    </select>
 
-    <!-- 5. 根据ID查订单 -->
-    <select id="selectById" resultType="com.thirdgroup.cdms.model.DeliveryOrder">
-        SELECT
-        <include refid="BaseColumnList"/>
-        FROM delivery_order
-        WHERE id = #{orderId}
+    <!-- 查待接单订单 -->
+    <select id="selectPendingOrders" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM cdms_delivery_order
+        WHERE status = #{status,jdbcType=TINYINT}
+        AND deliveryman_id IS NULL
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 查外卖员的在途订单 -->
+    <select id="selectByStatusAndDeliveryman" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM cdms_delivery_order
+        WHERE
+        deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
+        AND status = #{status,jdbcType=TINYINT}
+        ORDER BY create_time DESC
     </select>
 </mapper>

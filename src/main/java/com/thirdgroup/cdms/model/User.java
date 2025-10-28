@@ -8,7 +8,7 @@ import java.util.Date;
  * User entity
  */
 @Data
-public class User {
+public abstract class User {
     /**
      * user_id
      * @Primary Key
@@ -85,4 +85,12 @@ public class User {
      */
     private Date updateTime;
 
+    /**
+     * 子类已经实现了，我在那边override了一下，你这边自己实现，要是有问题对一下
+     * @return
+     */
+
+    public Long getId() {
+        return null;
+    }
 }
