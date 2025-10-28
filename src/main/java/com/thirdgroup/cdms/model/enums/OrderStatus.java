@@ -6,7 +6,7 @@ package com.thirdgroup.cdms.model.enums;
 public enum OrderStatus {
     PENDING(0, "待接单"),
     ACCEPTED(1, "已接单待取货"),
-    IN_TRANSIT(2, "配送中"),
+    DELIVERING(2, "配送中"),
     COMPLETED(3, "已完成"),
     CANCELLED(4, "已取消"),
     ABANDONED_PENDING(5, "放弃待审核");
