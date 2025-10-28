@@ -11,7 +11,8 @@ import com.thirdgroup.cdms.exception.LoginException;
 public interface AuthService {
 
     /**
-     * 根据 username 和 password 验证用户信息
+     * 根据 username 和 password 验证用户信息,
+     * 并更新登录信息
      *
      * @param username 用户名
      * @param password 密码
