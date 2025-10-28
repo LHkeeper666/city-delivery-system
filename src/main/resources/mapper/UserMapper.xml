@@ -20,82 +20,88 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        user_id, username, password, role, phone_no, status, work_status, fail_count, last_login_time, last_login_ip, last_login_success, last_login_remark, create_time, creator_id, update_time
+        user_id, username, password, role, phone_no, status, work_status, fail_count,
+        last_login_time, last_login_ip, last_login_success, last_login_remark,
+        create_time, creator_id, update_time
     </sql>
 
-    <insert id="insert" parameterType="com.thirdgroup.cdms.model.User">
+    <!-- 修正：user_id 是自增主键，无需手动插入 -->
+    <insert id="insert" parameterType="com.thirdgroup.cdms.model.User" useGeneratedKeys="true" keyProperty="userId">
         INSERT INTO cdms_user (
-            user_id, username, password, role, phone_no, status, work_status, fail_count, last_login_time, last_login_ip, last_login_success, last_login_remark, create_time, creator_id, update_time
-        )
-        VALUES (
-            #{ userId,jdbcType=BIGINT },
-            #{ username,jdbcType=VARCHAR },
-            #{ password,jdbcType=VARCHAR },
-            #{ role,jdbcType=TINYINT },
-            #{ phoneNo,jdbcType=VARCHAR },
-            #{ status,jdbcType=TINYINT },
-            #{ workStatus,jdbcType=TINYINT },
-            #{ failCount,jdbcType=INTEGER },
-            #{ lastLoginTime,jdbcType=TIMESTAMP },
-            #{ lastLoginIp,jdbcType=VARCHAR },
-            #{ lastLoginSuccess,jdbcType=TINYINT },
-            #{ lastLoginRemark,jdbcType=VARCHAR },
-            #{ createTime,jdbcType=TIMESTAMP },
-            #{ creatorId,jdbcType=BIGINT },
-            #{ updateTime,jdbcType=TIMESTAMP }
-        )
+            username, password, role, phone_no, status, work_status, fail_count,
+            last_login_time, last_login_ip, last_login_success, last_login_remark,
+            create_time, creator_id, update_time
+        ) VALUES (
+                     #{username,jdbcType=VARCHAR},
+                     #{password,jdbcType=VARCHAR},
+                     #{role,jdbcType=TINYINT},
+                     #{phoneNo,jdbcType=VARCHAR},
+                     #{status,jdbcType=TINYINT},
+                     #{workStatus,jdbcType=TINYINT},
+                     #{failCount,jdbcType=INTEGER},
+                     #{lastLoginTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+                     #{lastLoginIp,jdbcType=VARCHAR},
+                     #{lastLoginSuccess,jdbcType=TINYINT},
+                     #{lastLoginRemark,jdbcType=VARCHAR},
+                     #{createTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+                     #{creatorId,jdbcType=BIGINT},
+                     #{updateTime,jdbcType=TIMESTAMP,javaType=java.util.Date}
+                 )
     </insert>
 
     <delete id="deleteByPrimaryKey">
         DELETE FROM cdms_user
-        WHERE user_id = #{ userId,jdbcType=BIGINT }
+        WHERE user_id = #{userId,jdbcType=BIGINT}
     </delete>
 
     <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.model.User">
         UPDATE cdms_user
         SET
-            username = #{ username,jdbcType=VARCHAR },
-            password = #{ password,jdbcType=VARCHAR },
-            role = #{ role,jdbcType=TINYINT },
-            phone_no = #{ phoneNo,jdbcType=VARCHAR },
-            status = #{ status,jdbcType=TINYINT },
-            work_status = #{ workStatus,jdbcType=TINYINT },
-            fail_count = #{ failCount,jdbcType=INTEGER },
-            last_login_time = #{ lastLoginTime,jdbcType=TIMESTAMP },
-            last_login_ip = #{ lastLoginIp,jdbcType=VARCHAR },
-            last_login_success = #{ lastLoginSuccess,jdbcType=TINYINT },
-            last_login_remark = #{ lastLoginRemark,jdbcType=VARCHAR },
-            create_time = #{ createTime,jdbcType=TIMESTAMP },
-            creator_id = #{ creatorId,jdbcType=BIGINT },
-            update_time = #{ updateTime,jdbcType=TIMESTAMP }
-        WHERE user_id = #{ userId,jdbcType=BIGINT }
+            username = #{username,jdbcType=VARCHAR},
+            password = #{password,jdbcType=VARCHAR},
+            role = #{role,jdbcType=TINYINT},
+            phone_no = #{phoneNo,jdbcType=VARCHAR},
+            status = #{status,jdbcType=TINYINT},
+            work_status = #{workStatus,jdbcType=TINYINT},
+            fail_count = #{failCount,jdbcType=INTEGER},
+            last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+            last_login_ip = #{lastLoginIp,jdbcType=VARCHAR},
+            last_login_success = #{lastLoginSuccess,jdbcType=TINYINT},
+            last_login_remark = #{lastLoginRemark,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+            creator_id = #{creatorId,jdbcType=BIGINT},
+            update_time = #{updateTime,jdbcType=TIMESTAMP,javaType=java.util.Date}
+        WHERE user_id = #{userId,jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List" />
         FROM cdms_user
-        WHERE user_id = #{ userId,jdbcType=BIGINT }
+        WHERE user_id = #{userId,jdbcType=BIGINT}
     </select>
 
     <select id="selectAll" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List" />
         FROM cdms_user
+        ORDER BY create_time DESC
     </select>
 
     <select id="selectByUsername" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List" />
+        SELECT <include refid="Base_Column_List" />
         FROM cdms_user
-        WHERE username = #{ username,jdbcType=VARCHAR }
+        WHERE username = #{username,jdbcType=VARCHAR}
     </select>
 
+    <!-- 修正：参数名和字段匹配 -->
     <update id="updateLoginInfoById">
         UPDATE cdms_user
         SET
-            fail_count = #{failCount, jdbcType=INTEGER},
-            last_login_ip = #{ip, jdbcType=VARCHAR},
-            last_login_success = #{success, jdbcType=TINYINT},
-            last_login_remark = #{remark, jdbcType=VARCHAR},
-            last_login_time = NOW()
-        WHERE user_id = #{userId, jdbcType=BIGINT}
+            fail_count = #{failCount,jdbcType=INTEGER},
+            last_login_ip = #{ip,jdbcType=VARCHAR},
+            last_login_success = #{success,jdbcType=TINYINT},
+            last_login_remark = #{remark,jdbcType=VARCHAR},
+            last_login_time = NOW(),
+            update_time = NOW()  -- 补充更新时间
+        WHERE user_id = #{userId,jdbcType=BIGINT}
     </update>
 </mapper>

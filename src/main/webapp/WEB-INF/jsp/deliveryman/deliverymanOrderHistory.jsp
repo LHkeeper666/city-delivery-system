@@ -26,7 +26,7 @@
             </tr>
         </c:forEach>
     </table>
-    <a href="${pageContext.request.contextPath}/deliverymanWorkbench.jsp" class="btn btn-default">返回工作台</a>
+    <a href="${pageContext.request.contextPath}/deliveryman/deliverymanWorkbench.jsp" class="btn btn-default">返回工作台</a>
 </div>
 </body>
 </html>

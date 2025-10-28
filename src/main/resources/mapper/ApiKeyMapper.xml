@@ -13,38 +13,37 @@
         key_id, app_name, api_key, status, create_time
     </sql>
 
-    <insert id="insert" parameterType="com.thirdgroup.cdms.model.ApiKey">
+    <!-- 修正：key_id 是自增主键，无需手动插入 -->
+    <insert id="insert" parameterType="com.thirdgroup.cdms.model.ApiKey" useGeneratedKeys="true" keyProperty="keyId">
         INSERT INTO cdms_api_key (
-            key_id, app_name, api_key, status, create_time
-        )
-        VALUES (
-            #{ keyId,jdbcType=BIGINT },
-            #{ appName,jdbcType=VARCHAR },
-            #{ apiKey,jdbcType=VARCHAR },
-            #{ status,jdbcType=VARCHAR },
-            #{ createTime,jdbcType=TIMESTAMP }
-        )
+            app_name, api_key, status, create_time
+        ) VALUES (
+                     #{appName,jdbcType=VARCHAR},
+                     #{apiKey,jdbcType=VARCHAR},
+                     #{status,jdbcType=VARCHAR},
+                     #{createTime,jdbcType=TIMESTAMP,javaType=java.util.Date}
+                 )
     </insert>
 
     <delete id="deleteByPrimaryKey">
         DELETE FROM cdms_api_key
-        WHERE key_id = #{ keyId,jdbcType=BIGINT }
+        WHERE key_id = #{keyId,jdbcType=BIGINT}
     </delete>
 
     <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.model.ApiKey">
         UPDATE cdms_api_key
         SET
-            app_name = #{ appName,jdbcType=VARCHAR },
-            api_key = #{ apiKey,jdbcType=VARCHAR },
-            status = #{ status,jdbcType=VARCHAR },
-            create_time = #{ createTime,jdbcType=TIMESTAMP }
-        WHERE key_id = #{ keyId,jdbcType=BIGINT }
+            app_name = #{appName,jdbcType=VARCHAR},
+            api_key = #{apiKey,jdbcType=VARCHAR},
+            status = #{status,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=TIMESTAMP,javaType=java.util.Date}
+        WHERE key_id = #{keyId,jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List" />
         FROM cdms_api_key
-        WHERE key_id = #{ keyId,jdbcType=BIGINT }
+        WHERE key_id = #{keyId,jdbcType=BIGINT}
     </select>
 
     <select id="selectAll" resultMap="BaseResultMap">

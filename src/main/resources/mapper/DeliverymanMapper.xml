@@ -1,49 +1,106 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.thirdgroup.cdms.mapper.DeliverymanMapper">
-    <!-- 通用查询：查所有字段,这里需要重构，没有写完 -->
+    <!-- 基础字段列表：与cdms_user表完全匹配 -->
     <sql id="BaseColumnList">
-        id, name, phone, password, status, avatar, balance, create_time
+        user_id,         -- 主键（BIGINT）
+        username,        -- 用户名
+        password,        -- 加密密码
+        role,            -- 角色（1=外卖员）
+        phone_no,        -- 手机号
+        status,          -- 账号状态（0=启用）
+        work_status,     -- 工作状态（0=离线）
+        profit,          -- 总收入
+        create_time,     -- 创建时间
+        update_time      -- 更新时间
     </sql>
 
-    <!-- 根据ID查外卖员 -->
+    <!-- 1. 根据ID查询（参数名#{userId}，与接口@Param("userId")匹配） -->
     <select id="selectById" resultType="com.thirdgroup.cdms.model.Deliveryman">
-        SELECT
-        <include refid="BaseColumnList"/>
+        SELECT <include refid="BaseColumnList"/>
         FROM cdms_user
-        WHERE id = #{id}
+        WHERE user_id = #{userId,jdbcType=BIGINT}  -- 匹配表字段+接口参数
+        AND role = 1  -- 仅查外卖员
     </select>
 
-    <!-- 根据手机号查外卖员（登录用） -->
+    <!-- 2. 根据手机号查询（无修改，已匹配） -->
     <select id="selectByPhone" resultType="com.thirdgroup.cdms.model.Deliveryman">
-        SELECT
-        <include refid="BaseColumnList"/>
+        SELECT <include refid="BaseColumnList"/>
         FROM cdms_user
-        WHERE phone = #{phone}
+        WHERE phone_no = #{phone,jdbcType=VARCHAR}
+        AND role = 1
     </select>
 
-    <!-- 更新外卖员状态 -->
+    <!-- 3. 更新工作状态（参数名#{userId}，与接口匹配） -->
     <update id="updateStatus">
         UPDATE cdms_user
-        SET status = #{status}
-        WHERE id = #{id}
+        SET
+            work_status = #{status,jdbcType=TINYINT},
+            update_time = NOW()
+        WHERE user_id = #{userId,jdbcType=BIGINT}  -- 匹配接口参数
+          AND role = 1
     </update>
 
-    <!-- 更新外卖员信息（个人中心用，只更姓名、头像） -->
-    <update id="updateProfile">
+    <!-- 4. 更新个人信息（依赖实体类Deliveryman的userId属性） -->
+    <update id="updateProfile" parameterType="com.thirdgroup.cdms.model.Deliveryman">
         UPDATE cdms_user
         <set>
-            <if test="name != null and name != ''">name = #{name},</if>
-            <if test="avatar != null and avatar != ''">avatar = #{avatar},</if>
-            <if test="phone != null and phone != ''">phone = #{phone},</if>
+            <if test="username != null and username != ''">username = #{username,jdbcType=VARCHAR},</if>
+            <if test="phoneNo != null and phoneNo != ''">phone_no = #{phoneNo,jdbcType=VARCHAR},</if>
+            update_time = NOW()
         </set>
-        WHERE id = #{id}
+        WHERE user_id = #{userId,jdbcType=BIGINT}  -- 实体类需有userId属性
+        AND role = 1
     </update>
 
-    <!-- 更新余额（完成订单加收益） -->
+    <!-- 5. 更新余额（参数名#{userId}，与接口匹配） -->
     <update id="updateBalance">
         UPDATE cdms_user
-        SET balance = balance + #{addProfit}
-        WHERE id = #{id}
+        SET
+            profit = profit + #{addProfit,jdbcType=DECIMAL},
+            update_time = NOW()
+        WHERE user_id = #{userId,jdbcType=BIGINT}  -- 匹配接口参数
+          AND role = 1
     </update>
+
+    <!-- 6. 根据手机号更新密码（无修改，已匹配） -->
+    <update id="updatePasswordByPhone">
+        UPDATE cdms_user
+        SET
+            password = #{newPassword,jdbcType=VARCHAR},
+            update_time = NOW()
+        WHERE phone_no = #{phone,jdbcType=VARCHAR}
+          AND role = 1
+    </update>
+
+    <!-- 7. 新增外卖员（无修改，keyProperty="userId"自动填充实体类userId） -->
+    <insert id="insert" parameterType="com.thirdgroup.cdms.model.Deliveryman" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO cdms_user (
+            username,
+            password,
+            role,
+            phone_no,
+            status,
+            work_status,
+            create_time,
+            update_time
+        ) VALUES (
+                     #{username,jdbcType=VARCHAR},
+                     #{password,jdbcType=VARCHAR},
+                     1,
+                     #{phoneNo,jdbcType=VARCHAR},
+                     0,
+                     0,
+                     NOW(),
+                     NOW()
+                 )
+    </insert>
+
+    <!-- 8. 检查用户名是否存在（无修改，已匹配） -->
+    <select id="countByUsername" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM cdms_user
+        WHERE username = #{username,jdbcType=VARCHAR}
+          AND role = 1
+    </select>
 </mapper>

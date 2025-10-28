@@ -1,27 +1,43 @@
 package com.thirdgroup.cdms.mapper;
+import com.thirdgroup.cdms.model.DeliveryOrder;
 import com.thirdgroup.cdms.model.Deliveryman;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
- * 外卖员Mapper：操作courier表
+ * 外卖员Mapper：操作cdms_user表（外卖员角色）
  */
-@Mapper // 标记为MyBatis Mapper接口（或在config里配置扫描）
+@Mapper
 public interface DeliverymanMapper {
-    // 根据ID查外卖员（登录后获取详情用）
-    Deliveryman selectById(@Param("id") Integer id);
+    // 1. 根据ID查外卖员（参数名：id→userId，类型：Integer→Long，匹配表中user_id（BIGINT））
+    Deliveryman selectById(@Param("userId") Long userId);
 
-    // 根据手机号查外卖员（登录验证用）
+    // 2. 根据手机号查外卖员（无修改，已匹配）
     Deliveryman selectByPhone(@Param("phone") String phone);
 
-    // 更新外卖员状态（接单时设为在线，退出时设为离线）
-    int updateStatus(@Param("id") Integer id, @Param("status") Integer status);
+    // 3. 更新外卖员工作状态（参数名：id→userId，类型：Integer→Long）
+    int updateStatus(@Param("userId") Long userId, @Param("status") Integer status);
 
-    // 更新外卖员信息（个人中心修改姓名、头像等）
-    int updateProfile(Deliveryman courier);
+    // 4. 更新外卖员信息（依赖实体类属性，需确保实体类有userId）
+    int updateProfile(Deliveryman deliveryman);
 
-    // 更新余额（完成订单后加收益）
-    int updateBalance(@Param("id") Integer id, @Param("addProfit") BigDecimal addProfit);
+    // 5. 更新余额（参数名：id→userId，类型：Integer→Long）
+    int updateBalance(@Param("userId") Long userId, @Param("addProfit") BigDecimal addProfit);
+
+    // 6. 根据手机号更新密码（无修改，已匹配）
+    int updatePasswordByPhone(
+            @Param("phone") String phone,
+            @Param("newPassword") String newPassword
+    );
+
+    // 7. 新增外卖员（无修改，已匹配实体类userId）
+    int insert(Deliveryman deliveryman);
+
+    // 8. 检查用户名是否存在（无修改，已匹配）
+    int countByUsername(@Param("username") String username);
+    // 新增：根据外卖员ID查询我的订单（状态=1：配送中）
+    List<DeliveryOrder> selectMyOrders(@Param("userId") Long userId);
 }

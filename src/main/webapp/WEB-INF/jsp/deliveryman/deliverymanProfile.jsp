@@ -14,7 +14,7 @@
         <tr><td>手机号</td><td>${user.phone}</td></tr>
         <tr><td>总完成订单</td><td>${user.totalOrders}</td></tr>
     </table>
-    <a href="${pageContext.request.contextPath}/deliverymanWorkbench.jsp" class="btn btn-default">返回工作台</a>
+    <a href="${pageContext.request.contextPath}/deliveryman/deliverymanWorkbench.jsp" class="btn btn-default">返回工作台</a>
     <a href="${pageContext.request.contextPath}/deliveryman/updatePwd.jsp" class="btn btn-warning">修改密码</a>
 </div>
 </body>

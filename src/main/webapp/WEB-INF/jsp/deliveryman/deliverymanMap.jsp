@@ -28,7 +28,7 @@
     </div>
     <div class="text-center mt-3">
         <button class="btn btn-success" onclick="finish(${order.id})">确认送达</button>
-        <a href="${pageContext.request.contextPath}/deliverymanWorkbench.jsp" class="btn btn-default">返回</a>
+        <a href="${pageContext.request.contextPath}/deliveryman/deliverymanWorkbench.jsp" class="btn btn-default">返回</a>
     </div>
 </div>
 

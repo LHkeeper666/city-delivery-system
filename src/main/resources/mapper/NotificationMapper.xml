@@ -15,46 +15,55 @@
         id, deliveryman_id, content, type, is_read, create_time, sms_sent
     </sql>
 
+    <!-- 修正：id 是自定义格式（NT+日期+序号），手动传入，无需自增 -->
     <insert id="insert" parameterType="com.thirdgroup.cdms.model.Notification">
         INSERT INTO cdms_notification (
             id, deliveryman_id, content, type, is_read, create_time, sms_sent
-        )
-        VALUES (
-            #{ id,jdbcType=VARCHAR },
-            #{ deliverymanId,jdbcType=BIGINT },
-            #{ content,jdbcType=VARCHAR },
-            #{ type,jdbcType=TINYINT },
-            #{ isRead,jdbcType=TINYINT },
-            #{ createTime,jdbcType=TIMESTAMP },
-            #{ smsSent,jdbcType=TINYINT }
-        )
+        ) VALUES (
+                     #{id,jdbcType=VARCHAR},
+                     #{deliverymanId,jdbcType=BIGINT},
+                     #{content,jdbcType=VARCHAR},
+                     #{type,jdbcType=TINYINT},
+                     #{isRead,jdbcType=TINYINT},
+                     #{createTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+                     #{smsSent,jdbcType=TINYINT}
+                 )
     </insert>
 
     <delete id="deleteByPrimaryKey">
         DELETE FROM cdms_notification
-        WHERE id = #{ id,jdbcType=VARCHAR }
+        WHERE id = #{id,jdbcType=VARCHAR}
     </delete>
 
     <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.model.Notification">
         UPDATE cdms_notification
         SET
-            deliveryman_id = #{ deliverymanId,jdbcType=BIGINT },
-            content = #{ content,jdbcType=VARCHAR },
-            type = #{ type,jdbcType=TINYINT },
-            is_read = #{ isRead,jdbcType=TINYINT },
-            create_time = #{ createTime,jdbcType=TIMESTAMP },
-            sms_sent = #{ smsSent,jdbcType=TINYINT }
-        WHERE id = #{ id,jdbcType=VARCHAR }
+            deliveryman_id = #{deliverymanId,jdbcType=BIGINT},
+            content = #{content,jdbcType=VARCHAR},
+            type = #{type,jdbcType=TINYINT},
+            is_read = #{isRead,jdbcType=TINYINT},
+            create_time = #{createTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+            sms_sent = #{smsSent,jdbcType=TINYINT}
+        WHERE id = #{id,jdbcType=VARCHAR}
     </update>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List" />
         FROM cdms_notification
-        WHERE id = #{ id,jdbcType=VARCHAR }
+        WHERE id = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 新增：按配送员ID查询通知（常用场景） -->
+    <select id="selectByDeliverymanId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM cdms_notification
+        WHERE deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
+        ORDER BY create_time DESC
     </select>
 
     <select id="selectAll" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List" />
         FROM cdms_notification
+        ORDER BY create_time DESC
     </select>
 </mapper>

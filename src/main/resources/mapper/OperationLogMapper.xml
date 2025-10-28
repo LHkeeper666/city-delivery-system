@@ -14,44 +14,53 @@
         log_id, operator_id, operation_type, operation_obj, operation_time, result
     </sql>
 
-    <insert id="insert" parameterType="com.thirdgroup.cdms.model.OperationLog">
+    <!-- 修正：log_id 是自增主键，无需手动插入 -->
+    <insert id="insert" parameterType="com.thirdgroup.cdms.model.OperationLog" useGeneratedKeys="true" keyProperty="logId">
         INSERT INTO cdms_operation_log (
-            log_id, operator_id, operation_type, operation_obj, operation_time, result
-        )
-        VALUES (
-            #{ logId,jdbcType=BIGINT },
-            #{ operatorId,jdbcType=BIGINT },
-            #{ operationType,jdbcType=VARCHAR },
-            #{ operationObj,jdbcType=VARCHAR },
-            #{ operationTime,jdbcType=TIMESTAMP },
-            #{ result,jdbcType=VARCHAR }
-        )
+            operator_id, operation_type, operation_obj, operation_time, result
+        ) VALUES (
+                     #{operatorId,jdbcType=BIGINT},
+                     #{operationType,jdbcType=VARCHAR},
+                     #{operationObj,jdbcType=VARCHAR},
+                     #{operationTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+                     #{result,jdbcType=VARCHAR}
+                 )
     </insert>
 
     <delete id="deleteByPrimaryKey">
         DELETE FROM cdms_operation_log
-        WHERE log_id = #{ logId,jdbcType=BIGINT }
+        WHERE log_id = #{logId,jdbcType=BIGINT}
     </delete>
 
     <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.model.OperationLog">
         UPDATE cdms_operation_log
         SET
-            operator_id = #{ operatorId,jdbcType=BIGINT },
-            operation_type = #{ operationType,jdbcType=VARCHAR },
-            operation_obj = #{ operationObj,jdbcType=VARCHAR },
-            operation_time = #{ operationTime,jdbcType=TIMESTAMP },
-            result = #{ result,jdbcType=VARCHAR }
-        WHERE log_id = #{ logId,jdbcType=BIGINT }
+            operator_id = #{operatorId,jdbcType=BIGINT},
+            operation_type = #{operationType,jdbcType=VARCHAR},
+            operation_obj = #{operationObj,jdbcType=VARCHAR},
+            operation_time = #{operationTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+            result = #{result,jdbcType=VARCHAR}
+        WHERE log_id = #{logId,jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List" />
         FROM cdms_operation_log
-        WHERE log_id = #{ logId,jdbcType=BIGINT }
+        WHERE log_id = #{logId,jdbcType=BIGINT}
+    </select>
+
+    <!-- 新增：按操作员ID和时间查询日志（常用场景） -->
+    <select id="selectByOperatorId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM cdms_operation_log
+        WHERE operator_id = #{operatorId,jdbcType=BIGINT}
+        AND operation_time BETWEEN #{startTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP}
+        ORDER BY operation_time DESC
     </select>
 
     <select id="selectAll" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List" />
         FROM cdms_operation_log
+        ORDER BY operation_time DESC
     </select>
 </mapper>

@@ -19,3 +19,6 @@ INSERT INTO cdms_user (
     TRUE,
     CURRENT_TIMESTAMP
  );
+/**
+  可能会和之前的sql冲突，把数据库删了重新执行就行
+ */
