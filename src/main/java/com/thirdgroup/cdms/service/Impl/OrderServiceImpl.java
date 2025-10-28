@@ -42,17 +42,20 @@ public class OrderServiceImpl implements OrderService {
         if (order == null || order.getStatus() != OrderStatus.PENDING.getCode()) {
             return false; // 订单不存在或已被接单
         }
-        // 2. 更新订单：分配外卖员+设为配送中
-        int orderRows = orderMapper.acceptOrder(
-                orderId,
-                courierId,
-                OrderStatus.DELIVERING.getCode(),
-                OrderStatus.PENDING.getCode() // 只更新待接单的订单
-        );
-        // 3. 更新外卖员状态为在线（双重保险）DeliverymanStatus status
-        boolean courierRows = courierService.updateStatus(courierId, OrderStatus.DELIVERING.getCode());
-        // 4. 两个操作都成功才算接单成功
-        return orderRows > 0 && courierRows;
+
+        // TODO: 未解决bug，临时注释
+        return true;
+//        // 2. 更新订单：分配外卖员+设为配送中
+//        int orderRows = orderMapper.acceptOrder(
+//                orderId,
+//                courierId,
+//                OrderStatus.DELIVERING.getCode(),
+//                OrderStatus.PENDING.getCode() // 只更新待接单的订单
+//        );
+//        // 3. 更新外卖员状态为在线（双重保险）DeliverymanStatus status
+//        boolean courierRows = courierService.updateStatus(courierId, OrderStatus.DELIVERING.getCode());
+//        // 4. 两个操作都成功才算接单成功
+//        return orderRows > 0 && courierRows;
     }
 
     // 3. 更新订单状态（确认取餐：还是配送中，不用改；确认送达：设为已完成+加收益）
@@ -65,9 +68,11 @@ public class OrderServiceImpl implements OrderService {
             return false;
         }
         // 2. 确认送达：加收益给外卖员
-        if (targetStatus == OrderStatus.COMPLETED) {
-            courierService.addBalance(order.getCourierId(), order.getProfit());
-        }
+        // TODO
+        // 临时注释
+//        if (targetStatus == OrderStatus.COMPLETED) {
+//            courierService.addBalance(order.getCourierId(), order.getProfit());
+//        }
         // 3. 更新订单状态和时间
         int rows = orderMapper.updateStatus(
                 orderId,
@@ -80,10 +85,13 @@ public class OrderServiceImpl implements OrderService {
     // 4. 获取外卖员的配送中订单
     @Override
     public List<DeliveryOrder> getDeliveringByCourierId(Integer courierId) {
-        return orderMapper.selectDeliveringByCourierId(
-                courierId,
-                OrderStatus.DELIVERING.getCode()
-        );
+        return null;
+        // TODO
+        // 临时注释
+//        return orderMapper.selectDeliveringByCourierId(
+//                courierId,
+//                OrderStatus.DELIVERING.getCode()
+//        );
     }
 
     // 5. 根据ID查订单
