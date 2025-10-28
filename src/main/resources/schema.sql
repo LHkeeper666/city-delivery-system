@@ -22,6 +22,8 @@ CREATE TABLE cdms_user (
     creator_id BIGINT,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
+    profit DECIMAL(10,2),
+
     FOREIGN KEY (creator_id) REFERENCES cdms_user(user_id),
 
     CHECK (role IN (0,1)),
@@ -47,6 +49,8 @@ CREATE TABLE cdms_delivery_order (
     weight DECIMAL(10,2),
     volume DECIMAL(10,3),
     delivery_fee DECIMAL(10,2) NOT NULL,
+    platform_income  DECIMAL(10,2),
+    deliveryman_income DECIMAL(10,2),
     expected_mins INT,
     remark VARCHAR(255),
 

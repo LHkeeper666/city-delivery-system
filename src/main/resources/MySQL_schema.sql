@@ -25,6 +25,8 @@ CREATE TABLE cdms.cdms_user (
     creator_id     BIGINT DEFAULT NULL COMMENT '创建人ID（管理员）',
     update_time    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
 
+    profit         DECIMAL(10,2) DEFAULT 0 COMMENT '总收入'
+
     FOREIGN KEY (creator_id) REFERENCES cdms_user(user_id),
 
         CHECK (role IN (0,1)),
@@ -53,6 +55,8 @@ CREATE TABLE cdms.cdms_delivery_order (
     weight           DECIMAL(10,2) DEFAULT NULL COMMENT '货物重量（kg）',
     volume           DECIMAL(10,3) DEFAULT NULL COMMENT '货物体积（m³）',
     delivery_fee     DECIMAL(10,2) NOT NULL COMMENT '配送费用（元）',
+    platform_income  DECIMAL(10,2) DEFAULT 0 COMMENT '平台收入（抽成部分）',
+    deliveryman_income DECIMAL(10,2) DEFAULT 0 COMMENT '配送员收入（剩余部分）',
     expected_mins   INT DEFAULT NULL COMMENT '预计配送时效（分钟）',
     remark           VARCHAR(255) DEFAULT NULL COMMENT '备注',
 
