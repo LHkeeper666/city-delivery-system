@@ -3,8 +3,10 @@ package com.thirdgroup.cdms.service.impl;
 import com.thirdgroup.cdms.mapper.DeliveryOrderMapper;
 import com.thirdgroup.cdms.model.ApiKey;
 import com.thirdgroup.cdms.model.DeliveryOrder;
+import com.thirdgroup.cdms.model.DeliveryTrace;
 import com.thirdgroup.cdms.model.PageResult;
 import com.thirdgroup.cdms.service.Interface.AdminService;
+import com.thirdgroup.cdms.service.Interface.TraceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,9 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     private DeliveryOrderMapper orderMapper;  // 订单Mapper接口
 
+    @Autowired
+    private TraceService traceService;
+
     @Override
     public String publishOrder(DeliveryOrder order) {
         return "";
@@ -22,7 +27,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public PageResult<DeliveryOrder> queryAllOrders(
-            Integer status, String keyword, int page, int size, long id) {
+            Integer status, String keyword, int page, int size, Long id) {
         // 1. 计算分页起始位置（MySQL分页用LIMIT start, size）
         int start = (page - 1) * size;  // 第1页：start=0，第2页：start=10...
 
@@ -32,7 +37,7 @@ public class AdminServiceImpl implements AdminService {
         );
 
         // 3. 查询总记录数（用于计算总页数）
-        Long total = orderMapper.count(status, keyword);
+        Long total = orderMapper.count(status, keyword, id);
 
         // 4. 封装到PageResult并返回
         PageResult<DeliveryOrder> result = new PageResult<>();
@@ -51,6 +56,12 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public ApiKey createApiKey(String appName) {
         return null;
+    }
+
+    @Override
+    public List<DeliveryTrace> trackOrder(String orderId) {
+        List<DeliveryTrace> deliveryTraceList = traceService.getOrderTraces(orderId);
+        return deliveryTraceList;
     }
 }
 // 先用ai生成一下，这个后面我自己改
