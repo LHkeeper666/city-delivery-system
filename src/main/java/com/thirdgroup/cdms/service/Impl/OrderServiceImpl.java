@@ -1,10 +1,9 @@
 package com.thirdgroup.cdms.service.impl;
 
-/**
- * 实现Orderservice接口
- */
 import com.thirdgroup.cdms.mapper.OrderMapper;
 import com.thirdgroup.cdms.model.DeliveryOrder;
+import com.thirdgroup.cdms.model.Deliveryman;
+import com.thirdgroup.cdms.model.enums.DeliverymanStatus;
 import com.thirdgroup.cdms.model.enums.OrderStatus;
 import com.thirdgroup.cdms.service.Interface.DeliveryManService;
 import com.thirdgroup.cdms.service.Interface.OrderService;
@@ -12,12 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 /**
- * 订单Service实现：核心业务（接单、更新状态）
+ * 订单Service实现：核心业务（接单、更新状态、订单查询）
  */
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -26,83 +26,123 @@ public class OrderServiceImpl implements OrderService {
     private OrderMapper orderMapper;
 
     @Autowired
-    private DeliveryManService courierService; // 注入外卖员Service，完成订单时加收益
+    private DeliveryManService deliveryManService;
 
-    // 1. 获取待接单订单（status=0）
+    // 1. 获取待接单订单（状态=待接单+未分配外卖员）
     @Override
     public List<DeliveryOrder> getPendingOrders() {
         return orderMapper.selectPendingOrders(OrderStatus.PENDING.getCode());
     }
 
-    // 2. 接单：加事务（防止订单更新成功但外卖员状态更新失败）
-    @Transactional // 标记为事务方法，出错自动回滚
+    // 接单方法（核心修改）
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean acceptOrder(Integer orderId, Integer courierId) {
-        // 1. 查订单是否存在且是待接单状态
+    public boolean acceptOrder(Long orderId, Long userId) {
         DeliveryOrder order = orderMapper.selectById(orderId);
-        if (order == null || order.getStatus() != OrderStatus.PENDING.getCode()) {
-            return false; // 订单不存在或已被接单
-        }
-
-        // TODO: 未解决bug，临时注释
-        return true;
-//        // 2. 更新订单：分配外卖员+设为配送中
-//        int orderRows = orderMapper.acceptOrder(
-//                orderId,
-//                courierId,
-//                OrderStatus.DELIVERING.getCode(),
-//                OrderStatus.PENDING.getCode() // 只更新待接单的订单
-//        );
-//        // 3. 更新外卖员状态为在线（双重保险）DeliverymanStatus status
-//        boolean courierRows = courierService.updateStatus(courierId, OrderStatus.DELIVERING.getCode());
-//        // 4. 两个操作都成功才算接单成功
-//        return orderRows > 0 && courierRows;
-    }
-
-    // 3. 更新订单状态（确认取餐：还是配送中，不用改；确认送达：设为已完成+加收益）
-    @Transactional
-    @Override
-    public boolean updateOrderStatus(Integer orderId, OrderStatus targetStatus) {
-        // 1. 查订单
-        DeliveryOrder order = orderMapper.selectById(orderId);
-        if (order == null) {
+        if (order == null || order.getStatus() != OrderStatus.PENDING.getCode() || order.getDeliverymanId() != null) {
             return false;
         }
-        // 2. 确认送达：加收益给外卖员
-        // TODO
-        // 临时注释
-//        if (targetStatus == OrderStatus.COMPLETED) {
-//            courierService.addBalance(order.getCourierId(), order.getProfit());
-//        }
-        // 3. 更新订单状态和时间
-        int rows = orderMapper.updateStatus(
+
+        Deliveryman deliveryman = deliveryManService.getById(userId);
+        if (deliveryman == null
+                || (deliveryman.getWorkStatus() != DeliverymanStatus.ONLINE.getCode()
+                && deliveryman.getWorkStatus() != DeliverymanStatus.RESTING.getCode())) {
+            return false;
+        }
+
+        // 关键修改：删除最后一个参数（new Date()），与接口参数保持一致
+        int orderRows = orderMapper.acceptOrder(
                 orderId,
-                targetStatus.getCode(),
-                new Date() // 完成时间
+                userId,
+                OrderStatus.ACCEPTED.getCode(),
+                OrderStatus.PENDING.getCode()
+                // 已删除：new Date() 这一行
         );
+        if (orderRows <= 0) {
+            throw new RuntimeException("订单更新失败");
+        }
+
+        boolean statusSuccess = deliveryManService.updateStatus(userId, DeliverymanStatus.ONLINE);
+        if (!statusSuccess) {
+            throw new RuntimeException("外卖员状态更新失败");
+        }
+
+        return true;
+    }
+
+    // 3. 更新订单状态（支持取货→配送中→完成的完整流程）
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public boolean updateOrderStatus(Long orderId, OrderStatus targetStatus) {
+        DeliveryOrder order = orderMapper.selectById(orderId);
+        if (order == null || !isStatusTransitionValid(order.getStatus(), targetStatus.getCode())) {
+            return false;
+        }
+        // 完成订单时添加收益
+        if (targetStatus == OrderStatus.COMPLETED) {
+            if (order.getDeliverymanId() == null) {
+                return false;
+            }
+            BigDecimal profit = order.getDeliverymanIncome() != null ? order.getDeliverymanIncome() : new BigDecimal("10.00");
+            boolean profitSuccess = deliveryManService.addBalance(order.getDeliverymanId(), profit);
+            if (!profitSuccess) {
+                throw new RuntimeException("收益添加失败");
+            }
+        }
+        // 更新订单状态和时间
+        int rows = orderMapper.updateStatus(orderId, targetStatus.getCode(), new Date());
         return rows > 0;
     }
 
-    // 4. 获取外卖员的配送中订单
+    // 4. 获取外卖员的所有在途订单（无需修改代码，排序依赖XML的update_time）
     @Override
-    public List<DeliveryOrder> getDeliveringByCourierId(Integer courierId) {
-        return null;
-        // TODO
-        // 临时注释
-//        return orderMapper.selectDeliveringByCourierId(
-//                courierId,
-//                OrderStatus.DELIVERING.getCode()
-//        );
+    public List<DeliveryOrder> getMyOrders(Long userId) {
+        if (deliveryManService.getById(userId) == null) {
+            return Collections.emptyList();
+        }
+        // 调用Mapper时，排序逻辑已在XML中改为按update_time（接单时会更新）
+        List<DeliveryOrder> acceptedOrders = orderMapper.selectByStatusAndDeliveryman(
+                userId, OrderStatus.ACCEPTED.getCode());
+        List<DeliveryOrder> deliveringOrders = orderMapper.selectByStatusAndDeliveryman(
+                userId, OrderStatus.DELIVERING.getCode());
+        acceptedOrders.addAll(deliveringOrders);
+        return acceptedOrders;
     }
 
     // 5. 根据ID查订单
     @Override
-    public DeliveryOrder getById(Integer orderId) {
+    public DeliveryOrder getOrderById(Long orderId) {
         return orderMapper.selectById(orderId);
     }
-    //换页
+
+    // 6. 分页查询订单
     @Override
     public List<DeliveryOrder> selectPage(Integer status, String keyword, int start, int size) {
-        return Collections.emptyList();
+        keyword = keyword == null ? "" : "%" + keyword + "%";
+        return orderMapper.selectPage(status, keyword, start, size);
     }
+
+    // 辅助：完善状态流转校验（支持待接单→待取货→配送中→完成）
+    private boolean isStatusTransitionValid(int currentStatus, int targetStatus) {
+        // 任何状态都可以取消
+        if (targetStatus == OrderStatus.CANCELLED.getCode()) {
+            return true;
+        }
+        // 合法流转路径：待接单→待取货→配送中→完成
+        return (currentStatus == OrderStatus.PENDING.getCode() && targetStatus == OrderStatus.ACCEPTED.getCode())
+                || (currentStatus == OrderStatus.ACCEPTED.getCode() && targetStatus == OrderStatus.DELIVERING.getCode())
+                || (currentStatus == OrderStatus.DELIVERING.getCode() && targetStatus == OrderStatus.COMPLETED.getCode());
+    }
+
+    // 扩展：更新配送位置（供地图功能调用，暂时注释，后续启用）
+    // public boolean updateDeliveryLocation(Long orderId, Long userId, Double longitude, Double latitude) {
+    //     // 校验订单属于当前外卖员
+    //     DeliveryOrder order = orderMapper.selectById(orderId);
+    //     if (order == null || !order.getDeliverymanId().equals(userId)) {
+    //         return false;
+    //     }
+    //     // 更新订单中的经纬度信息（需在Mapper中实现，暂时注释）
+    //     // return orderMapper.updateLocation(orderId, longitude, latitude, new Date()) > 0;
+    //     return true;
+    // }
 }
