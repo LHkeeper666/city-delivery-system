@@ -9,6 +9,10 @@ public interface AdminService {
     String publishOrder(DeliveryOrder order);
     // 分页查询所有订单（带多条件筛选）
     PageResult<DeliveryOrder> queryAllOrders(Integer status, String keyword, int page, int size);
+
+    PageResult<DeliveryOrder> queryAllOrders(
+            Integer status, String keyword, int page, int size, Integer currentDeliverymanId);
+
     // 强制取消订单（仅管理员有权限）
     void cancelOrder(String orderId, String reason);
     // 管理API密钥（创建/禁用第三方接口密钥）

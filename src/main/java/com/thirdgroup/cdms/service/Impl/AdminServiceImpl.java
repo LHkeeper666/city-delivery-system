@@ -21,14 +21,19 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    public PageResult<DeliveryOrder> queryAllOrders(Integer status, String keyword, int page, int size) {
+        return null;
+    }
+
+    @Override
     public PageResult<DeliveryOrder> queryAllOrders(
-            Integer status, String keyword, int page, int size) {
+            Integer status, String keyword, int page, int size, Integer currentDeliverymanId) {
         // 1. 计算分页起始位置（MySQL分页用LIMIT start, size）
         int start = (page - 1) * size;  // 第1页：start=0，第2页：start=10...
 
         // 2. 查询当前页数据（调用Mapper接口，带条件+分页）
         List<DeliveryOrder> orderList = orderMapper.selectPage(
-                status, keyword, start, size
+                status, keyword, start, size, currentDeliverymanId
         );
 
         // 3. 查询总记录数（用于计算总页数）

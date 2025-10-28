@@ -1,21 +1,39 @@
-<!-- 订单列表页面示例（JSP） -->
-<table class="table">
-    <tbody>
-    <!-- 遍历当前页订单列表 -->
-    <c:forEach items="${pageResult.list}" var="order">
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<html>
+<head>
+    <title>订单列表示例</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h3>所有订单（示例）</h3>
+    <table class="table table-striped">
         <tr>
-            <td>${order.orderId}</td>
-            <td>${order.consigneeName}</td>
-            <td>${order.status}</td>
+            <th>ID</th>
+            <th>商家</th>
+            <th>用户</th>
+            <th>状态</th>
+            <th>操作</th>
         </tr>
-    </c:forEach>
-    </tbody>
-</table>
-
-<!-- 分页控件 -->
-<div class="pagination">
-    总条数：${pageResult.total} 条 |
-    当前第 ${pageResult.page} 页 / 共 ${(pageResult.total + pageResult.size - 1) / pageResult.size} 页
-    <a href="/admin/orders?page=${pageResult.page-1}&size=10">上一页</a>
-    <a href="/admin/orders?page=${pageResult.page+1}&size=10">下一页</a>
+        <c:forEach items="${allOrders}" var="order">
+            <tr>
+                <td>${order.id}</td>
+                <td>${order.shopName}</td>
+                <td>${order.userName}</td>
+                <td>
+                    <c:choose>
+                        <c:when test="${order.status == 0}">待接单</c:when>
+                        <c:when test="${order.status == 1}">配送中</c:when>
+                        <c:otherwise>已完成</c:otherwise>
+                    </c:choose>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-info">查看</button>
+                </td>
+            </tr>
+        </c:forEach>
+    </table>
 </div>
+</body>
+</html>
