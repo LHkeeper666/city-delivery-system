@@ -13,6 +13,8 @@
         <result column="weight" property="weight" jdbcType="DECIMAL" />
         <result column="volume" property="volume" jdbcType="DECIMAL" />
         <result column="delivery_fee" property="deliveryFee" jdbcType="DECIMAL" />
+        <result column="platform_income" property="platformIncome" jdbcType="DECIMAL" />
+        <result column="deliveryman_income" property="deliverymanIncome" jdbcType="DECIMAL" />
         <result column="expected_mins" property="expectedMins" jdbcType="INTEGER" />
         <result column="remark" property="remark" jdbcType="VARCHAR" />
         <result column="status" property="status" jdbcType="TINYINT" />
@@ -95,9 +97,10 @@
     </select><!--    后面区分一下select count-->
 
     <!-- 分页查询当前页数据 -->
-    <select id="selectPage" resultType="com.thirdgroup.cdms.model.DeliveryOrder">
+    <select id="selectPageByDeliveryman" resultType="com.thirdgroup.cdms.model.DeliveryOrder">
         SELECT * FROM delivery_order
         <where>
+            deliveryman_id = #{id}
             <!-- 动态条件：状态筛选 -->
             <if test="status != null">AND status = #{status}</if>
             <!-- 动态条件：关键词搜索（订单号/收件人姓名） -->
@@ -117,6 +120,36 @@
             <if test="keyword != null and keyword != ''">
                 AND (order_id LIKE CONCAT('%', #{keyword}, '%')
                 OR consignee_name LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+    </select>
+    <select id="selectPageAdmin" resultType="com.thirdgroup.cdms.model.DeliveryOrder">
+#         TODO: 这里待修改
+        SELECT <include refid="Base_Column_List"/>
+        FROM cmds_delivery_order LEFT JOIN cmds_user
+        <where>
+            <!-- 按订单状态过滤 -->
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+
+            <!-- 按外卖员ID过滤 -->
+            <if test="Id != null">
+                AND deliveryman_id = #{Id}
+            </if>
+
+            <!-- 模糊搜索关键词 -->
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    order_id LIKE CONCAT('%', #{keyword}, '%')
+                    OR sender_name LIKE CONCAT('%', #{keyword}, '%')
+                    OR sender_phone LIKE CONCAT('%', #{keyword}, '%')
+                    OR consignee_name LIKE CONCAT('%', #{keyword}, '%')
+                    OR consignee_phone LIKE CONCAT('%', #{keyword}, '%')
+                    OR sender_address LIKE CONCAT('%', #{keyword}, '%')
+                    OR consignee_address LIKE CONCAT('%', #{keyword}, '%')
+                    OR delivery_name LIKE CONCAT('%', #{keyword}, '%')
+                )
             </if>
         </where>
     </select>

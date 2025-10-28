@@ -23,6 +23,8 @@ public class DeliveryOrder {
     private BigDecimal weight;
     private BigDecimal volume;
     private BigDecimal deliveryFee;
+    private BigDecimal platformIncome;
+    private BigDecimal deliverymanIncome;
     private Integer expectedMins;
     private String remark;
     private Integer status;
