@@ -10,8 +10,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 
@@ -25,6 +27,7 @@ import javax.sql.DataSource;
 //        ,"com.thirdgroup.cdms.mapper"
 })
 @MapperScan("com.thirdgroup.cdms.mapper")
+@EnableTransactionManagement
 public class DataSourceConfig {
 
 //    @Bean
@@ -68,7 +71,7 @@ public class DataSourceConfig {
     public DataSourceInitializer dataSourceInitializer(DataSource dataSource) {
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
 
-        populator.addScript(new ClassPathResource("schema.sql")); // 确保路径正确
+        populator.addScript(new ClassPathResource("schema.sql"));
 
         populator.addScript(new ClassPathResource("data.sql"));
 
@@ -104,5 +107,10 @@ public class DataSourceConfig {
     @Bean
     public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
         return new SqlSessionTemplate(sqlSessionFactory);
+    }
+
+    @Bean
+    public DataSourceTransactionManager transactionManager(DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
     }
 }

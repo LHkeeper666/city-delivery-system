@@ -54,4 +54,11 @@
         SELECT <include refid="Base_Column_List" />
         FROM cdms_delivery_trace
     </select>
+<!--    <select id="selectByOrderId" resultType="com.thirdgroup.cdms.model.DeliveryTrace"-->
+<!--            parameterType="java.lang.String"></select>-->
+    <select id="selectByOrderId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM cdms_delivery_trace
+        WHERE order_id = #{ orderId,jdbcType=VARCHAR }
+    </select>
 </mapper>

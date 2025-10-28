@@ -12,4 +12,6 @@ public interface DeliveryTraceMapper {
     int updateByPrimaryKey(DeliveryTrace record);
     DeliveryTrace selectByPrimaryKey(Long traceId);
     List<DeliveryTrace> selectAll();
+
+    List<DeliveryTrace> selectByOrderId(String orderId);
 }

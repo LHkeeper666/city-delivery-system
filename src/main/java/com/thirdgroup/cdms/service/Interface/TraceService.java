@@ -1,6 +1,7 @@
 package com.thirdgroup.cdms.service.Interface;
 
 import com.thirdgroup.cdms.model.DeliveryTrace;
+import com.thirdgroup.cdms.model.PageResult;
 
 import java.util.List;
 

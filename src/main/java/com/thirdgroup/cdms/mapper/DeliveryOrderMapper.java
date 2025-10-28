@@ -63,7 +63,7 @@ public interface DeliveryOrderMapper {
             @Param("keyword") String keyword,  // 搜索关键词（如订单号、收件人）
             @Param("start") int start,
             @Param("size") int size,
-            @Param("Id") long usersId
+            @Param("deliverymanId") Long usersId
     );
 
     // 3. 接单：更新订单的courier_id、status、accept_time
@@ -79,6 +79,9 @@ public interface DeliveryOrderMapper {
     // 查询总条数
     Long count(
             @Param("status") Integer status,
-            @Param("keyword") String keyword
+            @Param("keyword") String keyword,
+            @Param("deliverymanId") Long userId
     );
+
+    Long countByDeliveryman(@Param("deliverymanId") Long deliverymanId, @Param("status") Integer status, @Param("keyword") String keyword);
 }

@@ -113,8 +113,8 @@
         LIMIT #{start}, #{size}    <!-- 分页核心：只返回当前页数据 -->
     </select>
     <!-- 统计总条数（与查询条件一致，不含LIMIT） -->
-    <select id="count" resultType="java.lang.Long">
-        SELECT COUNT(*) FROM delivery_order
+    <select id="countByDeliveryman" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM cdms_delivery_order
         <where>
             <if test="status != null">AND status = #{status}</if>
             <if test="keyword != null and keyword != ''">
@@ -124,9 +124,10 @@
         </where>
     </select>
     <select id="selectPageAdmin" resultType="com.thirdgroup.cdms.model.DeliveryOrder">
-#         TODO: 这里待修改
-        SELECT <include refid="Base_Column_List"/>
-        FROM cmds_delivery_order LEFT JOIN cmds_user
+        SELECT o.*, u.username AS deliveryman_name
+        FROM cdms_delivery_order o
+        LEFT JOIN cdms_user u
+        ON o.deliveryman_id = u.user_id
         <where>
             <!-- 按订单状态过滤 -->
             <if test="status != null">
@@ -134,21 +135,54 @@
             </if>
 
             <!-- 按外卖员ID过滤 -->
-            <if test="Id != null">
+            <if test="deliverymanId != null">
                 AND deliveryman_id = #{Id}
             </if>
 
             <!-- 模糊搜索关键词 -->
             <if test="keyword != null and keyword != ''">
                 AND (
-                    order_id LIKE CONCAT('%', #{keyword}, '%')
-                    OR sender_name LIKE CONCAT('%', #{keyword}, '%')
-                    OR sender_phone LIKE CONCAT('%', #{keyword}, '%')
-                    OR consignee_name LIKE CONCAT('%', #{keyword}, '%')
-                    OR consignee_phone LIKE CONCAT('%', #{keyword}, '%')
-                    OR sender_address LIKE CONCAT('%', #{keyword}, '%')
-                    OR consignee_address LIKE CONCAT('%', #{keyword}, '%')
-                    OR delivery_name LIKE CONCAT('%', #{keyword}, '%')
+                    o.order_id LIKE CONCAT('%', #{keyword}, '%')
+                    OR o.sender_name LIKE CONCAT('%', #{keyword}, '%')
+                    OR o.sender_phone LIKE CONCAT('%', #{keyword}, '%')
+                    OR o.consignee_name LIKE CONCAT('%', #{keyword}, '%')
+                    OR o.consignee_phone LIKE CONCAT('%', #{keyword}, '%')
+                    OR o.sender_address LIKE CONCAT('%', #{keyword}, '%')
+                    OR o.consignee_address LIKE CONCAT('%', #{keyword}, '%')
+                    OR u.username LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+        ORDER BY create_time DESC  <!-- 按创建时间倒序（最新的在前） -->
+        LIMIT #{start}, #{size}    <!-- 分页核心：只返回当前页数据 -->
+    </select>
+    <select id="count" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM cdms_delivery_order o
+        LEFT JOIN cdms_user u
+        ON o.deliveryman_id = u.user_id
+        <where>
+            <!-- 按订单状态过滤 -->
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+
+            <!-- 按外卖员ID过滤 -->
+            <if test="deliverymanId != null">
+                AND deliveryman_id = #{Id}
+            </if>
+
+            <!-- 模糊搜索关键词 -->
+            <if test="keyword != null and keyword != ''">
+                AND (
+                o.order_id LIKE CONCAT('%', #{keyword}, '%')
+                OR o.sender_name LIKE CONCAT('%', #{keyword}, '%')
+                OR o.sender_phone LIKE CONCAT('%', #{keyword}, '%')
+                OR o.consignee_name LIKE CONCAT('%', #{keyword}, '%')
+                OR o.consignee_phone LIKE CONCAT('%', #{keyword}, '%')
+                OR o.sender_address LIKE CONCAT('%', #{keyword}, '%')
+                OR o.consignee_address LIKE CONCAT('%', #{keyword}, '%')
+                OR u.username LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
         </where>
