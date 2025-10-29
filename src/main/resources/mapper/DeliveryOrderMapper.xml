@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.thirdgroup.cdms.mapper.DeliveryOrderMapper">
-    <!-- 基础结果集：仅映射数据库存在的字段 -->
+    <!-- 1. 基础结果集：明确order_id为VARCHAR，与实体类String orderId匹配 -->
     <resultMap id="BaseResultMap" type="com.thirdgroup.cdms.model.DeliveryOrder">
-        <id column="order_id" property="orderId" jdbcType="VARCHAR" />
+        <id column="order_id" property="orderId" jdbcType="VARCHAR" /> <!-- 核心：VARCHAR类型 -->
         <result column="sender_name" property="senderName" jdbcType="VARCHAR" />
         <result column="sender_phone" property="senderPhone" jdbcType="VARCHAR" />
         <result column="sender_address" property="senderAddress" jdbcType="VARCHAR" />
@@ -26,53 +26,54 @@
         <result column="cancel_time" property="cancelTime" jdbcType="TIMESTAMP" />
     </resultMap>
 
-    <!-- 基础字段列表：仅包含数据库存在的字段 -->
+    <!-- 2. 基础字段列表：复用字段定义 -->
     <sql id="Base_Column_List">
+        order_id, sender_name, sender_phone, sender_address, consignee_name, consignee_phone,
+        consignee_address, goods_type, weight, volume, delivery_fee, platform_income,
+        deliveryman_income, <!-- 必须包含此字段，否则无法返回收益 -->
+        expected_mins, remark, status, create_time, creator_id,
+        deliveryman_id, complete_time, cancel_time
+    </sql>
+
+    <!-- 3. 新增订单：补充order_id类型校验 -->
+    <insert id="insert" parameterType="com.thirdgroup.cdms.model.DeliveryOrder">
+        INSERT INTO cdms_delivery_order (
         order_id, sender_name, sender_phone, sender_address, consignee_name, consignee_phone,
         consignee_address, goods_type, weight, volume, delivery_fee, platform_income,
         deliveryman_income, expected_mins, remark, status, create_time, creator_id,
         deliveryman_id, complete_time, cancel_time
-    </sql>
-
-    <!-- 新增订单 -->
-    <insert id="insert" parameterType="com.thirdgroup.cdms.model.DeliveryOrder">
-        INSERT INTO cdms_delivery_order (
-            order_id, sender_name, sender_phone, sender_address, consignee_name, consignee_phone,
-            consignee_address, goods_type, weight, volume, delivery_fee, platform_income,
-            deliveryman_income, expected_mins, remark, status, create_time, creator_id,
-            deliveryman_id, complete_time, cancel_time
         ) VALUES (
-                     #{orderId,jdbcType=VARCHAR},
-                     #{senderName,jdbcType=VARCHAR},
-                     #{senderPhone,jdbcType=VARCHAR},
-                     #{senderAddress,jdbcType=VARCHAR},
-                     #{consigneeName,jdbcType=VARCHAR},
-                     #{consigneePhone,jdbcType=VARCHAR},
-                     #{consigneeAddress,jdbcType=VARCHAR},
-                     #{goodsType,jdbcType=VARCHAR},
-                     #{weight,jdbcType=DECIMAL},
-                     #{volume,jdbcType=DECIMAL},
-                     #{deliveryFee,jdbcType=DECIMAL},
-                     #{platformIncome,jdbcType=DECIMAL},
-                     #{deliverymanIncome,jdbcType=DECIMAL},
-                     #{expectedMins,jdbcType=INTEGER},
-                     #{remark,jdbcType=VARCHAR},
-                     #{status,jdbcType=TINYINT},
-                     #{createTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
-                     #{creatorId,jdbcType=BIGINT},
-                     #{deliverymanId,jdbcType=BIGINT},
-                     #{completeTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
-                     #{cancelTime,jdbcType=TIMESTAMP,javaType=java.util.Date}
-                 )
+        #{orderId,jdbcType=VARCHAR},  <!-- 明确VARCHAR，与数据库匹配 -->
+        #{senderName,jdbcType=VARCHAR},
+        #{senderPhone,jdbcType=VARCHAR},
+        #{senderAddress,jdbcType=VARCHAR},
+        #{consigneeName,jdbcType=VARCHAR},
+        #{consigneePhone,jdbcType=VARCHAR},
+        #{consigneeAddress,jdbcType=VARCHAR},
+        #{goodsType,jdbcType=VARCHAR},
+        #{weight,jdbcType=DECIMAL},
+        #{volume,jdbcType=DECIMAL},
+        #{deliveryFee,jdbcType=DECIMAL},
+        #{platformIncome,jdbcType=DECIMAL},
+        #{deliverymanIncome,jdbcType=DECIMAL},
+        #{expectedMins,jdbcType=INTEGER},
+        #{remark,jdbcType=VARCHAR},
+        #{status,jdbcType=TINYINT},
+        #{createTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+        #{creatorId,jdbcType=BIGINT},
+        #{deliverymanId,jdbcType=BIGINT},
+        #{completeTime,jdbcType=TIMESTAMP,javaType=java.util.Date},
+        #{cancelTime,jdbcType=TIMESTAMP,javaType=java.util.Date}
+        )
     </insert>
 
-    <!-- 删除订单 -->
+    <!-- 4. 删除订单：无需修改（已正确使用VARCHAR） -->
     <delete id="deleteByPrimaryKey">
         DELETE FROM cdms_delivery_order
-        WHERE order_id = #{ orderId,jdbcType=VARCHAR }
+        WHERE order_id = #{orderId,jdbcType=VARCHAR}
     </delete>
 
-    <!-- 更新订单 -->
+    <!-- 5. 全量更新订单：无需修改（已正确使用VARCHAR） -->
     <update id="updateByPrimaryKey" parameterType="com.thirdgroup.cdms.model.DeliveryOrder">
         UPDATE cdms_delivery_order
         SET
@@ -99,21 +100,21 @@
         WHERE order_id = #{orderId,jdbcType=VARCHAR}
     </update>
 
-    <!-- 按主键查订单 -->
+    <!-- 6. 按主键查询订单：无需修改（已正确使用VARCHAR） -->
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM cdms_delivery_order
         WHERE order_id = #{orderId,jdbcType=VARCHAR}
     </select>
 
-    <!-- 查询所有订单 -->
+    <!-- 7. 查询所有订单：无需修改 -->
     <select id="selectAll" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM cdms_delivery_order
         ORDER BY create_time DESC
     </select>
 
-    <!-- 分页查询配送员的订单列表 -->
+    <!-- 8. 分页查询骑手个人订单：优化模糊查询类型 -->
     <select id="selectPageByDeliveryman" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM cdms_delivery_order
@@ -121,114 +122,101 @@
             deliveryman_id = #{userId,jdbcType=BIGINT}
             <if test="status != null">AND status = #{status,jdbcType=TINYINT}</if>
             <if test="keyword != null and keyword != ''">
-                AND (order_id LIKE CONCAT('%', #{keyword}, '%')
-                OR consignee_name LIKE CONCAT('%', #{keyword}, '%'))
-            </if>
-        </where>
-        ORDER BY create_time DESC  <!-- 按创建时间倒序（最新的在前） -->
-        LIMIT #{start}, #{size}    <!-- 分页核心：只返回当前页数据 -->
-    </select>
-    <!-- 统计总条数（与查询条件一致，不含LIMIT） -->
-    <select id="countByDeliveryman" resultType="java.lang.Long">
-        SELECT COUNT(*) FROM cdms_delivery_order
-        <where>
-            <if test="status != null">AND status = #{status}</if>
-            <if test="keyword != null and keyword != ''">
-                AND (order_id LIKE CONCAT('%', #{keyword}, '%')
-                OR consignee_name LIKE CONCAT('%', #{keyword}, '%'))
-            </if>
-        </where>
-    </select>
-    <select id="selectPageAdmin" resultType="com.thirdgroup.cdms.model.DeliveryOrder">
-        SELECT o.*, u.username AS deliveryman_name
-        FROM cdms_delivery_order o
-        LEFT JOIN cdms_user u
-        ON o.deliveryman_id = u.user_id
-        <where>
-            <!-- 按订单状态过滤 -->
-            <if test="status != null">
-                AND status = #{status}
-            </if>
-
-            <!-- 按外卖员ID过滤 -->
-            <if test="deliverymanId != null">
-                AND deliveryman_id = #{Id}
-            </if>
-
-            <!-- 模糊搜索关键词 -->
-            <if test="keyword != null and keyword != ''">
                 AND (
-                    o.order_id LIKE CONCAT('%', #{keyword}, '%')
-                    OR o.sender_name LIKE CONCAT('%', #{keyword}, '%')
-                    OR o.sender_phone LIKE CONCAT('%', #{keyword}, '%')
-                    OR o.consignee_name LIKE CONCAT('%', #{keyword}, '%')
-                    OR o.consignee_phone LIKE CONCAT('%', #{keyword}, '%')
-                    OR o.sender_address LIKE CONCAT('%', #{keyword}, '%')
-                    OR o.consignee_address LIKE CONCAT('%', #{keyword}, '%')
-                    OR u.username LIKE CONCAT('%', #{keyword}, '%')
+                order_id LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')  <!-- 补充VARCHAR类型 -->
+                OR consignee_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
                 )
             </if>
         </where>
-        ORDER BY create_time DESC  <!-- 按创建时间倒序（最新的在前） -->
-        LIMIT #{start}, #{size}    <!-- 分页核心：只返回当前页数据 -->
+        ORDER BY create_time DESC
+        LIMIT #{start,jdbcType=INTEGER}, #{size,jdbcType=INTEGER}  <!-- 补充分页参数类型 -->
     </select>
+
+    <!-- 9. 统计骑手订单总数：优化模糊查询类型 -->
+    <select id="countByDeliveryman" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM cdms_delivery_order
+        <where>
+            deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
+            <if test="status != null">AND status = #{status,jdbcType=TINYINT}</if>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                order_id LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')  <!-- 补充VARCHAR类型 -->
+                OR consignee_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                )
+            </if>
+        </where>
+    </select>
+
+    <!-- 10. 管理员分页查询订单：优化模糊查询类型 -->
+    <select id="selectPageAdmin" resultMap="BaseResultMap">
+        SELECT o.*, u.username AS deliveryman_name
+        FROM cdms_delivery_order o
+        LEFT JOIN cdms_user u ON o.deliveryman_id = u.user_id
+        <where>
+            <if test="status != null">AND o.status = #{status,jdbcType=TINYINT}</if>
+            <if test="deliverymanId != null">AND o.deliveryman_id = #{deliverymanId,jdbcType=BIGINT}</if>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                o.order_id LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')  <!-- 补充VARCHAR类型 -->
+                OR o.sender_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                OR o.consignee_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                OR u.username LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                )
+            </if>
+        </where>
+        ORDER BY o.create_time DESC
+        LIMIT #{start,jdbcType=INTEGER}, #{size,jdbcType=INTEGER}  <!-- 补充分页参数类型 -->
+    </select>
+
+    <!-- 11. 管理员统计订单总数：优化模糊查询类型 -->
     <select id="count" resultType="java.lang.Long">
         SELECT COUNT(*)
         FROM cdms_delivery_order o
-        LEFT JOIN cdms_user u
-        ON o.deliveryman_id = u.user_id
+        LEFT JOIN cdms_user u ON o.deliveryman_id = u.user_id
         <where>
-            <!-- 按订单状态过滤 -->
-            <if test="status != null">
-                AND status = #{status}
-            </if>
-
-            <!-- 按外卖员ID过滤 -->
-            <if test="deliverymanId != null">
-                AND deliveryman_id = #{Id}
-            </if>
-
-            <!-- 模糊搜索关键词 -->
+            <if test="status != null">AND o.status = #{status,jdbcType=TINYINT}</if>
+            <if test="deliverymanId != null">AND o.deliveryman_id = #{deliverymanId,jdbcType=BIGINT}</if>
             <if test="keyword != null and keyword != ''">
                 AND (
-                    o.order_id LIKE CONCAT('%', #{keyword}, '%')
-                    OR o.sender_name LIKE CONCAT('%', #{keyword}, '%')
-                    OR o.sender_phone LIKE CONCAT('%', #{keyword}, '%')
-                    OR o.consignee_name LIKE CONCAT('%', #{keyword}, '%')
-                    OR o.consignee_phone LIKE CONCAT('%', #{keyword}, '%')
-                    OR o.sender_address LIKE CONCAT('%', #{keyword}, '%')
-                    OR o.consignee_address LIKE CONCAT('%', #{keyword}, '%')
-                    OR u.username LIKE CONCAT('%', #{keyword}, '%')
+                o.order_id LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')  <!-- 补充VARCHAR类型 -->
+                OR o.sender_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                OR o.consignee_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                OR u.username LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
                 )
             </if>
         </where>
     </select>
-    <!-- 分页查询订单 -->
+
+    <!-- 12. 通用分页查询订单：优化分页参数类型 -->
     <select id="selectPage" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM cdms_delivery_order
         <where>
             <if test="status != null">AND status = #{status,jdbcType=TINYINT}</if>
             <if test="keyword != null and keyword != ''">
-                AND (order_id LIKE #{keyword,jdbcType=VARCHAR}
-                OR sender_name LIKE #{keyword,jdbcType=VARCHAR}
-                OR consignee_name LIKE #{keyword,jdbcType=VARCHAR})
+                AND (
+                order_id LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')  <!-- 补充VARCHAR类型 -->
+                OR sender_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                OR consignee_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                )
             </if>
         </where>
         ORDER BY create_time DESC
-        LIMIT #{start,jdbcType=INTEGER}, #{size,jdbcType=INTEGER}
+        LIMIT #{start,jdbcType=INTEGER}, #{size,jdbcType=INTEGER}  <!-- 明确INTEGER类型 -->
     </select>
-    <!-- 查询当前外卖员的在途订单 -->
+
+    <!-- 13. 查询骑手在途订单：无需修改 -->
     <select id="selectMyOrders" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM cdms_delivery_order
         WHERE
         deliveryman_id = #{userId,jdbcType=BIGINT}
-        AND status = 1
+        AND status IN (1, 2)
         ORDER BY create_time DESC
     </select>
 
-    <!-- 按状态和配送员查询 -->
+    <!-- 14. 按骑手ID和状态查询订单：无需修改 -->
     <select id="selectByStatusAndDeliveryman" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM cdms_delivery_order
@@ -238,7 +226,7 @@
         ORDER BY create_time DESC
     </select>
 
-    <!-- 查询待接单订单 -->
+    <!-- 15. 查询待接单订单：无需修改 -->
     <select id="selectPendingOrders" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM cdms_delivery_order
@@ -248,13 +236,26 @@
         ORDER BY create_time DESC
     </select>
 
-    <!-- 兼容历史方法 -->
+    <!-- 16. 兼容历史方法：无需修改 -->
     <select id="selectDeliveringByCourierId" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM cdms_delivery_order
         WHERE
         deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
         AND status = #{status,jdbcType=TINYINT}
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 17. 历史订单查询：无需修改（已正确适配） -->
+    <select id="selectHistoryOrders" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> <!-- 复用字段列表，避免漏查 -->
+        FROM cdms_delivery_order
+        WHERE
+        deliveryman_id = #{userId,jdbcType=BIGINT}
+        AND status IN
+        <foreach collection="statusCodes" item="code" open="(" separator="," close=")">
+            #{code,jdbcType=TINYINT}
+        </foreach>
         ORDER BY create_time DESC
     </select>
 </mapper>

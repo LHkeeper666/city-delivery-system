@@ -28,7 +28,18 @@ INSERT INTO cdms_user (
      0,
      TRUE,
      CURRENT_TIMESTAMP
+),
+         ('cjh',
+          '$2a$10$aLs7OA3oUfTt9TiPCfhr6.XWN0wknOTVa82rfd8nNQEtsyW0knn8S',
+          1,
+          '13609193515',
+          0,
+          1,
+          0,
+          TRUE,
+          CURRENT_TIMESTAMP
 );
+
 
 INSERT INTO cdms_delivery_order (
     order_id,
