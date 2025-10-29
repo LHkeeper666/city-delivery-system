@@ -13,9 +13,13 @@ import com.thirdgroup.cdms.utils.PasswordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
+import com.thirdgroup.cdms.model.enums.OrderStatus;
+import java.math.BigDecimal;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -29,8 +33,59 @@ public class AdminServiceImpl implements AdminService {
     private UserMapper userMapper;  // 用户Mapper接口
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String publishOrder(DeliveryOrder order) {
-        return "";
+        try {
+            // 生成订单ID：DEL + 日期 + 3位流水号
+            String orderId = generateOrderId();
+            order.setOrderId(orderId);
+            
+            // 设置订单状态为待接单
+            order.setStatus(OrderStatus.PENDING.getCode());
+            
+            // 设置创建时间
+            order.setCreateTime(new Date());
+            
+            // 计算平台收入和配送员收入（假设平台抽取20%）
+            if (order.getDeliveryFee() != null) {
+                BigDecimal platformRate = new BigDecimal(0.2); // 20%平台抽成
+                order.setPlatformIncome(order.getDeliveryFee().multiply(platformRate));
+                order.setDeliverymanIncome(order.getDeliveryFee().subtract(order.getPlatformIncome()));
+            }
+            
+            // 保存订单到数据库
+            orderMapper.insert(order);
+            
+            // 返回生成的订单ID
+            return order.getOrderId();
+        } catch (Exception e) {
+            throw new RuntimeException("发布订单失败: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 生成订单ID
+     * 规则：DEL + 日期（yyyyMMdd） + 3位流水号
+     */
+    private String generateOrderId() {
+        // 获取当前日期
+        String dateStr = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        
+        // 查询当天最大的订单号
+        String maxOrderId = orderMapper.getMaxOrderIdByDate(dateStr);
+        
+        String sequence;
+        if (maxOrderId != null && maxOrderId.startsWith("DEL" + dateStr)) {
+            // 提取序号部分并加1
+            String seqStr = maxOrderId.substring(9); // DELyyyyMMdd后的3位
+            int seq = Integer.parseInt(seqStr) + 1;
+            sequence = String.format("%03d", seq);
+        } else {
+            // 如果没有找到，从001开始
+            sequence = "001";
+        }
+        
+        return "DEL" + dateStr + sequence;
     }
 
     @Override

@@ -15,7 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
+import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Api(tags = "管理接口")
@@ -47,6 +48,91 @@ public class AdminController {
         // TODO: jsp名称不确定
 //        return deliveryOrderPageResult.getList().get(0).getConsigneeAddress();
         return null;
+    }
+    
+    /**
+     * 显示发布配送信息页面
+     */
+    @GetMapping("/publish-order")
+    public String publishOrderPage(Model model) {
+        model.addAttribute("deliveryOrder", new DeliveryOrder());
+        return "admin/publishOrder";
+    }
+    
+    /**
+     * 处理发布配送信息表单提交
+     */
+    @PostMapping("/publish-order")
+    public String publishOrder(@ModelAttribute DeliveryOrder order, HttpSession session, Model model) {
+        try {
+            // 表单验证
+            if (order.getSenderAddress() == null || order.getSenderAddress().trim().isEmpty()) {
+                model.addAttribute("error", "接货地址不能为空");
+                model.addAttribute("deliveryOrder", order);
+                return "admin/publishOrder";
+            }
+            if (order.getSenderName() == null || order.getSenderName().trim().isEmpty()) {
+                model.addAttribute("error", "接货人姓名不能为空");
+                model.addAttribute("deliveryOrder", order);
+                return "admin/publishOrder";
+            }
+            if (order.getSenderPhone() == null || order.getSenderPhone().trim().isEmpty() || 
+                !order.getSenderPhone().matches("1[3-9]\\d{9}")) {
+                model.addAttribute("error", "接货人电话格式不正确，请输入11位手机号码");
+                model.addAttribute("deliveryOrder", order);
+                return "admin/publishOrder";
+            }
+            if (order.getConsigneeAddress() == null || order.getConsigneeAddress().trim().isEmpty()) {
+                model.addAttribute("error", "配送地址不能为空");
+                model.addAttribute("deliveryOrder", order);
+                return "admin/publishOrder";
+            }
+            if (order.getConsigneeName() == null || order.getConsigneeName().trim().isEmpty()) {
+                model.addAttribute("error", "收货人姓名不能为空");
+                model.addAttribute("deliveryOrder", order);
+                return "admin/publishOrder";
+            }
+            if (order.getConsigneePhone() == null || order.getConsigneePhone().trim().isEmpty() || 
+                !order.getConsigneePhone().matches("1[3-9]\\d{9}")) {
+                model.addAttribute("error", "收货人电话格式不正确，请输入11位手机号码");
+                model.addAttribute("deliveryOrder", order);
+                return "admin/publishOrder";
+            }
+            if (order.getDeliveryFee() == null || order.getDeliveryFee().compareTo(BigDecimal.ZERO) <= 0) {
+                model.addAttribute("error", "配送费用必须大于0");
+                model.addAttribute("deliveryOrder", order);
+                return "admin/publishOrder";
+            }
+            if (order.getGoodsType() == null || order.getGoodsType().trim().isEmpty()) {
+                model.addAttribute("error", "货物类型不能为空");
+                model.addAttribute("deliveryOrder", order);
+                return "admin/publishOrder";
+            }
+            if (order.getExpectedMins() != null && order.getExpectedMins() <= 0) {
+                model.addAttribute("error", "预计送达时间必须大于0小时");
+                model.addAttribute("deliveryOrder", order);
+                return "admin/publishOrder";
+            }
+            
+            // 设置创建者ID（从session中获取当前管理员）
+            User currentUser = (User) session.getAttribute("user");
+            if (currentUser != null) {
+                order.setCreatorId(currentUser.getUserId());
+            }
+            
+            // 调用服务层发布订单
+            String orderId = adminService.publishOrder(order);
+            
+            // 保存订单ID到模型中，用于前端显示
+            model.addAttribute("orderId", orderId);
+            model.addAttribute("success", true);
+            
+            return "admin/publishOrder";
+        } catch (Exception e) {
+            model.addAttribute("error", "发布订单失败：" + e.getMessage());
+            model.addAttribute("deliveryOrder", order);
+            return "admin/publishOrder";
+        }
     }
 
     /**
