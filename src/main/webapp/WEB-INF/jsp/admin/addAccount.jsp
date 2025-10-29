@@ -45,6 +45,21 @@
             <div class="alert alert-danger">${error}</div>
         </c:if>
         
+        <!-- 成功消息将通过弹窗显示 -->
+        
+        <script>
+            // 处理表单提交
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.querySelector('form');
+                
+                form.addEventListener('submit', function(event) {
+                    // 显示成功消息弹窗
+                    alert('账号创建成功');
+                    // 弹窗确认后，表单会继续提交并重定向到账号管理界面
+                });
+            });
+        </script>
+        
         <form action="${pageContext.request.contextPath}/admin/accounts/add" method="post" class="form-horizontal">
             <div class="form-group">
                 <label for="username" class="col-sm-3 control-label">用户名 <span style="color: red;">*</span></label>

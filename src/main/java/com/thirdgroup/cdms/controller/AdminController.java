@@ -101,9 +101,19 @@ public class AdminController {
      * 新增账号页面
      */
     @GetMapping("/accounts/add")
-    public String addAccountPage(Model model) {
+    public String addAccountPage(
+            @RequestParam(required = false) Boolean success,
+            @RequestParam(required = false) String message,
+            Model model) {
         model.addAttribute("roles", UserRole.values());
         model.addAttribute("statuses", UserStatus.values());
+        // 传递success和message参数给前端页面
+        if (success != null) {
+            model.addAttribute("success", success);
+        }
+        if (message != null) {
+            model.addAttribute("message", message);
+        }
         return "admin/addAccount";
     }
     
@@ -124,7 +134,7 @@ public class AdminController {
             
             // 调用服务层创建账号
             adminService.createAccount(user);
-            model.addAttribute("message", "账号创建成功");
+            // 创建成功后重定向回账号管理界面
             return "redirect:/admin/accounts";
         } catch (Exception e) {
             // 处理异常，提供友好的错误提示
