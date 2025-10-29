@@ -74,7 +74,8 @@ public class DataSourceConfig {
         populator.addScript(new ClassPathResource("schema.sql"));
 
         populator.addScript(new ClassPathResource("data.sql"));
-
+        // 测试阶段避免乱码：设置SQL脚本执行编码为UTF-8（解决H2插入中文乱码）
+        populator.setSqlScriptEncoding("UTF-8");
         DataSourceInitializer initializer = new DataSourceInitializer();
         initializer.setDataSource(dataSource);
         initializer.setDatabasePopulator(populator);
