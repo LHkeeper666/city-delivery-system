@@ -22,7 +22,7 @@ INSERT INTO cdms_user (
      'deliveryman1',
      '{noop}1234',
      1,
-     '1111111111111',
+     '111111111111',
      0,
      1,
      0,
