@@ -12,10 +12,14 @@ import com.thirdgroup.cdms.service.Interface.TraceService;
 import com.thirdgroup.cdms.utils.PasswordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
+import com.thirdgroup.cdms.model.enums.OrderStatus;
+import java.math.BigDecimal;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -29,8 +33,59 @@ public class AdminServiceImpl implements AdminService {
     private UserMapper userMapper;  // 用户Mapper接口
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String publishOrder(DeliveryOrder order) {
-        return "";
+        try {
+            // 生成订单ID：DEL + 日期 + 3位流水号
+            String orderId = generateOrderId();
+            order.setOrderId(orderId);
+            
+            // 设置订单状态为待接单
+            order.setStatus(OrderStatus.PENDING.getCode());
+            
+            // 设置创建时间
+            order.setCreateTime(new Date());
+            
+            // 计算平台收入和配送员收入（假设平台抽取20%）
+            if (order.getDeliveryFee() != null) {
+                BigDecimal platformRate = new BigDecimal(0.2); // 20%平台抽成
+                order.setPlatformIncome(order.getDeliveryFee().multiply(platformRate));
+                order.setDeliverymanIncome(order.getDeliveryFee().subtract(order.getPlatformIncome()));
+            }
+            
+            // 保存订单到数据库
+            orderMapper.insert(order);
+            
+            // 返回生成的订单ID
+            return order.getOrderId();
+        } catch (Exception e) {
+            throw new RuntimeException("发布订单失败: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 生成订单ID
+     * 规则：DEL + 日期（yyyyMMdd） + 3位流水号
+     */
+    private String generateOrderId() {
+        // 获取当前日期
+        String dateStr = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        
+        // 查询当天最大的订单号
+        String maxOrderId = orderMapper.getMaxOrderIdByDate(dateStr);
+        
+        String sequence;
+        if (maxOrderId != null && maxOrderId.startsWith("DEL" + dateStr)) {
+            // 提取序号部分并加1
+            String seqStr = maxOrderId.substring(9); // DELyyyyMMdd后的3位
+            int seq = Integer.parseInt(seqStr) + 1;
+            sequence = String.format("%03d", seq);
+        } else {
+            // 如果没有找到，从001开始
+            sequence = "001";
+        }
+        
+        return "DEL" + dateStr + sequence;
     }
 
     @Override
@@ -109,6 +164,12 @@ public class AdminServiceImpl implements AdminService {
     
     @Override
     public Long createAccount(User user) {
+        // 检查用户名是否已存在
+        User existingUser = userMapper.selectByUsername(user.getUsername());
+        if (existingUser != null) {
+            throw new RuntimeException("用户名已存在");
+        }
+        
         // 密码加密
         user.setPassword(PasswordUtils.encode(user.getPassword()));
         user.setCreateTime(new Date());
@@ -124,13 +185,27 @@ public class AdminServiceImpl implements AdminService {
         // 更新非密码字段
         User existingUser = userMapper.selectByPrimaryKey(user.getUserId());
         if (existingUser != null) {
-            user.setPassword(existingUser.getPassword()); // 保持密码不变
-            user.setUpdateTime(new Date());
-            userMapper.updateByPrimaryKey(user);
+            existingUser.setPassword(existingUser.getPassword()); // 保持密码不变
+            existingUser.setUpdateTime(new Date());
+            
+            // 更新非空字段
+            if (user.getPhoneNo() != null) {
+                existingUser.setPhoneNo(user.getPhoneNo());
+            }
+            if (user.getStatus() != null) {
+                existingUser.setStatus(user.getStatus());
+            }
+            if (user.getWorkStatus() != null) {
+                existingUser.setWorkStatus(user.getWorkStatus());
+            }
+            
+            // 更新用户信息
+            userMapper.updateByPrimaryKey(existingUser);
         }
     }
     
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteAccount(Long userId) {
         // 检查是否为最后一个管理员账号（避免删除所有管理员）
         List<User> adminUsers = userMapper.selectAll().stream()
@@ -138,12 +213,23 @@ public class AdminServiceImpl implements AdminService {
             .collect(Collectors.toList());
         
         User userToDelete = userMapper.selectByPrimaryKey(userId);
-        if (userToDelete != null && userToDelete.getRole().equals(0) && adminUsers.size() <= 1) {
-            return false; // 不能删除最后一个管理员
+        if (userToDelete == null) {
+            return false; // 用户不存在
         }
         
-        userMapper.deleteByPrimaryKey(userId);
-        return true;
+        // 不能删除最后一个管理员
+        if (userToDelete.getRole().equals(0) && adminUsers.size() <= 1) {
+            return false;
+        }
+        
+        // 如果是配送员，先处理相关订单（避免外键约束冲突）
+        if (userToDelete.getRole().equals(2)) { // 假设2表示配送员角色
+            // 将相关订单的配送员ID设置为null
+            orderMapper.updateDeliverymanIdToNull(userId);
+        }
+        // 执行删除操作
+        int rows = userMapper.deleteByPrimaryKey(userId);
+        return rows > 0;
     }
     
     @Override

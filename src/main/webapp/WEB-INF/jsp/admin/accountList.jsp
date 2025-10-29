@@ -35,6 +35,7 @@
                 <ul class="nav navbar-nav">
                     <li class="active"><a href="${pageContext.request.contextPath}/admin/accounts">账号管理</a></li>
                     <li><a href="${pageContext.request.contextPath}/admin/orders">订单管理</a></li>
+                    <li><a href="${pageContext.request.contextPath}/admin/publish-order">发布配送</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="#">欢迎，${sessionScope.user.username}</a></li>

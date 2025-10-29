@@ -45,6 +45,19 @@
             <div class="alert alert-danger">${error}</div>
         </c:if>
         
+        <script>
+            // 处理表单提交
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.querySelector('form');
+                
+                form.addEventListener('submit', function(event) {
+                    // 显示成功消息弹窗
+                    alert('账号修改成功');
+                    // 弹窗确认后，表单会继续提交并重定向到账号管理界面
+                });
+            });
+        </script>
+        
         <form action="${pageContext.request.contextPath}/admin/accounts/edit" method="post" class="form-horizontal">
             <input type="hidden" name="userId" value="${user.userId}">
             

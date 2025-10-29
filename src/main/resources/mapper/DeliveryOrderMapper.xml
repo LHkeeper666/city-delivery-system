@@ -245,7 +245,7 @@
         AND status = #{status,jdbcType=TINYINT}
         ORDER BY create_time DESC
     </select>
-
+    
     <!-- 17. 历史订单查询：无需修改（已正确适配） -->
     <select id="selectHistoryOrders" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/> <!-- 复用字段列表，避免漏查 -->
@@ -258,4 +258,12 @@
         </foreach>
         ORDER BY create_time DESC
     </select>
+    
+    <!-- 18. 将配送员的所有订单的配送员ID设置为null -->
+    <!-- 用于删除配送员账号时处理外键约束 -->
+    <update id="updateDeliverymanIdToNull" parameterType="java.lang.Long">
+        UPDATE cdms_delivery_order 
+        SET deliveryman_id = NULL 
+        WHERE deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
+    </update>
 </mapper>

@@ -41,10 +41,25 @@ public interface DeliveryOrderMapper {
             @Param("keyword") String keyword,
             @Param("deliverymanId") Long deliverymanId
     );
-
+    
+    /**
+     * 查询骑手在途订单数
+     */
     Long countByDeliveryman(
             @Param("deliverymanId") Long deliverymanId,
             @Param("status") Integer status,
-            @Param("keyword") String keyword
+            @Param("start") Integer start,
+            @Param("end") Integer end
     );
+    
+    /**
+     * 根据日期查询当天最大的订单号
+     */
+    String getMaxOrderIdByDate(@Param("dateStr") String dateStr);
+    
+    /**
+     * 将配送员的所有订单的配送员ID设置为null
+     * 用于删除配送员账号时处理外键约束
+     */
+    int updateDeliverymanIdToNull(@Param("deliverymanId") Long deliverymanId);
 }
