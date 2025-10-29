@@ -111,15 +111,34 @@ public class AdminController {
      * 保存新增账号
      */
     @PostMapping("/accounts/add")
-    public String addAccount(CommonUser user, Model model) {
+    public String addAccount(@ModelAttribute CommonUser user, Model model) {
         try {
+            // 先进行基础验证
+            if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+                model.addAttribute("error", "用户名不能为空");
+                model.addAttribute("roles", UserRole.values());
+                model.addAttribute("statuses", UserStatus.values());
+                model.addAttribute("user", user); // 保留用户输入的值
+                return "admin/addAccount";
+            }
+            
+            // 调用服务层创建账号
             adminService.createAccount(user);
             model.addAttribute("message", "账号创建成功");
             return "redirect:/admin/accounts";
         } catch (Exception e) {
-            model.addAttribute("error", "账号创建失败：" + e.getMessage());
+            // 处理异常，提供友好的错误提示
+            String errorMsg = "用户名已存在，请重新输入用户名";
+            
+            // 检查是否为其他类型的异常
+            if (!e.getMessage().contains("用户名已存在") && !e.getMessage().contains("UNIQUE INDEX") && !e.getMessage().contains("unique constraint")) {
+                errorMsg = "账号创建失败，请稍后重试";
+            }
+            
+            model.addAttribute("error", errorMsg);
             model.addAttribute("roles", UserRole.values());
             model.addAttribute("statuses", UserStatus.values());
+            model.addAttribute("user", user); // 保留用户输入的值
             return "admin/addAccount";
         }
     }
@@ -163,11 +182,16 @@ public class AdminController {
      */
     @GetMapping("/accounts/delete/{id}")
     public String deleteAccount(@PathVariable Long id, Model model) {
-        boolean success = adminService.deleteAccount(id);
-        if (success) {
-            model.addAttribute("message", "账号删除成功");
-        } else {
-            model.addAttribute("error", "不能删除最后一个管理员账号");
+        try {
+            boolean success = adminService.deleteAccount(id);
+            if (success) {
+                model.addAttribute("message", "账号删除成功");
+            } else {
+                model.addAttribute("error", "不能删除最后一个管理员账号或用户不存在");
+            }
+        } catch (Exception e) {
+            // 捕获可能的数据库异常，提供友好的错误消息
+            model.addAttribute("error", "删除账号失败：" + e.getMessage());
         }
         return "redirect:/admin/accounts";
     }

@@ -49,7 +49,7 @@
             <div class="form-group">
                 <label for="username" class="col-sm-3 control-label">用户名 <span style="color: red;">*</span></label>
                 <div class="col-sm-9">
-                    <input type="text" id="username" name="username" class="form-control" placeholder="6-20位字母/数字组合" required>
+                    <input type="text" id="username" name="username" class="form-control" placeholder="6-20位字母/数字组合" required value="${user.username}">
                     <small class="text-muted">用户名长度6-20位，只能包含字母和数字</small>
                 </div>
             </div>
@@ -57,7 +57,7 @@
             <div class="form-group">
                 <label for="password" class="col-sm-3 control-label">密码 <span style="color: red;">*</span></label>
                 <div class="col-sm-9">
-                    <input type="password" id="password" name="password" class="form-control" placeholder="8-20位，包含字母、数字和特殊符号" required>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="8-20位，包含字母、数字和特殊符号" required value="${user.password}">
                     <small class="text-muted">密码长度8-20位，必须包含字母、数字和特殊符号</small>
                 </div>
             </div>
@@ -68,7 +68,7 @@
                     <select id="role" name="role" class="form-control" required>
                         <option value="">请选择角色</option>
                         <c:forEach items="${roles}" var="role">
-                            <option value="${role.code}">${role.desc}</option>
+                            <option value="${role.code}" <c:if test="${role.code eq user.role}">selected</c:if>>${role.desc}</option>
                         </c:forEach>
                     </select>
                 </div>
@@ -77,7 +77,7 @@
             <div class="form-group">
                 <label for="phoneNo" class="col-sm-3 control-label">手机号</label>
                 <div class="col-sm-9">
-                    <input type="text" id="phoneNo" name="phoneNo" class="form-control" placeholder="11位手机号" pattern="1[3-9]\d{9}">
+                    <input type="text" id="phoneNo" name="phoneNo" class="form-control" placeholder="11位手机号" pattern="1[3-9]\d{9}" value="${user.phoneNo}">
                     <small class="text-muted">请输入11位手机号码，配送员账号建议必填</small>
                 </div>
             </div>
@@ -145,5 +145,25 @@
             return true;
         };
     </script>
+     <script>
+         // 页面加载时检查错误消息并弹窗显示
+         document.addEventListener('DOMContentLoaded', function() {
+             // 检查页面上的错误消息div
+             var errorDiv = document.querySelector('.alert-danger');
+             if (errorDiv) {
+                 // 使用alert弹窗显示错误信息
+                 alert(errorDiv.textContent.trim());
+                 // 移除页面上的错误消息div，避免重复显示
+                 errorDiv.style.display = 'none';
+             }
+             
+             // 检查URL参数中的错误信息
+             const urlParams = new URLSearchParams(window.location.search);
+             const errorParam = urlParams.get('error');
+             if (errorParam) {
+                 alert(decodeURIComponent(errorParam));
+             }
+         });
+     </script>
 </body>
 </html>

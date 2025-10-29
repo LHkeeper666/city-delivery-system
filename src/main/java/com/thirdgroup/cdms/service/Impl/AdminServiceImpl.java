@@ -12,7 +12,7 @@ import com.thirdgroup.cdms.service.Interface.TraceService;
 import com.thirdgroup.cdms.utils.PasswordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -109,6 +109,12 @@ public class AdminServiceImpl implements AdminService {
     
     @Override
     public Long createAccount(User user) {
+        // 检查用户名是否已存在
+        User existingUser = userMapper.selectByUsername(user.getUsername());
+        if (existingUser != null) {
+            throw new RuntimeException("用户名已存在");
+        }
+        
         // 密码加密
         user.setPassword(PasswordUtils.encode(user.getPassword()));
         user.setCreateTime(new Date());
@@ -124,13 +130,27 @@ public class AdminServiceImpl implements AdminService {
         // 更新非密码字段
         User existingUser = userMapper.selectByPrimaryKey(user.getUserId());
         if (existingUser != null) {
-            user.setPassword(existingUser.getPassword()); // 保持密码不变
-            user.setUpdateTime(new Date());
-            userMapper.updateByPrimaryKey(user);
+            existingUser.setPassword(existingUser.getPassword()); // 保持密码不变
+            existingUser.setUpdateTime(new Date());
+            
+            // 更新非空字段
+            if (user.getPhoneNo() != null) {
+                existingUser.setPhoneNo(user.getPhoneNo());
+            }
+            if (user.getStatus() != null) {
+                existingUser.setStatus(user.getStatus());
+            }
+            if (user.getWorkStatus() != null) {
+                existingUser.setWorkStatus(user.getWorkStatus());
+            }
+            
+            // 更新用户信息
+            userMapper.updateByPrimaryKey(existingUser);
         }
     }
     
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteAccount(Long userId) {
         // 检查是否为最后一个管理员账号（避免删除所有管理员）
         List<User> adminUsers = userMapper.selectAll().stream()
@@ -138,12 +158,23 @@ public class AdminServiceImpl implements AdminService {
             .collect(Collectors.toList());
         
         User userToDelete = userMapper.selectByPrimaryKey(userId);
-        if (userToDelete != null && userToDelete.getRole().equals(0) && adminUsers.size() <= 1) {
-            return false; // 不能删除最后一个管理员
+        if (userToDelete == null) {
+            return false; // 用户不存在
         }
         
-        userMapper.deleteByPrimaryKey(userId);
-        return true;
+        // 不能删除最后一个管理员
+        if (userToDelete.getRole().equals(0) && adminUsers.size() <= 1) {
+            return false;
+        }
+        
+        // 如果是配送员，先处理相关订单（避免外键约束冲突）
+        if (userToDelete.getRole().equals(2)) { // 假设2表示配送员角色
+            // 将相关订单的配送员ID设置为null
+            orderMapper.updateDeliverymanIdToNull(userId);
+        }
+        // 执行删除操作
+        int rows = userMapper.deleteByPrimaryKey(userId);
+        return rows > 0;
     }
     
     @Override
