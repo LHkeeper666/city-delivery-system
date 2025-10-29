@@ -74,19 +74,20 @@
         WHERE user_id = #{userId,jdbcType=BIGINT}
     </update>
 
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    <select id="selectByPrimaryKey" resultType="com.thirdgroup.cdms.model.CommonUser">
         SELECT <include refid="Base_Column_List" />
         FROM cdms_user
         WHERE user_id = #{userId,jdbcType=BIGINT}
     </select>
 
-    <select id="selectAll" resultMap="BaseResultMap">
+    <!-- 使用专门的CommonUser类作为User抽象类的通用实现 -->
+    <select id="selectAll" resultType="com.thirdgroup.cdms.model.CommonUser">
         SELECT <include refid="Base_Column_List" />
         FROM cdms_user
         ORDER BY create_time DESC
     </select>
 
-    <select id="selectByUsername" resultMap="BaseResultMap">
+    <select id="selectByUsername" resultType="com.thirdgroup.cdms.model.CommonUser">
         SELECT <include refid="Base_Column_List" />
         FROM cdms_user
         WHERE username = #{username,jdbcType=VARCHAR}

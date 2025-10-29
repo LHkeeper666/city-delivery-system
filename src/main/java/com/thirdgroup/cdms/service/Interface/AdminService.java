@@ -4,6 +4,7 @@ import com.thirdgroup.cdms.model.ApiKey;
 import com.thirdgroup.cdms.model.DeliveryOrder;
 import com.thirdgroup.cdms.model.DeliveryTrace;
 import com.thirdgroup.cdms.model.PageResult;
+import com.thirdgroup.cdms.model.User;
 
 import java.util.List;
 
@@ -25,4 +26,34 @@ public interface AdminService {
      * 根据 orderId 查找对应的订单的 trace 列表
      */
     List<DeliveryTrace> trackOrder(String orderId);
+    
+    /**
+     * 分页查询所有用户账号
+     */
+    PageResult<User> queryAllUsers(Integer role, Integer status, String keyword, int page, int size);
+    
+    /**
+     * 创建新账号（管理员或配送员）
+     */
+    Long createAccount(User user);
+    
+    /**
+     * 更新账号信息
+     */
+    void updateAccount(User user);
+    
+    /**
+     * 删除账号
+     */
+    boolean deleteAccount(Long userId);
+    
+    /**
+     * 重置账号密码
+     */
+    void resetPassword(Long userId, String newPassword);
+    
+    /**
+     * 查询单个账号详情
+     */
+    User getUserById(Long userId);
 }
