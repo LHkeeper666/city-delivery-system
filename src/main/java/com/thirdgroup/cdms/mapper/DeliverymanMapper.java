@@ -40,4 +40,10 @@ public interface DeliverymanMapper {
     int countByUsername(@Param("username") String username);
     // 新增：根据外卖员ID查询我的订单（状态=1：配送中）
     List<DeliveryOrder> selectMyOrders(@Param("userId") Long userId);
+
+    int updatePhone(
+            @Param("userId") Long userId,
+            @Param("newPhone") String newPhone,
+            @Param("updateTime") java.util.Date updateTime
+    );
 }

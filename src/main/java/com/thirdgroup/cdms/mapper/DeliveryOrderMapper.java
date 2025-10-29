@@ -4,66 +4,47 @@ import com.thirdgroup.cdms.model.DeliveryOrder;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Date;
 import java.util.List;
 
 @Mapper
 public interface DeliveryOrderMapper {
+    // 1. 插入订单（基础方法）
     int insert(DeliveryOrder record);
-    int deleteByPrimaryKey(String orderId);
-    int updateByPrimaryKey(DeliveryOrder record);
-    DeliveryOrder selectByPrimaryKey(String orderId);
 
-    /**
-     * 按创建时间倒序查询所有订单
-     */
-    List<DeliveryOrder> selectAll();
+    // 2. 根据骑手ID和多状态查历史订单（核心方法）
+    List<DeliveryOrder> selectHistoryOrders(
+            @Param("userId") Long userId, // 骑手ID（与Service参数一致）
+            @Param("statusCodes") List<Integer> statusCodes // 多状态列表
+    );
 
-    /**
-     * 分页查询配送员的订单列表
-     */
+    // 3. 分页查询骑手订单（个人中心用）
     List<DeliveryOrder> selectPageByDeliveryman(
             @Param("status") Integer status,
             @Param("keyword") String keyword,
             @Param("start") int start,
             @Param("size") int size,
-            @Param("id") long userId
+            @Param("id") Long userId
     );
 
-    /**
-     * 分页查询订单列表（管理员端）
-     */
+    // 4. 分页查询管理员订单
     List<DeliveryOrder> selectPageAdmin(
             @Param("status") Integer status,
             @Param("keyword") String keyword,
             @Param("start") int start,
             @Param("size") int size,
-            @Param("deliverymanId") Long usersId
+            @Param("deliverymanId") Long deliverymanId
     );
 
-    // 接单：更新订单
-    int acceptOrder(
-            @Param("orderId") Integer orderId,
-            @Param("courierId") Integer courierId,
-            @Param("status") Integer status
-    );
-
-    // 更新订单状态
-    int updateStatus(
-            @Param("orderId") Integer orderId,
-            @Param("status") Integer status,
-            @Param("time") Date time
-    );
-
-    // 根据ID查订单
-    DeliveryOrder selectById(@Param("orderId") Integer orderId);
-
-    // 查询总条数
+    // 5. 查询订单总数
     Long count(
             @Param("status") Integer status,
             @Param("keyword") String keyword,
-            @Param("deliverymanId") Long userId
+            @Param("deliverymanId") Long deliverymanId
     );
 
-    Long countByDeliveryman(@Param("deliverymanId") Long deliverymanId, @Param("status") Integer status, @Param("keyword") String keyword);
+    Long countByDeliveryman(
+            @Param("deliverymanId") Long deliverymanId,
+            @Param("status") Integer status,
+            @Param("keyword") String keyword
+    );
 }

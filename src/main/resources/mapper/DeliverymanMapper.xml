@@ -103,4 +103,15 @@
         WHERE username = #{username,jdbcType=VARCHAR}
           AND role = 1
     </select>
-</mapper>
+
+    <!-- 9. 修改手机号（新增，与接口DeliverymanMapper.updatePhone匹配） -->
+    <update id="updatePhone">
+        UPDATE cdms_user
+        SET
+            phone_no = #{newPhone,jdbcType=VARCHAR},
+            update_time = #{updateTime,jdbcType=TIMESTAMP}
+        WHERE
+            user_id = #{userId,jdbcType=BIGINT}
+          AND role = 1
+    </update>
+</mapper>  <!-- 关键修复：确保根标签</mapper>正确闭合，无多余内容 -->
