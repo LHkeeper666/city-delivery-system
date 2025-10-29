@@ -1,10 +1,14 @@
 package com.thirdgroup.cdms.mapper;
 
 import com.thirdgroup.cdms.model.DeliveryOrder;
+import com.thirdgroup.cdms.model.OrderStatisticsDTO;
+import com.thirdgroup.cdms.model.OrderTrendDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface DeliveryOrderMapper {
@@ -32,16 +36,20 @@ public interface DeliveryOrderMapper {
             @Param("keyword") String keyword,
             @Param("start") int start,
             @Param("size") int size,
-            @Param("deliverymanId") Long deliverymanId
+            @Param("deliverymanId") Long deliverymanId,
+            @Param("startTime") Date startTime,
+            @Param("endTime") Date endTime
     );
 
     // 5. 查询订单总数
     Long count(
             @Param("status") Integer status,
             @Param("keyword") String keyword,
-            @Param("deliverymanId") Long deliverymanId
+            @Param("deliverymanId") Long deliverymanId,
+            @Param("startTime") Date startTime,
+            @Param("endTime") Date endTime
     );
-    
+
     /**
      * 查询骑手在途订单数
      */
@@ -51,12 +59,42 @@ public interface DeliveryOrderMapper {
             @Param("start") Integer start,
             @Param("end") Integer end
     );
-    
+
+    /**
+     * 分页查询未完成订单，支持关键词模糊搜索
+     */
+    List<DeliveryOrder> selectActiveOrdersByPage(
+            @Param("keyword") String keyword,
+            @Param("start") int start,
+            @Param("size") int size
+    );
+
+    /**
+     * 统计未完成订单数目，支持关键词模糊搜索
+     */
+    Long countActiveOrders(@Param("keyword") String keyword);
+
+    /**
+     * 统计时间范围内的订单数据
+     */
+    OrderStatisticsDTO countOrderStatistics(
+            @Param("startTime") Date startTime,
+            @Param("endTime") Date endTime
+    );
+
+    /**
+     * 统计时间范围内每天的完成订单数、平台收入和平均订单完成时间
+     */
+    List<OrderTrendDTO> getOrderTrendByDate(
+            @Param("startTime") Date startTime,
+            @Param("endTime") Date endTime
+    );
+
     /**
      * 根据日期查询当天最大的订单号
      */
     String getMaxOrderIdByDate(@Param("dateStr") String dateStr);
-    
+
     /**
      * 将配送员的所有订单的配送员ID设置为null
      * 用于删除配送员账号时处理外键约束

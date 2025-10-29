@@ -158,12 +158,14 @@
             <if test="deliverymanId != null">AND o.deliveryman_id = #{deliverymanId,jdbcType=BIGINT}</if>
             <if test="keyword != null and keyword != ''">
                 AND (
-                o.order_id LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')  <!-- 补充VARCHAR类型 -->
-                OR o.sender_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
-                OR o.consignee_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
-                OR u.username LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                    o.order_id LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')  <!-- 补充VARCHAR类型 -->
+                    OR o.sender_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                    OR o.consignee_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                    OR u.username LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
                 )
             </if>
+            <if test="startTime != null">AND o.create_time &gt;= #{startTime}</if>
+            <if test="endTime != null">AND o.create_time &lt; #{endTime}</if>
         </where>
         ORDER BY o.create_time DESC
         LIMIT #{start,jdbcType=INTEGER}, #{size,jdbcType=INTEGER}  <!-- 补充分页参数类型 -->
@@ -179,12 +181,14 @@
             <if test="deliverymanId != null">AND o.deliveryman_id = #{deliverymanId,jdbcType=BIGINT}</if>
             <if test="keyword != null and keyword != ''">
                 AND (
-                o.order_id LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')  <!-- 补充VARCHAR类型 -->
-                OR o.sender_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
-                OR o.consignee_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
-                OR u.username LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                    o.order_id LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')  <!-- 补充VARCHAR类型 -->
+                    OR o.sender_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                    OR o.consignee_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                    OR u.username LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
                 )
             </if>
+            <if test="startTime != null">AND o.create_time &gt;= #{startTime}</if>
+            <if test="endTime != null">AND o.create_time &lt; #{endTime}</if>
         </where>
     </select>
 
@@ -245,7 +249,7 @@
         AND status = #{status,jdbcType=TINYINT}
         ORDER BY create_time DESC
     </select>
-    
+
     <!-- 17. 历史订单查询：无需修改（已正确适配） -->
     <select id="selectHistoryOrders" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/> <!-- 复用字段列表，避免漏查 -->
@@ -258,12 +262,85 @@
         </foreach>
         ORDER BY create_time DESC
     </select>
-    
+
+    <select id="selectActiveOrdersByPage" resultType="com.thirdgroup.cdms.model.DeliveryOrder">
+        SELECT <include refid="Base_Column_List"/>
+        FROM cdms_delivery_order
+        <where>
+            status NOT IN (4, 5)
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    order_id LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                    OR sender_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                    OR consignee_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                    OR sender_phone LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                    OR consignee_phone LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                )
+            </if>
+        </where>
+        ORDER BY create_time DESC
+        LIMIT #{start,jdbcType=INTEGER}, #{size,jdbcType=INTEGER}
+    </select>
+
+    <select id="countActiveOrders" resultType="java.lang.Long" parameterType="java.lang.String">
+        SELECT COUNT(*)
+        FROM cdms_delivery_order
+        <where>
+            status NOT IN (4, 5)
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    order_id LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                    OR sender_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                    OR consignee_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                    OR sender_phone LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                    OR consignee_phone LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                )
+            </if>
+        </where>
+    </select>
+
+    <select id="countOrderStatistics" resultType="com.thirdgroup.cdms.model.OrderStatisticsDTO">
+        SELECT
+            COUNT(*) AS totalCount,
+            SUM(platform_income) AS totalAmount,
+            SUM(CASE WHEN status = 3 THEN 1 ELSE 0 END) AS completedCount,
+            SUM(CASE WHEN status = 4 THEN 1 ELSE 0 END) AS canceledCount,
+            SUM(CASE WHEN status = 2 THEN 1 ELSE 0 END) AS deliveringCount,
+            AVG(TIMESTAMPDIFF(MINUTE, create_time, complete_time)) AS avgDeliveryTime
+        FROM cdms_delivery_order
+        <where>
+            <if test="startTime != null">AND create_time &gt;= #{startTime}</if>
+            <if test="endTime != null">AND create_time &lt; #{endTime}</if>
+        </where>
+    </select>
+
+    <select id="getOrderTrendByDate" resultType="com.thirdgroup.cdms.model.OrderTrendDTO">
+        SELECT
+            DATE(create_time) AS date,
+            COUNT(*) AS orderCount,
+            SUM(platform_income) AS totalIncome,
+            AVG(
+                CASE
+                    WHEN complete_time IS NOT NULL
+                    THEN TIMESTAMPDIFF(MINUTE, create_time, complete_time)
+                    ELSE NULL
+                END
+            ) AS avgDeliveryTime
+        FROM cdms_delivery_order
+        <where>
+            status = 3
+            <if test="startTime != null">AND create_time &gt;= #{startTime}</if>
+            <if test="endTime != null">AND create_time &lt;= #{endTime}</if>
+        </where>
+        GROUP BY DATE(create_time)
+        ORDER BY DATE(create_time)
+    </select>
+
     <!-- 18. 将配送员的所有订单的配送员ID设置为null -->
     <!-- 用于删除配送员账号时处理外键约束 -->
     <update id="updateDeliverymanIdToNull" parameterType="java.lang.Long">
-        UPDATE cdms_delivery_order 
-        SET deliveryman_id = NULL 
+        UPDATE cdms_delivery_order
+        SET deliveryman_id = NULL
         WHERE deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
     </update>
 </mapper>

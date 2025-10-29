@@ -2,21 +2,21 @@ package com.thirdgroup.cdms.service.impl;
 
 import com.thirdgroup.cdms.mapper.DeliveryOrderMapper;
 import com.thirdgroup.cdms.mapper.UserMapper;
-import com.thirdgroup.cdms.model.ApiKey;
-import com.thirdgroup.cdms.model.DeliveryOrder;
-import com.thirdgroup.cdms.model.DeliveryTrace;
-import com.thirdgroup.cdms.model.PageResult;
-import com.thirdgroup.cdms.model.User;
+import com.thirdgroup.cdms.model.*;
 import com.thirdgroup.cdms.service.Interface.AdminService;
 import com.thirdgroup.cdms.service.Interface.TraceService;
+import com.thirdgroup.cdms.utils.DateUtils;
 import com.thirdgroup.cdms.utils.PasswordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
+
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.Map;
 import java.util.stream.Collectors;
 import com.thirdgroup.cdms.model.enums.OrderStatus;
 import java.math.BigDecimal;
@@ -39,30 +39,30 @@ public class AdminServiceImpl implements AdminService {
             // 生成订单ID：DEL + 日期 + 3位流水号
             String orderId = generateOrderId();
             order.setOrderId(orderId);
-            
+
             // 设置订单状态为待接单
             order.setStatus(OrderStatus.PENDING.getCode());
-            
+
             // 设置创建时间
             order.setCreateTime(new Date());
-            
+
             // 计算平台收入和配送员收入（假设平台抽取20%）
             if (order.getDeliveryFee() != null) {
                 BigDecimal platformRate = new BigDecimal(0.2); // 20%平台抽成
                 order.setPlatformIncome(order.getDeliveryFee().multiply(platformRate));
                 order.setDeliverymanIncome(order.getDeliveryFee().subtract(order.getPlatformIncome()));
             }
-            
+
             // 保存订单到数据库
             orderMapper.insert(order);
-            
+
             // 返回生成的订单ID
             return order.getOrderId();
         } catch (Exception e) {
             throw new RuntimeException("发布订单失败: " + e.getMessage());
         }
     }
-    
+
     /**
      * 生成订单ID
      * 规则：DEL + 日期（yyyyMMdd） + 3位流水号
@@ -70,10 +70,10 @@ public class AdminServiceImpl implements AdminService {
     private String generateOrderId() {
         // 获取当前日期
         String dateStr = new SimpleDateFormat("yyyyMMdd").format(new Date());
-        
+
         // 查询当天最大的订单号
         String maxOrderId = orderMapper.getMaxOrderIdByDate(dateStr);
-        
+
         String sequence;
         if (maxOrderId != null && maxOrderId.startsWith("DEL" + dateStr)) {
             // 提取序号部分并加1
@@ -84,23 +84,27 @@ public class AdminServiceImpl implements AdminService {
             // 如果没有找到，从001开始
             sequence = "001";
         }
-        
+
         return "DEL" + dateStr + sequence;
     }
 
     @Override
     public PageResult<DeliveryOrder> queryAllOrders(
-            Integer status, String keyword, int page, int size, Long id, Date startTime, Date endTime) {
+            Integer status, String keyword, int page, int size, Long deliverymanId, Date startTime, Date endTime) {
+        if (endTime != null) {
+            endTime = DateUtils.addDays(endTime, 1);
+        }
+
         // 1. 计算分页起始位置（MySQL分页用LIMIT start, size）
         int start = (page - 1) * size;  // 第1页：start=0，第2页：start=10...
 
         // 2. 查询当前页数据（调用Mapper接口，带条件+分页）
         List<DeliveryOrder> orderList = orderMapper.selectPageAdmin(
-                status, keyword, start, size, id, startTime, endTime
+                status, keyword, start, size, deliverymanId, startTime, endTime
         );
 
         // 3. 查询总记录数（用于计算总页数）
-        Long total = orderMapper.count(status, keyword, id, startTime, endTime);
+        Long total = orderMapper.count(status, keyword, deliverymanId, startTime, endTime);
 
         // 4. 封装到PageResult并返回
         PageResult<DeliveryOrder> result = new PageResult<>();
@@ -110,6 +114,20 @@ public class AdminServiceImpl implements AdminService {
         result.setSize(size);         // 每页条数
         return result;
     }
+
+    public PageResult<DeliveryOrder> queryActiveOrders(
+            String keyword, int page, int size) {
+        int start = (page - 1) * size;
+        List<DeliveryOrder> orderList = orderMapper.selectActiveOrdersByPage(keyword, start, size);
+        Long totalCount = orderMapper.countActiveOrders(keyword);
+        PageResult<DeliveryOrder> result = new PageResult<>();
+        result.setList(orderList);
+        result.setTotal(totalCount);
+        result.setPage(page);
+        result.setSize(size);
+        return result;
+    }
+
 
     @Override
     public void cancelOrder(String orderId, String reason) {
@@ -169,7 +187,7 @@ public class AdminServiceImpl implements AdminService {
         if (existingUser != null) {
             throw new RuntimeException("用户名已存在");
         }
-        
+
         // 密码加密
         user.setPassword(PasswordUtils.encode(user.getPassword()));
         user.setCreateTime(new Date());
@@ -187,7 +205,7 @@ public class AdminServiceImpl implements AdminService {
         if (existingUser != null) {
             existingUser.setPassword(existingUser.getPassword()); // 保持密码不变
             existingUser.setUpdateTime(new Date());
-            
+
             // 更新非空字段
             if (user.getPhoneNo() != null) {
                 existingUser.setPhoneNo(user.getPhoneNo());
@@ -198,7 +216,7 @@ public class AdminServiceImpl implements AdminService {
             if (user.getWorkStatus() != null) {
                 existingUser.setWorkStatus(user.getWorkStatus());
             }
-            
+
             // 更新用户信息
             userMapper.updateByPrimaryKey(existingUser);
         }
@@ -216,7 +234,7 @@ public class AdminServiceImpl implements AdminService {
         if (userToDelete == null) {
             return false; // 用户不存在
         }
-        
+
         // 不能删除最后一个管理员
         if (userToDelete.getRole().equals(0) && adminUsers.size() <= 1) {
             return false;
@@ -244,6 +262,20 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public User getUserById(Long userId) {
         return userMapper.selectByPrimaryKey(userId);
+    }
+
+    @Override
+    public OrderStatisticsDTO getOrderStatistic(Date startTime, Date endTime) {
+        endTime = DateUtils.addDays(endTime, 1);
+        OrderStatisticsDTO orderStatistics =  orderMapper.countOrderStatistics(startTime, endTime);
+        return orderStatistics;
+    }
+
+    @Override
+    public List<OrderTrendDTO> getOrderTrend(Date startTime, Date endTime) {
+        endTime = DateUtils.addDays(endTime, 1);
+        List<OrderTrendDTO> orderTrendByDate = orderMapper.getOrderTrendByDate(startTime, endTime);
+        return orderTrendByDate;
     }
 }
 // 先用ai生成一下，这个后面我自己改

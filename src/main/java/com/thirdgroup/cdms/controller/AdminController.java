@@ -1,23 +1,22 @@
 package com.thirdgroup.cdms.controller;
 
-import com.thirdgroup.cdms.model.DeliveryOrder;
-import com.thirdgroup.cdms.model.DeliveryTrace;
-import com.thirdgroup.cdms.model.PageResult;
-import com.thirdgroup.cdms.model.User;
-import com.thirdgroup.cdms.model.CommonUser;
+import com.thirdgroup.cdms.model.*;
 import com.thirdgroup.cdms.model.enums.UserRole;
 import com.thirdgroup.cdms.model.enums.UserStatus;
 import com.thirdgroup.cdms.service.Interface.AdminService;
 import com.thirdgroup.cdms.utils.Result;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @Api(tags = "管理接口")
 @Controller
@@ -32,24 +31,38 @@ public class AdminController {
      * TODO: 页面大小暂时定为10，后续考虑在配置文件中配置
      */
     @PostMapping("/orders")
-//    @ResponseBody // 测试用
     public String queryOrders(
             @RequestParam(required = false) Integer status,
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) Long id,
+            @RequestParam(required = false) Long deliverymanId,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startTime,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endTime,
             Model model
     ) {
-        PageResult<DeliveryOrder> deliveryOrderPageResult = adminService.queryAllOrders(status, keyword, page, size, id);
+        PageResult<DeliveryOrder> deliveryOrderPageResult = adminService.queryAllOrders(status, keyword, page, size, deliverymanId, startTime, endTime);
 
-        model.addAttribute("deliveryOrders", Result.success(deliveryOrderPageResult));
+        model.addAttribute("historyOrders", Result.success(deliveryOrderPageResult));
 
-        // TODO: jsp名称不确定
-//        return deliveryOrderPageResult.getList().get(0).getConsigneeAddress();
-        return null;
+        return "admin/ordersHistory.jsp";
     }
-    
+
+    /**
+     * 查询所有未完成订单
+     */
+    @PostMapping("/orders/active")
+    public String queryActiveOrders(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model
+    ) {
+        PageResult<DeliveryOrder> deliveryOrderPageResult = adminService.queryActiveOrders(keyword, page, size);
+        model.addAttribute("ActiveOrders", Result.success(deliveryOrderPageResult));
+        return "admin/activeOrders.jsp";
+    }
+
     /**
      * 显示发布配送信息页面
      */
@@ -58,7 +71,7 @@ public class AdminController {
         model.addAttribute("deliveryOrder", new DeliveryOrder());
         return "admin/publishOrder";
     }
-    
+
     /**
      * 处理发布配送信息表单提交
      */
@@ -76,7 +89,7 @@ public class AdminController {
                 model.addAttribute("deliveryOrder", order);
                 return "admin/publishOrder";
             }
-            if (order.getSenderPhone() == null || order.getSenderPhone().trim().isEmpty() || 
+            if (order.getSenderPhone() == null || order.getSenderPhone().trim().isEmpty() ||
                 !order.getSenderPhone().matches("1[3-9]\\d{9}")) {
                 model.addAttribute("error", "接货人电话格式不正确，请输入11位手机号码");
                 model.addAttribute("deliveryOrder", order);
@@ -92,7 +105,7 @@ public class AdminController {
                 model.addAttribute("deliveryOrder", order);
                 return "admin/publishOrder";
             }
-            if (order.getConsigneePhone() == null || order.getConsigneePhone().trim().isEmpty() || 
+            if (order.getConsigneePhone() == null || order.getConsigneePhone().trim().isEmpty() ||
                 !order.getConsigneePhone().matches("1[3-9]\\d{9}")) {
                 model.addAttribute("error", "收货人电话格式不正确，请输入11位手机号码");
                 model.addAttribute("deliveryOrder", order);
@@ -113,20 +126,20 @@ public class AdminController {
                 model.addAttribute("deliveryOrder", order);
                 return "admin/publishOrder";
             }
-            
+
             // 设置创建者ID（从session中获取当前管理员）
             User currentUser = (User) session.getAttribute("user");
             if (currentUser != null) {
                 order.setCreatorId(currentUser.getUserId());
             }
-            
+
             // 调用服务层发布订单
             String orderId = adminService.publishOrder(order);
-            
+
             // 保存订单ID到模型中，用于前端显示
             model.addAttribute("orderId", orderId);
             model.addAttribute("success", true);
-            
+
             return "admin/publishOrder";
         } catch (Exception e) {
             model.addAttribute("error", "发布订单失败：" + e.getMessage());
@@ -139,25 +152,35 @@ public class AdminController {
      * 获取 orderId 对应订单的历史动态
      */
     @GetMapping("/track/{orderId}")
-//    @ResponseBody // 测试用
     public String trackOrder(
             @PathVariable String orderId,
             Model model
     ) {
         List<DeliveryTrace> deliveryTraceList = adminService.trackOrder(orderId);
         if (deliveryTraceList != null && !deliveryTraceList.isEmpty()) {
-//            System.out.println("traceList: " + deliveryTraceList);
             model.addAttribute("deliveryTraceList", Result.success(deliveryTraceList));
-        } else {
-            // TODO: 不确定
-//            model.addAttribute("errorMsg", Result.error());
         }
-
-
-        // TODO: jsp名称不确定
-        return null;
+        return "admin/orderTraces.jsp";
     }
-    
+
+    @PostMapping("/order/statistic")
+    public String getOrderStatistic (
+            @RequestParam(required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startTime,
+            @RequestParam(required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endTime,
+            Model model
+    ) {
+        OrderStatisticsDTO orderStatistic = adminService.getOrderStatistic(startTime, endTime);
+        List<OrderTrendDTO> orderTrendList = adminService.getOrderTrend(startTime, endTime);
+
+        System.out.println("orderStatistic: " + orderStatistic);
+        System.out.println("orderTrendList: " + orderTrendList);
+
+        model.addAttribute("orderStatistic", orderStatistic);
+        model.addAttribute("orderTrendList", orderTrendList);
+
+        return "admin/orderStatistic.jsp";
+    }
+
     /**
      * 账号管理首页 - 展示账号列表
      */
@@ -217,7 +240,7 @@ public class AdminController {
                 model.addAttribute("user", user); // 保留用户输入的值
                 return "admin/addAccount";
             }
-            
+
             // 调用服务层创建账号
             adminService.createAccount(user);
             // 创建成功后重定向回账号管理界面
@@ -225,12 +248,12 @@ public class AdminController {
         } catch (Exception e) {
             // 处理异常，提供友好的错误提示
             String errorMsg = "用户名已存在，请重新输入用户名";
-            
+
             // 检查是否为其他类型的异常
             if (!e.getMessage().contains("用户名已存在") && !e.getMessage().contains("UNIQUE INDEX") && !e.getMessage().contains("unique constraint")) {
                 errorMsg = "账号创建失败，请稍后重试";
             }
-            
+
             model.addAttribute("error", errorMsg);
             model.addAttribute("roles", UserRole.values());
             model.addAttribute("statuses", UserStatus.values());
