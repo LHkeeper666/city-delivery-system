@@ -100,4 +100,54 @@ public interface DeliveryOrderMapper {
      * 用于删除配送员账号时处理外键约束
      */
     int updateDeliverymanIdToNull(@Param("deliverymanId") Long deliverymanId);
+    
+    /**
+     * 根据多条件组合查询配送单（用于配送跟踪功能）
+     * @param orderId 配送单编号
+     * @param senderPhone 接货人电话
+     * @param consigneePhone 收货人电话
+     * @param deliverymanId 配送员ID
+     * @param deliverymanName 配送员姓名
+     * @param status 配送状态
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @param start 分页起始位置
+     * @param size 每页大小
+     * @return 配送单列表
+     */
+    List<DeliveryOrder> selectByTrackingConditions(
+            @Param("orderId") String orderId,
+            @Param("senderPhone") String senderPhone,
+            @Param("consigneePhone") String consigneePhone,
+            @Param("deliverymanId") Long deliverymanId,
+            @Param("deliverymanName") String deliverymanName,
+            @Param("status") Integer status,
+            @Param("startTime") Date startTime,
+            @Param("endTime") Date endTime,
+            @Param("start") int start,
+            @Param("size") int size
+    );
+    
+    /**
+     * 统计符合跟踪条件的配送单数量
+     * @param orderId 配送单编号
+     * @param senderPhone 接货人电话
+     * @param consigneePhone 收货人电话
+     * @param deliverymanId 配送员ID
+     * @param deliverymanName 配送员姓名
+     * @param status 配送状态
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return 配送单数量
+     */
+    Long countByTrackingConditions(
+            @Param("orderId") String orderId,
+            @Param("senderPhone") String senderPhone,
+            @Param("consigneePhone") String consigneePhone,
+            @Param("deliverymanId") Long deliverymanId,
+            @Param("deliverymanName") String deliverymanName,
+            @Param("status") Integer status,
+            @Param("startTime") Date startTime,
+            @Param("endTime") Date endTime
+    );
 }

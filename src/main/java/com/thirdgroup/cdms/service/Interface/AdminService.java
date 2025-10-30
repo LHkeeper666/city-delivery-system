@@ -66,4 +66,11 @@ public interface AdminService {
      * 统计时间范围内每天的完成订单数、平台收入和平均订单完成时间
      */
     List<OrderTrendDTO> getOrderTrend(Date startTime, Date endTime);
+    
+    /**
+     * 多条件查询配送单列表，用于配送信息跟踪
+     */
+    PageResult<DeliveryOrder> queryDeliveryOrdersByConditions(
+            String orderId, String pickupPhone, String deliveryPhone, String deliverymanInfo,
+            Integer status, Date startTime, Date endTime, int page, int size);
 }
