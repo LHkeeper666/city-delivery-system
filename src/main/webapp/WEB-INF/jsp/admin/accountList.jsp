@@ -48,10 +48,19 @@
     <div class="container">
         <h2>账号管理</h2>
         
-        <!-- 消息提示 -->
-        <c:if test="${not empty message}">
-            <div class="alert alert-success">${message}</div>
+        <!-- 成功消息弹窗 -->
+        <c:if test="${not empty success and success}">
+            <script type="text/javascript">
+                // 使用setTimeout确保在DOM加载完成后显示弹窗
+                window.onload = function() {
+                    setTimeout(function() {
+                        alert('账号新增成功');
+                    }, 100);
+                };
+            </script>
         </c:if>
+        
+        <!-- 错误消息提示 -->
         <c:if test="${not empty error}">
             <div class="alert alert-danger">${error}</div>
         </c:if>

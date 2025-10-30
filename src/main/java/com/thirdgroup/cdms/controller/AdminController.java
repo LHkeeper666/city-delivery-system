@@ -6,6 +6,7 @@ import com.thirdgroup.cdms.model.enums.UserStatus;
 import com.thirdgroup.cdms.service.Interface.AdminService;
 import com.thirdgroup.cdms.service.Interface.OrderService;
 import com.thirdgroup.cdms.utils.Result;
+import javax.servlet.http.HttpServletRequest;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -246,6 +247,7 @@ public class AdminController {
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request,
             Model model
     ) {
         PageResult<User> userPageResult = adminService.queryAllUsers(role, status, keyword, page, size);
@@ -258,6 +260,11 @@ public class AdminController {
         model.addAttribute("searchRole", role);
         model.addAttribute("searchStatus", status);
         model.addAttribute("keyword", keyword);
+        // 使用HttpServletRequest获取success参数，避免参数解析问题
+        String successParam = request.getParameter("success");
+        if (successParam != null && "true".equalsIgnoreCase(successParam)) {
+            model.addAttribute("success", true);
+        }
         return "admin/accountList";
     }
     
@@ -298,8 +305,8 @@ public class AdminController {
 
             // 调用服务层创建账号
             adminService.createAccount(user);
-            // 创建成功后重定向回账号管理界面
-            return "redirect:/admin/accounts";
+            // 创建成功后重定向回账号管理界面，带上success参数以触发弹窗
+            return "redirect:/admin/accounts?success=true";
         } catch (Exception e) {
             // 处理异常，提供友好的错误提示
             String errorMsg = "用户名已存在，请重新输入用户名";
