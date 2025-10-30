@@ -5,6 +5,7 @@ import com.thirdgroup.cdms.model.enums.UserRole;
 import com.thirdgroup.cdms.model.enums.UserStatus;
 import com.thirdgroup.cdms.service.Interface.AdminService;
 import com.thirdgroup.cdms.service.Interface.OrderService;
+import com.thirdgroup.cdms.utils.DateUtils;
 import com.thirdgroup.cdms.utils.Result;
 import javax.servlet.http.HttpServletRequest;
 import io.swagger.annotations.Api;
@@ -219,12 +220,19 @@ public class AdminController {
         return "admin/orderTraces";
     }
 
-    @PostMapping("/order/statistic")
+    @RequestMapping("/order/statistic")
     public String getOrderStatistic (
-            @RequestParam(required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startTime,
-            @RequestParam(required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endTime,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startTime,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endTime,
             Model model
     ) {
+        if (startTime == null && endTime == null) {
+            endTime = new Date();
+            startTime = DateUtils.addDays(endTime, -30);
+        }
+        System.out.println("startTime:" + startTime);
+        System.out.println("endTime:" + endTime);
+
         OrderStatisticsDTO orderStatistic = adminService.getOrderStatistic(startTime, endTime);
         List<OrderTrendDTO> orderTrendList = adminService.getOrderTrend(startTime, endTime);
 
@@ -232,7 +240,7 @@ public class AdminController {
         System.out.println("orderTrendList: " + orderTrendList);
 
         model.addAttribute("orderStatistic", orderStatistic);
-        model.addAttribute("orderTrendList", orderTrendList);
+        model.addAttribute("trendList", orderTrendList);
 
         return "admin/orderStatistic";
     }
