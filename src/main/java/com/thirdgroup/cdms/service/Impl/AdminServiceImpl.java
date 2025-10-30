@@ -56,6 +56,9 @@ public class AdminServiceImpl implements AdminService {
             // 保存订单到数据库
             orderMapper.insert(order);
 
+            // 添加订单创建的跟踪记录
+            traceService.addTrace(orderId, OrderStatus.PENDING.getCode(), order.getCreatorId(), "管理员发布配送单，待配送员接单");
+
             // 返回生成的订单ID
             return order.getOrderId();
         } catch (Exception e) {
@@ -65,7 +68,7 @@ public class AdminServiceImpl implements AdminService {
 
     /**
      * 生成订单ID
-     * 规则：DEL + 日期（yyyyMMdd） + 3位流水号
+     * 规则：ORD + 日期（yyyyMMdd） + 3位流水号
      */
     private String generateOrderId() {
         // 获取当前日期
@@ -75,9 +78,9 @@ public class AdminServiceImpl implements AdminService {
         String maxOrderId = orderMapper.getMaxOrderIdByDate(dateStr);
 
         String sequence;
-        if (maxOrderId != null && maxOrderId.startsWith("DEL" + dateStr)) {
+        if (maxOrderId != null && maxOrderId.startsWith("ORD" + dateStr)) {
             // 提取序号部分并加1
-            String seqStr = maxOrderId.substring(9); // DELyyyyMMdd后的3位
+            String seqStr = maxOrderId.substring(9); // ORDyyyyMMdd后的3位
             int seq = Integer.parseInt(seqStr) + 1;
             sequence = String.format("%03d", seq);
         } else {
@@ -85,7 +88,7 @@ public class AdminServiceImpl implements AdminService {
             sequence = "001";
         }
 
-        return "DEL" + dateStr + sequence;
+        return "ORD" + dateStr + sequence;
     }
 
     @Override
