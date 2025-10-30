@@ -4,6 +4,7 @@ import com.thirdgroup.cdms.model.*;
 import com.thirdgroup.cdms.model.enums.UserRole;
 import com.thirdgroup.cdms.model.enums.UserStatus;
 import com.thirdgroup.cdms.service.Interface.AdminService;
+import com.thirdgroup.cdms.service.Interface.OrderService;
 import com.thirdgroup.cdms.utils.Result;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +26,15 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
+    
+    @Autowired
+    private OrderService orderService;
 
     /**
      * 查询所有订单
      * TODO: 页面大小暂时定为10，后续考虑在配置文件中配置
      */
-    @PostMapping("/orders")
+    @RequestMapping("/orders")
     public String queryOrders(
             @RequestParam(required = false) Integer status,
             @RequestParam(required = false) String keyword,
@@ -45,7 +49,7 @@ public class AdminController {
 
         model.addAttribute("historyOrders", Result.success(deliveryOrderPageResult));
 
-        return "admin/ordersHistory.jsp";
+        return "admin/ordersHistory";
     }
 
     /**
@@ -54,13 +58,17 @@ public class AdminController {
     @PostMapping("/orders/active")
     public String queryActiveOrders(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer status,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             Model model
     ) {
-        PageResult<DeliveryOrder> deliveryOrderPageResult = adminService.queryActiveOrders(keyword, page, size);
+        PageResult<DeliveryOrder> deliveryOrderPageResult = adminService.queryActiveOrders(keyword, status, page, size);
         model.addAttribute("ActiveOrders", Result.success(deliveryOrderPageResult));
-        return "admin/activeOrders.jsp";
+        model.addAttribute("searchKeyword", keyword);
+        model.addAttribute("searchStatus", status);
+        model.addAttribute("page", page);
+        return "admin/activeOrders";
     }
 
     /**
@@ -153,6 +161,35 @@ public class AdminController {
     }
 
     /**
+     * 获取订单详情（支持查询参数形式）
+     */
+    @GetMapping("/delivery-tracking/detail")
+    public String trackOrderByParam(
+            @RequestParam String orderId,
+            Model model
+    ) {
+        // 添加订单ID到model中
+        model.addAttribute("orderId", orderId);
+        
+        // 获取订单详情
+        DeliveryOrder order = orderService.getOrderById(orderId);
+        if (order != null) {
+            model.addAttribute("order", order);
+        } else {
+            model.addAttribute("error", "未找到该配送单信息");
+        }
+        
+        // 获取配送跟踪信息
+        List<DeliveryTrace> deliveryTraceList = adminService.trackOrder(orderId);
+        if (deliveryTraceList != null && !deliveryTraceList.isEmpty()) {
+            model.addAttribute("deliveryTraceList", Result.success(deliveryTraceList));
+        } else {
+            model.addAttribute("errorDeliveryTrace", "未找到配送轨迹信息");
+        }
+        return "admin/orderTraces";
+    }
+
+    /**
      * 获取 orderId 对应订单的历史动态
      */
     @GetMapping("/track/{orderId}")
@@ -160,11 +197,25 @@ public class AdminController {
             @PathVariable String orderId,
             Model model
     ) {
+        // 添加订单ID到model中
+        model.addAttribute("orderId", orderId);
+        
+        // 获取订单详情
+        DeliveryOrder order = orderService.getOrderById(orderId);
+        if (order != null) {
+            model.addAttribute("order", order);
+        } else {
+            model.addAttribute("error", "未找到该配送单信息");
+        }
+        
+        // 获取配送跟踪信息
         List<DeliveryTrace> deliveryTraceList = adminService.trackOrder(orderId);
         if (deliveryTraceList != null && !deliveryTraceList.isEmpty()) {
             model.addAttribute("deliveryTraceList", Result.success(deliveryTraceList));
+        } else {
+            model.addAttribute("errorDeliveryTrace", "未找到配送轨迹信息");
         }
-        return "admin/orderTraces.jsp";
+        return "admin/orderTraces";
     }
 
     @PostMapping("/order/statistic")
@@ -182,7 +233,7 @@ public class AdminController {
         model.addAttribute("orderStatistic", orderStatistic);
         model.addAttribute("orderTrendList", orderTrendList);
 
-        return "admin/orderStatistic.jsp";
+        return "admin/orderStatistic";
     }
 
     /**

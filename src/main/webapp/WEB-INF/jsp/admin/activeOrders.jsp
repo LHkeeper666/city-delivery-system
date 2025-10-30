@@ -15,6 +15,8 @@
         }
         .container {
             max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
         }
         .search-form {
             margin-bottom: 20px;
@@ -24,6 +26,26 @@
         }
         .table-actions {
             white-space: nowrap;
+        }
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 15px;
+        }
+        table {
+            min-width: 100%;
+            table-layout: fixed;
+        }
+        th, td {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .narrow-col {
+            width: 80px;
+        }
+        .medium-col {
+            width: 120px;
         }
     </style>
 </head>
@@ -52,19 +74,30 @@
         <h1>订单管理 - 活跃订单</h1>
         
         <!-- 搜索表单 -->
-        <form id="searchForm" action="${pageContext.request.contextPath}/admin/orders/active" method="post" class="form-inline search-form">
+        <form id="searchForm" action="${pageContext.request.contextPath}/admin/orders/active" method="post" class="form-horizontal search-form">
             <div class="form-group">
-                <label for="keyword">关键词搜索 (订单号/收货人姓名/收货人电话)</label>
-                <input type="text" id="keyword" name="keyword" class="form-control" placeholder="请输入关键词搜索" 
-                       value="${searchKeyword != null ? searchKeyword : ''}">
+                <label for="keyword" class="col-sm-2 control-label">关键词搜索</label>
+                <div class="col-sm-4">
+                    <input type="text" id="keyword" name="keyword" class="form-control" 
+                           placeholder="订单号/收货人姓名/收货人电话" 
+                           value="${searchKeyword != null ? searchKeyword : ''}">
+                </div>
+                <label for="status" class="col-sm-2 control-label">订单状态</label>
+                <div class="col-sm-4">
+                    <select id="status" name="status" class="form-control">
+                        <option value="">全部</option>
+                        <option value="0" ${searchStatus != null && searchStatus == 0 ? 'selected' : ''}>待接单</option>
+                        <option value="1" ${searchStatus != null && searchStatus == 1 ? 'selected' : ''}>进行中</option>
+                    </select>
+                </div>
             </div>
             <div class="form-group">
-                <button type="submit" class="btn btn-primary">查询</button>
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-primary">查询</button>
+                    <button type="button" class="btn btn-default" onclick="resetForm()" style="margin-left: 10px;">重置</button>
+                </div>
             </div>
-            <div class="form-group">
-                <button type="button" class="btn btn-default" onclick="resetForm()">重置</button>
-            </div>
-            <input type="hidden" id="page" name="page" value="1">
+            <input type="hidden" id="page" name="page" value="${page != null ? page : 1}">
             <input type="hidden" id="size" name="size" value="10">
         </form>
         
@@ -77,19 +110,20 @@
         </c:if>
         
         <!-- 订单列表 -->
+        <div class="table-responsive">
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
-                    <th>订单号</th>
-                    <th>货物类型</th>
-                    <th>配送费用</th>
-                    <th>接货人</th>
-                    <th>接货电话</th>
-                    <th>收货人</th>
-                    <th>收货电话</th>
-                    <th>状态</th>
-                    <th>创建时间</th>
-                    <th>操作</th>
+                    <th class="medium-col">订单号</th>
+                    <th class="narrow-col">货物类型</th>
+                    <th class="narrow-col">配送费用</th>
+                    <th class="narrow-col">接货人</th>
+                    <th class="medium-col">接货电话</th>
+                    <th class="narrow-col">收货人</th>
+                    <th class="medium-col">收货电话</th>
+                    <th class="narrow-col">状态</th>
+                    <th class="medium-col">创建时间</th>
+                    <th class="medium-col">操作</th>
                 </tr>
             </thead>
             <tbody>
@@ -134,6 +168,7 @@
                 </c:if>
             </tbody>
         </table>
+        </div>
         
         <!-- 分页 -->
         <div class="row">
@@ -169,6 +204,8 @@
         // 重置表单
         function resetForm() {
             document.getElementById('keyword').value = '';
+            document.getElementById('status').value = '';
+            document.getElementById('page').value = '1';
             document.getElementById('searchForm').submit();
         }
         

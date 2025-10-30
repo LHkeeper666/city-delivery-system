@@ -107,7 +107,7 @@
         
         <!-- 返回按钮 -->
         <div class="mb-3">
-            <a href="${pageContext.request.contextPath}/admin/delivery-tracking" class="btn btn-default">
+            <a href="${pageContext.request.contextPath}/admin/orders" class="btn btn-default">
                 <span class="glyphicon glyphicon-arrow-left"></span> 返回列表
             </a>
         </div>
@@ -215,24 +215,9 @@
             </div>
             
             <!-- 配送员信息 -->
-            <c:if test="${not empty deliveryman}">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="info-card">
-                            <h4>配送员信息</h4>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <p><strong>配送员ID：</strong>${deliveryman.userId}</p>
-                                </div>
-                                <div class="col-md-4">
-                                    <p><strong>姓名：</strong>${deliveryman.username}</p>
-                                </div>
-                                <div class="col-md-4">
-                                    <p><strong>电话：</strong>${deliveryman.phoneNo}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <c:if test="${not empty errorDeliveryTrace}">
+                <div class="alert alert-warning text-center">
+                    ${errorDeliveryTrace}
                 </div>
             </c:if>
             
@@ -242,7 +227,7 @@
                     <div class="info-card">
                         <h4>配送跟踪节点</h4>
                         <div class="timeline">
-                            <c:forEach items="${deliveryTraces}" var="trace">
+                            <c:forEach items="${deliveryTraceList.data}" var="trace">
                                 <div class="timeline-item">
                                     <div class="timeline-dot"></div>
                                     <div class="timeline-time">
@@ -266,7 +251,7 @@
                                 </div>
                             </c:forEach>
                             
-                            <c:if test="${empty deliveryTraces}">
+                            <c:if test="${empty deliveryTraceList.data}">
                                 <div class="text-center text-muted">暂无配送跟踪记录</div>
                             </c:if>
                         </div>

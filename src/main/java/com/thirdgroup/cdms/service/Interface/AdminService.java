@@ -16,7 +16,7 @@ public interface AdminService {
      */
     PageResult<DeliveryOrder> queryAllOrders(
             Integer status, String keyword, int page, int size, Long deliverymanId, Date startTime, Date endTime);
-    PageResult<DeliveryOrder> queryActiveOrders(String keyword, int page, int size);
+    PageResult<DeliveryOrder> queryActiveOrders(String keyword, Integer status, int page, int size);
     // 强制取消订单（仅管理员有权限）
     void cancelOrder(String orderId, String reason);
     // 管理API密钥（创建/禁用第三方接口密钥）

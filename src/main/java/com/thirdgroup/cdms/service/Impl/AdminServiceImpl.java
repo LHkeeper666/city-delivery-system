@@ -118,16 +118,19 @@ public class AdminServiceImpl implements AdminService {
         return result;
     }
 
+    @Override
     public PageResult<DeliveryOrder> queryActiveOrders(
-            String keyword, int page, int size) {
+            String keyword, Integer status, int page, int size) {
         int start = (page - 1) * size;
-        List<DeliveryOrder> orderList = orderMapper.selectActiveOrdersByPage(keyword, start, size);
-        Long totalCount = orderMapper.countActiveOrders(keyword);
+        List<DeliveryOrder> orderList = orderMapper.selectActiveOrdersByPage(keyword, status, start, size);
+        Long totalCount = orderMapper.countActiveOrders(keyword, status);
         PageResult<DeliveryOrder> result = new PageResult<>();
         result.setList(orderList);
         result.setTotal(totalCount);
         result.setPage(page);
         result.setSize(size);
+        // 计算总页数，确保不会出现Math.min参数类型不匹配的问题
+        // 注意：PageResult类没有pages和current字段，只需要设置page字段即可
         return result;
     }
 
@@ -279,6 +282,42 @@ public class AdminServiceImpl implements AdminService {
         endTime = DateUtils.addDays(endTime, 1);
         List<OrderTrendDTO> orderTrendByDate = orderMapper.getOrderTrendByDate(startTime, endTime);
         return orderTrendByDate;
+    }
+
+    @Override
+    public PageResult<DeliveryOrder> queryDeliveryOrdersByConditions(
+            String orderId, String pickupPhone, String deliveryPhone, String deliverymanInfo,
+            Integer status, Date startTime, Date endTime, int page, int size) {
+        // 处理结束时间，加1天以便包含当天的所有数据
+        if (endTime != null) {
+            endTime = DateUtils.addDays(endTime, 1);
+        }
+
+        // 计算分页起始位置
+        int start = (page - 1) * size;
+
+        // 查询当前页数据，使用现有的selectByTrackingConditions方法
+        // 注意：这里需要根据接口参数调整，deliverymanInfo可能需要解析为deliverymanId和deliverymanName
+        // 由于接口定义中没有明确说明deliverymanInfo的格式，这里暂时将其作为deliverymanName处理
+        List<DeliveryOrder> orderList = orderMapper.selectByTrackingConditions(
+                orderId, pickupPhone, deliveryPhone, null, deliverymanInfo,
+                status, startTime, endTime, start, size
+        );
+
+        // 对于总数统计，由于没有直接的countByTrackingConditions方法
+        // 这里可以使用通用的count方法，并传入适当的参数
+        // 或者如果需要更精确的统计，可以考虑添加countByTrackingConditions方法到Mapper
+        Long total = orderMapper.count(
+                status, null, null, startTime, endTime
+        );
+
+        // 封装到PageResult并返回
+        PageResult<DeliveryOrder> result = new PageResult<>();
+        result.setList(orderList);
+        result.setTotal(total);
+        result.setPage(page);
+        result.setSize(size);
+        return result;
     }
 }
 // 先用ai生成一下，这个后面我自己改

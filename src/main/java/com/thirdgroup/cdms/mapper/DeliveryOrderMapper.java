@@ -61,18 +61,19 @@ public interface DeliveryOrderMapper {
     );
 
     /**
-     * 分页查询未完成订单，支持关键词模糊搜索
+     * 分页查询未完成订单，支持关键词和状态模糊搜索
      */
     List<DeliveryOrder> selectActiveOrdersByPage(
             @Param("keyword") String keyword,
+            @Param("status") Integer status,
             @Param("start") int start,
             @Param("size") int size
     );
 
     /**
-     * 统计未完成订单数目，支持关键词模糊搜索
+     * 统计未完成订单数目，支持关键词和状态模糊搜索
      */
-    Long countActiveOrders(@Param("keyword") String keyword);
+    Long countActiveOrders(@Param("keyword") String keyword, @Param("status") Integer status);
 
     /**
      * 统计时间范围内的订单数据
