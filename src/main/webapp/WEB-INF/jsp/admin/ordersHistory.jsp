@@ -190,11 +190,11 @@
                     
                     <c:if test="${startPage < 1}">
                         <c:set var="startPage" value="1" />
-                        <c:set var="endPage" value="${Math.min(5, totalPages)}" />
+                        <c:set var="endPage" value="${Math.min(5.0, totalPages)}" />
                     </c:if>
                     <c:if test="${endPage > totalPages}">
                         <c:set var="endPage" value="${totalPages}" />
-                        <c:set var="startPage" value="${Math.max(1, totalPages - 4)}" />
+                        <c:set var="startPage" value="${Math.max(1.0, totalPages - 4)}" />
                     </c:if>
                     
                     <c:forEach begin="${startPage}" end="${endPage}" var="p">
