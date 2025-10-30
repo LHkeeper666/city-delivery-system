@@ -10,7 +10,11 @@
             padding-bottom: 40px;
         }
         .container {
+            max-width: 1200px;
+        }
+        .form-container {
             max-width: 600px;
+            margin: 0 auto;
         }
         .form-group {
             margin-bottom: 15px;
@@ -28,6 +32,7 @@
                 <ul class="nav navbar-nav">
                     <li><a href="${pageContext.request.contextPath}/admin/accounts">账号管理</a></li>
                     <li><a href="${pageContext.request.contextPath}/admin/orders">订单管理</a></li>
+                    <li><a href="${pageContext.request.contextPath}/admin/publish-order">发布配送</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="#">欢迎，${sessionScope.user.username}</a></li>
@@ -38,6 +43,7 @@
     </nav>
 
     <div class="container">
+        <div class="form-container">
         <h2>重置密码</h2>
         
         <!-- 错误提示 -->
@@ -70,6 +76,7 @@
                 </div>
             </div>
         </form>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>

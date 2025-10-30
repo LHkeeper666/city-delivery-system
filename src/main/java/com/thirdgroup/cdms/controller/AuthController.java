@@ -8,6 +8,7 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -90,6 +91,54 @@ public class AuthController {
         response.addCookie(cookie);
 
         return "redirect:/login"; // 浏览器 URL 改为 /login
+    }
+    
+    /**
+     * 显示管理员登录页面
+     */
+    @GetMapping("/admin/login")
+    public String showAdminLoginPage() {
+        return "admin/adminLogin"; // 返回管理员登录JSP页面
+    }
+    
+    /**
+     * 处理管理员登录请求
+     */
+    @PostMapping("/admin/login")
+    public String adminLogin(
+            @RequestParam String username,
+            @RequestParam String password,
+            HttpSession session,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        try {
+            // 获取客户端IP
+            String ip = getClientIp(request);
+            // 调用认证服务进行登录
+            User user = authService.login(username, password, ip);
+            
+            // 检查是否是管理员角色
+            // 根据UserRole枚举，管理员角色ID是0
+            if (user.getRole() != 0) { // 0是管理员角色
+                // 如果不是管理员，重定向到失败页面
+                return "redirect:/admin/login?error=1"; // 不是管理员，返回错误
+            }
+            
+            // 设置会话属性
+            session.setAttribute("user", user);
+            
+            // 设置cookie
+            Cookie cookie = new Cookie("username", username);
+            cookie.setPath("/");
+            cookie.setMaxAge(7 * 24 * 3600);
+            response.addCookie(cookie);
+            
+            // 登录成功，重定向到管理员首页（假设是账号管理页面）
+            return "redirect:/admin/accounts"; // 重定向到管理员账号管理页面
+        } catch (LoginException e) {
+            // 登录失败，返回错误信息
+            return "redirect:/admin/login?error=1"; // 登录失败，返回错误
+        }
     }
 
     /**
