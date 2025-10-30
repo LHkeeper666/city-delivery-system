@@ -131,6 +131,10 @@ public class AdminController {
             User currentUser = (User) session.getAttribute("user");
             if (currentUser != null) {
                 order.setCreatorId(currentUser.getUserId());
+            } else {
+                // 如果session中没有用户信息，设置默认的管理员ID
+                // 这里假设默认管理员ID为1（系统中第一个创建的管理员）
+                order.setCreatorId(1L);
             }
 
             // 调用服务层发布订单

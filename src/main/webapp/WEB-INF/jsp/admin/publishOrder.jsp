@@ -189,7 +189,7 @@
             <div class="form-group">
                 <div class="col-sm-offset-3 col-sm-9">
                     <button type="submit" class="btn btn-primary">提交发布</button>
-                    <button type="reset" class="btn btn-default">重置</button>
+                    <button type="button" class="btn btn-default" onclick="resetForm()">重置</button>
                 </div>
             </div>
         </form>
@@ -206,6 +206,24 @@
                 }, 3000);
             }
         });
+        
+        // 自定义重置函数
+        function resetForm() {
+            // 获取表单中的所有输入元素
+            const form = document.querySelector('form');
+            const inputs = form.querySelectorAll('input, textarea, select');
+            
+            // 清空每个输入元素的值
+            inputs.forEach(input => {
+                // 对于下拉框，重置为第一个选项
+                if (input.tagName === 'SELECT') {
+                    input.selectedIndex = 0;
+                } else {
+                    // 对于其他输入元素，清空值
+                    input.value = '';
+                }
+            });
+        }
     </script>
 </body>
 </html>

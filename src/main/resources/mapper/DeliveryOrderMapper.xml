@@ -343,4 +343,12 @@
         SET deliveryman_id = NULL
         WHERE deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
     </update>
+
+    <!-- 19. 根据日期获取最大订单ID -->
+    <!-- 用于生成新的订单号 -->
+    <select id="getMaxOrderIdByDate" resultType="java.lang.String">
+        SELECT MAX(order_id) 
+        FROM cdms_delivery_order 
+        WHERE order_id LIKE CONCAT('ORD', #{dateStr,jdbcType=VARCHAR}, '%')
+    </select>
 </mapper>
