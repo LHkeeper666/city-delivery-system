@@ -10,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -26,6 +28,14 @@ public class AuthController {
     private AuthService authService;
 
     // TODO：状态码要对齐一下
+    /**
+     * 显示登录页面
+     */
+    @GetMapping("/login")
+    public String showLoginPage() {
+        return "admin/adminLogin"; // 返回管理员登录JSP页面
+    }
+    
     @ApiOperation(value = "用户登录", notes = "用户根据用户名与密码登录系统")
     @ApiResponses({
             @ApiResponse(code = 200, message = "登录成功，返回 'success'"),
@@ -61,13 +71,14 @@ public class AuthController {
 //            return "redirect:/home";
         } catch (LoginException e) {
             System.out.println("error:" + e.getMessage());
-
-//            model.addAttribute("errorMsg", e.getMessage());
-
-            model.addAttribute("errorMsg", Result.error(400, e.getMessage()));
-
-            return "failure";
-//            return "login"; // 回到登录页
+            
+            try {
+                // 重定向并传递错误消息
+                String errorMsg = java.net.URLEncoder.encode(e.getMessage(), "UTF-8");
+                return "redirect:/login?errorMsg=" + errorMsg;
+            } catch (Exception ex) {
+                return "redirect:/login?errorMsg=登录失败"; // 编码失败时的备用方案
+            }
         }
     }
 
@@ -75,7 +86,7 @@ public class AuthController {
     @ApiResponses({
             @ApiResponse(code = 200, message = "登出成功，跳转到登录页")
     })
-    @PostMapping("/logout")
+    @RequestMapping(value = "/logout", method = {RequestMethod.GET, RequestMethod.POST})
     public String logout(
             @ApiParam(value = "当前会话", hidden = true)
             HttpSession session,
@@ -136,8 +147,13 @@ public class AuthController {
             // 登录成功，重定向到管理员首页（假设是账号管理页面）
             return "redirect:/admin/accounts"; // 重定向到管理员账号管理页面
         } catch (LoginException e) {
-            // 登录失败，返回错误信息
-            return "redirect:/admin/login?error=1"; // 登录失败，返回错误
+            // 登录失败，返回具体的错误信息
+            try {
+                String errorMsg = java.net.URLEncoder.encode(e.getMessage(), "UTF-8");
+                return "redirect:/admin/login?errorMsg=" + errorMsg;
+            } catch (Exception ex) {
+                return "redirect:/admin/login?errorMsg=登录失败"; // 编码失败时的备用方案
+            }
         }
     }
 

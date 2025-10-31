@@ -95,7 +95,12 @@
             </div>
             
             <!-- 登录错误提示 -->
-            <c:if test="${param.error == '1'}">
+            <c:if test="${not empty param.errorMsg}">
+                <div class="error-message">
+                    ${param.errorMsg}
+                </div>
+            </c:if>
+            <c:if test="${param.error == '1' && empty param.errorMsg}">
                 <div class="error-message">
                     用户名或密码错误，请重新输入
                 </div>

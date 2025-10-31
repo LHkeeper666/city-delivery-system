@@ -22,9 +22,17 @@ public class AuthServiceImpl implements AuthService {
         User user = userService.findByUsername(username);
 
         if (user == null) {
-            throw new LoginException("用户不存在");
+            throw new LoginException("用户名不存在或密码错误");
         }
 
+        // 检查账号状态
+        if (user.getStatus() == 1) {
+            throw new LoginException("账号已被禁用");
+        }
+        if (user.getStatus() == 2) {
+            throw new LoginException("账号已被锁定");
+        }
+        
         // 如果尝试次数超过指定次数且与最后一次登录时间相差不超过5分钟
         if (user.getFailCount() >= 3) {
             Date untilDate = Date.from(DateUtils.addMinutes(user.getLastLoginTime(), 5).toInstant());
@@ -38,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
         if (!PasswordUtils.matches(password, user.getPassword())) {
             userService.updateLoginInfo(user.getUserId(), user.getFailCount() + 1, ip, false, "密码错误");
             System.out.println("wrong password");
-            throw new LoginException("密码错误");
+            throw new LoginException("用户名不存在或密码错误");
         }
 
         userService.updateLoginInfo(user.getUserId(), 0, ip, true, "");

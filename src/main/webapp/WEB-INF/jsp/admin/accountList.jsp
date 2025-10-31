@@ -163,32 +163,63 @@
         </table>
         
         <!-- 分页 -->
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <nav>
-                    <ul class="pagination">
-                        <li <c:if test="${page eq 1}">class="disabled"</c:if>>
-                            <a href="${pageContext.request.contextPath}/admin/accounts?page=${page-1}&size=${size}&role=${searchRole}&status=${searchStatus}&keyword=${keyword}" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        
-                        <c:forEach begin="1" end="${(total + size - 1) / size}" var="i">
-                            <li <c:if test="${i eq page}">class="active"</c:if>>
-                                <a href="${pageContext.request.contextPath}/admin/accounts?page=${i}&size=${size}&role=${searchRole}&status=${searchStatus}&keyword=${keyword}">${i}</a>
+        <c:if test="${total > 0}">
+        
+        <script>
+        function gotoPage(pageNum) {
+            window.location.href = '${pageContext.request.contextPath}/admin/accounts?page=' + pageNum + '&size=${size}&role=${searchRole}&status=${searchStatus}&keyword=${keyword}';
+        }
+        </script>
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <nav aria-label="Page navigation" class="text-center">
+                        <ul class="pagination">
+                            <li>
+                                <a href="javascript:void(0)" onclick="gotoPage(1)" aria-label="First">
+                                    <span aria-hidden="true">首页</span>
+                                </a>
                             </li>
-                        </c:forEach>
-                        
-                        <li <c:if test="${page eq (total + size - 1) / size}">class="disabled"</c:if>>
-                            <a href="${pageContext.request.contextPath}/admin/accounts?page=${page+1}&size=${size}&role=${searchRole}&status=${searchStatus}&keyword=${keyword}" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-                <p>共 ${total} 条记录，第 ${page} / ${(total + size - 1) / size} 页</p>
+                            <li>
+                                <a href="javascript:void(0)" onclick="gotoPage(${page > 1 ? page - 1 : 1})" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            
+                            <c:set var="startPage" value="${page - 2}" />
+                            <c:set var="endPage" value="${page + 2}" />
+                            <c:set var="totalPages" value="${Math.ceil(total / size)}" />
+                            
+                            <c:if test="${startPage < 1}">
+                                <c:set var="startPage" value="1" />
+                                <c:set var="endPage" value="${Math.min(5.0, totalPages)}" />
+                            </c:if>
+                            <c:if test="${endPage > totalPages}">
+                                <c:set var="endPage" value="${totalPages}" />
+                                <c:set var="startPage" value="${Math.max(1.0, totalPages - 4)}" />
+                            </c:if>
+                            
+                            <c:forEach begin="${startPage}" end="${endPage}" var="p">
+                                <li class="${p == page ? 'active' : ''}">
+                                    <a href="javascript:void(0)" onclick="gotoPage(${p})"><c:out value="${p}"/></a>
+                                </li>
+                            </c:forEach>
+                            
+                            <li>
+                                <a href="javascript:void(0)" onclick="gotoPage(${page < totalPages ? page + 1 : totalPages})" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0)" onclick="gotoPage(${totalPages})" aria-label="Last">
+                                    <span aria-hidden="true">末页</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    <p>共 ${total} 条记录，第 ${page} / ${totalPages} 页</p>
+                </div>
             </div>
-        </div>
+        </c:if>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
