@@ -102,6 +102,7 @@
                 </div>
                 
                 <button type="submit" class="btn btn-primary">搜索</button>
+                <a href="${pageContext.request.contextPath}/admin/accounts" class="btn btn-default" style="margin-left: 10px;">重置</a>
             </form>
         </div>
         

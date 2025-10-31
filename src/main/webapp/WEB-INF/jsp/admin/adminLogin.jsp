@@ -119,10 +119,6 @@
                 </div>
                 <button type="submit" class="btn btn-primary">登录</button>
             </form>
-            
-            <div class="copyright">
-                © 2025 同城配送系统 版权所有
-            </div>
         </div>
     </div>
 </body>
