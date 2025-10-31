@@ -73,4 +73,9 @@ public interface AdminService {
     PageResult<DeliveryOrder> queryDeliveryOrdersByConditions(
             String orderId, String pickupPhone, String deliveryPhone, String deliverymanInfo,
             Integer status, Date startTime, Date endTime, int page, int size);
+
+    /**
+     * 获取地址对应的订单数
+     */
+    List<Map<String, Object>> getOrderAddressMap(Date startTime, Date endTime);
 }

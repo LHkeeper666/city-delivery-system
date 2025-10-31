@@ -1,101 +1,166 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: LHkeeper
-  Date: 2025/10/30
-  Time: 22:43
-  To change this template use File | Settings | File Templates.
---%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
 <html>
 <head>
-    <title>订单统计</title>
+    <title>订单统计分析</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         body {
-            padding-top: 60px;
-            padding-bottom: 40px;
+            background-color: #f3f6f9;
+            padding-top: 70px;
         }
         .container {
-            max-width: 1200px;
+            max-width: 1300px;
+        }
+        .section-title {
+            font-weight: 700;
+            color: #333;
+            border-left: 5px solid #007bff;
+            padding-left: 10px;
+            margin-bottom: 25px;
         }
         .search-form {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .info-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            padding: 20px;
             margin-bottom: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
+        }
+        .info-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+        }
+        .info-card h5 {
+            font-weight: 600;
+        }
+        .info-card h3 {
+            font-size: 2rem;
+            font-weight: bold;
         }
     </style>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 
-    <jsp:include page="navbar.jsp"/>
+<jsp:include page="navbar.jsp"/>
 
-    <div class="container mt-4">
-        <form class="search-form d-flex align-items-center gap-3"
-              action="${pageContext.request.contextPath}/admin/order/statistic"
-              method="GET">
-            <label for="timeRange" class="form-label mb-0">时间范围：</label>
-            <select id="timeRange" class="form-select" name="timeRange" style="width: 200px;">
-<%--                <option value="">选择时间范围</option>--%>
-                <option value="7" ${7 eq timeRange ? 'selected' : ''}>过去一周</option>
-                <option value="30" ${30 eq timeRange ? 'selected' : ''}>过去一个月</option>
-                <option value="90" ${90 eq timeRange ? 'selected' : ''}>过去一个季度</option>
-                <option value="365" ${365 eq timeRange ? 'selected' : ''}>过去一年</option>
-            </select>
-            <input type="hidden" name="startTime" id="startTime">
-            <input type="hidden" name="endTime" id="endTime">
-        </form>
-    </div>
+<div class="container">
 
-    <!-- 订单统计概览卡片 -->
-    <div class="container mt-4">
-        <h3 class="fw-bold mb-4">📊 订单统计概览</h3> <!-- 标题更大 -->
-        <div class="row text-center mt-3">
-
-            <div class="col-md-4">
-                <div class="card shadow-lg border-success h-100"> <!-- 卡片阴影更大，高度自适应 -->
-                    <div class="card-body py-4"> <!-- 增加上下内边距 -->
-                        <h5 class="card-title text-success fw-bold fs-5">总订单数</h5> <!-- 字体更大 -->
-                        <h3 class="fw-bold fs-2">
-                            <c:out value="${orderStatistic.totalCount}" default="0"/> 单
-                        </h3>
-                    </div>
-                </div>
+    <!-- 🔍 查询区域 -->
+    <form class="search-form mb-4" action="${pageContext.request.contextPath}/admin/order/statistic" method="GET">
+        <div class="row align-items-center">
+            <div class="col-md-3">
+                <label for="timeRange" class="form-label">时间范围：</label>
+                <select id="timeRange" class="form-control" name="timeRange">
+                    <option value="7" ${7 eq timeRange ? 'selected' : ''}>过去一周</option>
+                    <option value="30" ${30 eq timeRange ? 'selected' : ''}>过去一个月</option>
+                    <option value="90" ${90 eq timeRange ? 'selected' : ''}>过去一个季度</option>
+                    <option value="365" ${365 eq timeRange ? 'selected' : ''}>过去一年</option>
+                </select>
+                <input type="hidden" name="startTime" id="startTime">
+                <input type="hidden" name="endTime" id="endTime">
             </div>
+        </div>
+    </form>
 
-            <div class="col-md-4">
-                <div class="card shadow-lg border-primary h-100">
-                    <div class="card-body py-4">
-                        <h5 class="card-title text-primary fw-bold fs-5">总收入</h5>
-                        <h3 class="fw-bold fs-2">
-                            ￥<fmt:formatNumber value="${orderStatistic.totalAmount}" pattern="#,##0.00" />
-                        </h3>
-                    </div>
-                </div>
+    <!-- 📊 概览卡片 -->
+    <h3 class="section-title">📈 订单统计概览</h3>
+    <div class="row text-center">
+        <div class="col-md-4">
+            <div class="info-card border-success">
+                <h5 class="text-success">总订单数</h5>
+                <h3><c:out value="${orderStatistic.totalCount}" default="0"/> 单</h3>
             </div>
-
-            <div class="col-md-4">
-                <div class="card shadow-lg border-danger h-100">
-                    <div class="card-body py-4">
-                        <h5 class="card-title text-danger fw-bold fs-5">平均配送时长</h5>
-                        <h3 class="fw-bold fs-2">
-                            <fmt:formatNumber value="${orderStatistic.avgDeliveryTime}" pattern="#0.00" /> 分钟
-                        </h3>
-                    </div>
-                </div>
+        </div>
+        <div class="col-md-4">
+            <div class="info-card border-primary">
+                <h5 class="text-primary">总收入</h5>
+                <h3>￥<fmt:formatNumber value="${orderStatistic.totalAmount}" pattern="#,##0.00" /></h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="info-card border-danger">
+                <h5 class="text-danger">平均配送时长</h5>
+                <h3><fmt:formatNumber value="${orderStatistic.avgDeliveryTime}" pattern="#0.00" /> 分钟</h3>
             </div>
         </div>
     </div>
 
-    <!-- 在页面中添加图表区域 -->
-    <div class="container mt-4">
-        <canvas id="ordersChart" height="120"></canvas>
+    <!-- 📅 图表展示 -->
+    <h3 class="section-title">📊 趋势与分布</h3>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="info-card">
+                <h4 class="text-center fw-bold mb-3">各地区订单热力图</h4>
+                <div id="orderHeatmap" style="width:100%;height:550px;"></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="info-card">
+                <h4 class="text-center fw-bold mb-3">历史订单趋势图</h4>
+                <canvas id="ordersChart" height="220"></canvas>
+            </div>
+        </div>
     </div>
-</body>
+</div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- 🌏 热力图脚本 -->
+<script>
+    const heatmapData = [
+        <c:forEach var="item" items="${heatmapData}" varStatus="loop">
+        {
+            name: '${item.address}',
+            value: ${item.normalized}, // 用归一化值来决定颜色
+            realValue: ${item.count}   // 保存真实订单数用于提示显示
+        }<c:if test="${!loop.last}">,</c:if>
+        </c:forEach>
+    ];
+
+    console.log(heatmapData);
+
+    const heatChart = echarts.init(document.getElementById('orderHeatmap'));
+    heatChart.setOption({
+        tooltip: {
+            trigger: 'item',
+            formatter: function (params) {
+                <%--return `${params.name}<br/>订单数: ${params.data.realValue}`;--%>
+                return params.name + '<br/>订单数：' + params.data.realValue;
+            }
+        },
+        visualMap: {
+            min: 0,
+            max: 1, // 因为 value 是归一化值
+            left: 'left',
+            bottom: '10%',
+            text: ['高', '低'],
+            inRange: { color: ['#d2e9ff', '#4c9aff', '#003f88'] },
+            calculable: true
+        },
+        series: [{
+            name: '订单量',
+            type: 'map',
+            map: 'china',
+            roam: true,
+            label: { show: false },
+            data: heatmapData
+        }]
+    });
+</script>
+
+<!-- 📈 折线图脚本 -->
 <script>
     const trendData = [
         <c:forEach var="t" items="${trendList}" varStatus="loop">
@@ -108,106 +173,60 @@
         </c:forEach>
     ];
 
-    // 格式化日期函数 - 只显示年月日
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        // 方法1: 使用toLocaleDateString
-        return date.toLocaleDateString('zh-CN', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-        });
-
-        // 方法2: 手动拼接（如果需要特定格式）
-        // const year = date.getFullYear();
-        // const month = String(date.getMonth() + 1).padStart(2, '0');
-        // const day = String(date.getDate()).padStart(2, '0');
-        // return `${year}-${month}-${day}`;
-    }
-
-    const dates = trendData.map(item => formatDate(item.date));
+    const dates = trendData.map(item => new Date(item.date).toLocaleDateString('zh-CN'));
     const orderCounts = trendData.map(item => item.orderCount);
     const incomes = trendData.map(item => item.totalIncome);
     const avgTimes = trendData.map(item => item.avgDeliveryTime);
 
-    const ctx = document.getElementById('ordersChart').getContext('2d');
-    new Chart(ctx, {
+    new Chart(document.getElementById('ordersChart'), {
         type: 'line',
         data: {
             labels: dates,
             datasets: [
-                {
-                    label: '订单数',
-                    data: orderCounts,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    tension: 0.3,
-                    fill: true
-                },
-                {
-                    label: '总收入（元）',
-                    data: incomes,
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    tension: 0.3,
-                    fill: true
-                },
-                {
-                    label: '平均配送时长（分钟）',
-                    data: avgTimes,
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    tension: 0.3,
-                    fill: true
-                }
+                { label: '订单数', data: orderCounts, borderColor: '#28a745', backgroundColor: 'rgba(40,167,69,0.15)', tension: 0.3, fill: true },
+                { label: '总收入（元）', data: incomes, borderColor: '#007bff', backgroundColor: 'rgba(0,123,255,0.15)', tension: 0.3, fill: true },
+                { label: '平均配送时长（分钟）', data: avgTimes, borderColor: '#dc3545', backgroundColor: 'rgba(220,53,69,0.15)', tension: 0.3, fill: true }
             ]
         },
         options: {
             responsive: true,
-            plugins: {
-                legend: { position: 'top' },
-                title: {
-                    display: true,
-                    text: '历史订单趋势图'
-                }
-            },
-            scales: {
-                y: { beginAtZero: true }
-            }
+            plugins: { legend: { position: 'top' } },
+            scales: { y: { beginAtZero: true } }
         }
     });
 
-    // 根据选择的时间范围重新GET
+    // ⏱️ 时间范围选择逻辑
     document.getElementById("timeRange").addEventListener("change", function() {
-        const value = this.value;
-        if (!value) return;
+        const val = this.value;
+        const end = new Date();
+        const start = new Date();
+        start.setDate(end.getDate() - parseInt(val) + 1);
 
-        const endTime = new Date();
-        const startTime = new Date();
-        startTime.setDate(endTime.getDate() - parseInt(value) + 1);
+        <%--const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;--%>
 
-        // 日期格式化函数
-        const fmt = (d) => {
-            if (!(d instanceof Date) || isNaN(d)) {
-                return "";
-            }
-            const y = d.getFullYear();
-            const m = String(d.getMonth() + 1).padStart(2, '0');
-            const da = String(d.getDate()).padStart(2, '0');
-            return y + '-' + m + '-' + da;
-        };
+        // 格式化日期函数 - 只显示年月日
+        function fmt(dateString) {
+            const date = new Date(dateString);
+            // 方法1: 使用toLocaleDateString
+            // return date.toLocaleDateString('zh-CN', {
+            //     year: 'numeric',
+            //     month: '2-digit',
+            //     day: '2-digit'
+            // });
 
-        const startStr = fmt(startTime);
-        const endStr = fmt(endTime);
+            // 方法2: 手动拼接（如果需要特定格式）
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            <%--return `${year}-${month}-${day}`;--%>
+            return year + '-' + month + '-' + day;
+        }
 
-        console.log("startStr =", startStr);
-        console.log("endStr =", endStr);
-
-        document.getElementById("startTime").value = startStr;
-        document.getElementById("endTime").value = endStr;
-
-        const form = this.closest("form");
-        form.submit();
+        document.getElementById("startTime").value = fmt(start);
+        document.getElementById("endTime").value = fmt(end);
+        this.form.submit();
     });
 </script>
+
+</body>
 </html>

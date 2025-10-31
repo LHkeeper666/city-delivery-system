@@ -151,4 +151,9 @@ public interface DeliveryOrderMapper {
             @Param("startTime") Date startTime,
             @Param("endTime") Date endTime
     );
+
+    List<Map<String, Object>> countOrdersByAddress(
+            @Param("startTime") Date startTime,
+            @Param("endTime") Date endTime
+    );
 }

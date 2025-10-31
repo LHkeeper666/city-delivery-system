@@ -357,4 +357,13 @@
         FROM cdms_delivery_order 
         WHERE order_id LIKE CONCAT('ORD', #{dateStr,jdbcType=VARCHAR}, '%')
     </select>
+    <select id="countOrdersByAddress" resultType="java.util.Map">
+        SELECT consignee_address AS address, COUNT(*) AS count
+        FROM cdms_delivery_order
+        <where>
+            <if test="startTime != null">AND create_time &gt;= #{startTime}</if>
+            <if test="endTime != null">AND create_time &lt;= #{endTime}</if>
+        </where>
+        GROUP BY consignee_address
+    </select>
 </mapper>

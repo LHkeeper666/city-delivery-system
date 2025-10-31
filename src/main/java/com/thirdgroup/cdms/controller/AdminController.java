@@ -237,13 +237,16 @@ public class AdminController {
 
         OrderStatisticsDTO orderStatistic = adminService.getOrderStatistic(startTime, endTime);
         List<OrderTrendDTO> orderTrendList = adminService.getOrderTrend(startTime, endTime);
+        List<Map<String, Object>> heatmapData = adminService.getOrderAddressMap(startTime, endTime);
 
         System.out.println("orderStatistic: " + orderStatistic);
         System.out.println("orderTrendList: " + orderTrendList);
+        System.out.println("heatmapData: " + heatmapData);
 
         model.addAttribute("orderStatistic", orderStatistic);
         model.addAttribute("trendList", orderTrendList);
         model.addAttribute("timeRange", timeRange);
+        model.addAttribute("heatmapData", heatmapData);
 
         return "admin/orderStatistic";
     }
