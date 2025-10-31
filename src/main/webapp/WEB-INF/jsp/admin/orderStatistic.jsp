@@ -37,12 +37,12 @@
               action="${pageContext.request.contextPath}/admin/order/statistic"
               method="GET">
             <label for="timeRange" class="form-label mb-0">时间范围：</label>
-            <select id="timeRange" class="form-select" style="width: 200px;">
-                <option value="">选择时间范围</option>
-                <option value="7">过去一周</option>
-                <option value="30">过去一个月</option>
-                <option value="90">过去一个季度</option>
-                <option value="365">过去一年</option>
+            <select id="timeRange" class="form-select" name="timeRange" style="width: 200px;">
+<%--                <option value="">选择时间范围</option>--%>
+                <option value="7" ${7 eq timeRange ? 'selected' : ''}>过去一周</option>
+                <option value="30" ${30 eq timeRange ? 'selected' : ''}>过去一个月</option>
+                <option value="90" ${90 eq timeRange ? 'selected' : ''}>过去一个季度</option>
+                <option value="365" ${365 eq timeRange ? 'selected' : ''}>过去一年</option>
             </select>
             <input type="hidden" name="startTime" id="startTime">
             <input type="hidden" name="endTime" id="endTime">
@@ -51,42 +51,41 @@
 
     <!-- 订单统计概览卡片 -->
     <div class="container mt-4">
-        <h4>📊 订单统计概览</h4>
+        <h3 class="fw-bold mb-4">📊 订单统计概览</h3> <!-- 标题更大 -->
         <div class="row text-center mt-3">
 
             <div class="col-md-4">
-                <div class="card shadow-sm border-success">
-                    <div class="card-body">
-                        <h6 class="card-title text-success">总订单数</h6>
-                        <h5 class="fw-bold">
+                <div class="card shadow-lg border-success h-100"> <!-- 卡片阴影更大，高度自适应 -->
+                    <div class="card-body py-4"> <!-- 增加上下内边距 -->
+                        <h5 class="card-title text-success fw-bold fs-5">总订单数</h5> <!-- 字体更大 -->
+                        <h3 class="fw-bold fs-2">
                             <c:out value="${orderStatistic.totalCount}" default="0"/> 单
-                        </h5>
+                        </h3>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-4">
-                <div class="card shadow-sm border-primary">
-                    <div class="card-body">
-                        <h6 class="card-title text-primary">总收入</h6>
-                        <h5 class="fw-bold">
+                <div class="card shadow-lg border-primary h-100">
+                    <div class="card-body py-4">
+                        <h5 class="card-title text-primary fw-bold fs-5">总收入</h5>
+                        <h3 class="fw-bold fs-2">
                             ￥<fmt:formatNumber value="${orderStatistic.totalAmount}" pattern="#,##0.00" />
-                        </h5>
+                        </h3>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-4">
-                <div class="card shadow-sm border-danger">
-                    <div class="card-body">
-                        <h6 class="card-title text-danger">平均配送时长</h6>
-                        <h5 class="fw-bold">
+                <div class="card shadow-lg border-danger h-100">
+                    <div class="card-body py-4">
+                        <h5 class="card-title text-danger fw-bold fs-5">平均配送时长</h5>
+                        <h3 class="fw-bold fs-2">
                             <fmt:formatNumber value="${orderStatistic.avgDeliveryTime}" pattern="#0.00" /> 分钟
-                        </h5>
+                        </h3>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -109,7 +108,24 @@
         </c:forEach>
     ];
 
-    const dates = trendData.map(item => item.date);
+    // 格式化日期函数 - 只显示年月日
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        // 方法1: 使用toLocaleDateString
+        return date.toLocaleDateString('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+
+        // 方法2: 手动拼接（如果需要特定格式）
+        // const year = date.getFullYear();
+        // const month = String(date.getMonth() + 1).padStart(2, '0');
+        // const day = String(date.getDate()).padStart(2, '0');
+        // return `${year}-${month}-${day}`;
+    }
+
+    const dates = trendData.map(item => formatDate(item.date));
     const orderCounts = trendData.map(item => item.orderCount);
     const incomes = trendData.map(item => item.totalIncome);
     const avgTimes = trendData.map(item => item.avgDeliveryTime);
@@ -170,7 +186,7 @@
         const startTime = new Date();
         startTime.setDate(endTime.getDate() - parseInt(value) + 1);
 
-        // 日期格式化函数（非常关键）
+        // 日期格式化函数
         const fmt = (d) => {
             if (!(d instanceof Date) || isNaN(d)) {
                 return "";

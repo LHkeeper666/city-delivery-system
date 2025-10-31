@@ -16,10 +16,18 @@
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="${pageContext.request.contextPath}/admin/accounts">账号管理</a></li>
-        <li><a href="${pageContext.request.contextPath}/admin/orders">订单管理</a></li>
-        <li><a href="${pageContext.request.contextPath}/admin/publish-order">发布配送</a></li>
-        <li><a href="${pageContext.request.contextPath}/admin/order/statistic">数据统计</a></li>
+        <li class="${pageContext.request.requestURI.contains('/admin/accountList') ? 'active' : ''}">
+          <a href="${pageContext.request.contextPath}/admin/accounts">账号管理</a>
+        </li>
+        <li class="${pageContext.request.requestURI.contains('/admin/ordersHistory') ? 'active' : ''}">
+          <a href="${pageContext.request.contextPath}/admin/orders">订单管理</a>
+        </li>
+        <li class="${pageContext.request.requestURI.contains('/admin/publishOrder') ? 'active' : ''}">
+          <a href="${pageContext.request.contextPath}/admin/publish-order">发布配送</a>
+        </li>
+        <li class="${pageContext.request.requestURI.contains('/admin/orderStatistic') ? 'active' : ''}">
+          <a href="${pageContext.request.contextPath}/admin/order/statistic">数据统计</a>
+        </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="#">欢迎，${sessionScope.user.username}</a></li>

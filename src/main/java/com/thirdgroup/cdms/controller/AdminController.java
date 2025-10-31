@@ -224,11 +224,13 @@ public class AdminController {
     public String getOrderStatistic (
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startTime,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endTime,
+            @RequestParam(required = false) Integer timeRange,
             Model model
     ) {
         if (startTime == null && endTime == null) {
             endTime = new Date();
-            startTime = DateUtils.addDays(endTime, -30);
+            startTime = DateUtils.addDays(endTime, -7);
+            timeRange = 7;
         }
         System.out.println("startTime:" + startTime);
         System.out.println("endTime:" + endTime);
@@ -241,6 +243,7 @@ public class AdminController {
 
         model.addAttribute("orderStatistic", orderStatistic);
         model.addAttribute("trendList", orderTrendList);
+        model.addAttribute("timeRange", timeRange);
 
         return "admin/orderStatistic";
     }
