@@ -26,24 +26,6 @@
 </head>
 <body>
     <!-- 导航栏 -->
-<%--    <nav class="navbar navbar-inverse navbar-fixed-top">--%>
-<%--        <div class="container">--%>
-<%--            <div class="navbar-header">--%>
-<%--                <a class="navbar-brand" href="${pageContext.request.contextPath}/admin/accounts">同城配送系统 - 管理员后台</a>--%>
-<%--            </div>--%>
-<%--            <div id="navbar" class="navbar-collapse collapse">--%>
-<%--                <ul class="nav navbar-nav">--%>
-<%--                    <li class="active"><a href="${pageContext.request.contextPath}/admin/accounts">账号管理</a></li>--%>
-<%--                    <li><a href="${pageContext.request.contextPath}/admin/orders">订单管理</a></li>--%>
-<%--                    <li><a href="${pageContext.request.contextPath}/admin/publish-order">发布配送</a></li>--%>
-<%--                </ul>--%>
-<%--                <ul class="nav navbar-nav navbar-right">--%>
-<%--                    <li><a href="#">欢迎，${sessionScope.user.username}</a></li>--%>
-<%--                    <li><a href="${pageContext.request.contextPath}/logout">退出登录</a></li>--%>
-<%--                </ul>--%>
-<%--            </div>--%>
-<%--        </div>--%>
-<%--    </nav>--%>
     <jsp:include page="navbar.jsp"/>
 
     <div class="container">

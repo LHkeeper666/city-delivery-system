@@ -4,9 +4,14 @@ import com.thirdgroup.cdms.model.*;
 import com.thirdgroup.cdms.model.enums.UserRole;
 import com.thirdgroup.cdms.model.enums.UserStatus;
 import com.thirdgroup.cdms.service.Interface.AdminService;
+import com.thirdgroup.cdms.service.Interface.ApiKeyService;
 import com.thirdgroup.cdms.service.Interface.OrderService;
+import com.thirdgroup.cdms.utils.ApiKeyUtil;
 import com.thirdgroup.cdms.utils.DateUtils;
 import com.thirdgroup.cdms.utils.Result;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Date;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
@@ -31,6 +37,9 @@ public class AdminController {
     
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private ApiKeyService apiKeyService;
 
     /**
      * 查询所有订单
@@ -414,5 +423,33 @@ public class AdminController {
             model.addAttribute("userId", userId);
             return "admin/resetPassword";
         }
+    }
+
+    @GetMapping("/api-key-list")
+    public String apiKeyList(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @RequestParam(required = false, defaultValue = "10") Integer size,
+            @RequestParam(required = false) String status,
+            Model model) {
+        PageResult<ApiKey> apiKeys = apiKeyService.queryByPage(keyword, status, page, size);
+        model.addAttribute("apiKeys", apiKeys);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("status", status);
+        return "admin/apiKeyList";
+    }
+
+    @PostMapping("/new-api-key")
+    public String newApiKey(String appName, Model model) {
+        String newApiKey = apiKeyService.createNewApiKey(appName);
+        model.addAttribute("newApiKey", newApiKey);
+        return "admin/newApiKey";
+    }
+
+    // TODO: 页面逻辑待优化
+    @GetMapping("api-key-set-status")
+    public String apiKeySetStatus(@RequestParam Long keyId, Model model) {
+        apiKeyService.turnStatus(keyId);
+        return "redirect:api-key-list";
     }
 }

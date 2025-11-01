@@ -28,6 +28,9 @@
         <li class="${pageContext.request.requestURI.contains('/admin/orderStatistic') ? 'active' : ''}">
           <a href="${pageContext.request.contextPath}/admin/order/statistic">数据统计</a>
         </li>
+        <li class="${pageContext.request.requestURI.contains('/admin/api-key-list') ? 'active' : ''}">
+          <a href="${pageContext.request.contextPath}/admin/api-key-list">apiKey管理</a>
+        </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="#">欢迎，${sessionScope.user.username}</a></li>

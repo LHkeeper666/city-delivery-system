@@ -58,8 +58,9 @@
 <jsp:include page="navbar.jsp"/>
 
 <div class="container">
+    <h1>数据统计</h1>
 
-    <!-- 🔍 查询区域 -->
+    <!-- 查询区域 -->
     <form class="search-form mb-4" action="${pageContext.request.contextPath}/admin/order/statistic" method="GET">
         <div class="row align-items-center">
             <div class="col-md-3">
@@ -76,7 +77,7 @@
         </div>
     </form>
 
-    <!-- 📊 概览卡片 -->
+    <!-- 概览卡片 -->
     <h3 class="section-title">📈 订单统计概览</h3>
     <div class="row text-center">
         <div class="col-md-4">
@@ -99,25 +100,28 @@
         </div>
     </div>
 
-    <!-- 📅 图表展示 -->
+    <!-- 图表展示 -->
     <h3 class="section-title">📊 趋势与分布</h3>
-    <div class="row">
-        <div class="col-md-6">
-            <div class="info-card">
+    <div class="row align-items-stretch">
+        <!-- 热力图 -->
+        <div class="col-md-7">
+            <div class="info-card h-100">
                 <h4 class="text-center fw-bold mb-3">各地区订单热力图</h4>
-                <div id="orderHeatmap" style="width:100%;height:550px;"></div>
+                <div id="orderHeatmap" style="width:100%;height:500px;"></div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="info-card">
+
+        <!-- 折线图 -->
+        <div class="col-md-5">
+            <div class="info-card h-100">
                 <h4 class="text-center fw-bold mb-3">历史订单趋势图</h4>
-                <canvas id="ordersChart" height="220"></canvas>
+                <canvas id="ordersChart" style="width:100%;height:500px;"></canvas>
             </div>
         </div>
     </div>
 </div>
 
-<!-- 🌏 热力图脚本 -->
+<!-- 热力图脚本 -->
 <script>
     const heatmapData = [
         <c:forEach var="item" items="${heatmapData}" varStatus="loop">
@@ -146,7 +150,7 @@
             left: 'left',
             bottom: '10%',
             text: ['高', '低'],
-            inRange: { color: ['#d2e9ff', '#4c9aff', '#003f88'] },
+            inRange: { color: ['#e4d9c2', '#fabb7d', '#f49506'] },
             calculable: true
         },
         series: [{
@@ -160,7 +164,7 @@
     });
 </script>
 
-<!-- 📈 折线图脚本 -->
+<!-- 折线图脚本 -->
 <script>
     const trendData = [
         <c:forEach var="t" items="${trendList}" varStatus="loop">
@@ -195,7 +199,7 @@
         }
     });
 
-    // ⏱️ 时间范围选择逻辑
+    // ⏱时间范围选择逻辑
     document.getElementById("timeRange").addEventListener("change", function() {
         const val = this.value;
         const end = new Date();

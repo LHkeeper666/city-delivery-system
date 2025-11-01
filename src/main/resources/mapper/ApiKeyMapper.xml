@@ -39,6 +39,14 @@
             create_time = #{createTime,jdbcType=TIMESTAMP,javaType=java.util.Date}
         WHERE key_id = #{keyId,jdbcType=BIGINT}
     </update>
+    <update id="turnStatus" parameterType="java.lang.Long">
+        UPDATE cdms_api_key
+        SET status = CASE
+                         WHEN status = 'enabled' THEN 'disabled'
+                         ELSE 'enabled'
+                     END
+        WHERE key_id = #{keyId, jdbcType=BIGINT}
+    </update>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List" />
@@ -49,5 +57,28 @@
     <select id="selectAll" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List" />
         FROM cdms_api_key
+    </select>
+    <select id="selectByApiKey" resultType="com.thirdgroup.cdms.model.ApiKey" parameterType="java.lang.String">
+        SELECT <include refid="Base_Column_List" />
+        FROM cdms_api_key
+        WHERE api_key = #{apiKey,jdbcType=VARCHAR}
+    </select>
+    <select id="selectByPageAndAppName" resultType="com.thirdgroup.cdms.model.ApiKey">
+        SELECT <include refid="Base_Column_List" />
+        FROM cdms_api_key
+        <where>
+            <if test="keyword != null and keyword != ''">AND app_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')</if>
+            <if test="status != null and status != ''">AND status = #{status, jdbcType=VARCHAR}</if>
+        </where>
+        ORDER BY create_time DESC
+        LIMIT #{start,jdbcType=INTEGER}, #{size,jdbcType=INTEGER}
+    </select>
+    <select id="countByAppName" resultType="java.lang.Long" parameterType="java.lang.String">
+        SELECT count(*)
+        FROM cdms_api_key
+        <where>
+            <if test="keyword != null and keyword != ''">AND app_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')</if>
+            <if test="status != null and status != ''">AND status = #{status, jdbcType=VARCHAR}</if>
+        </where>
     </select>
 </mapper>
