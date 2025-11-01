@@ -12,13 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import com.thirdgroup.cdms.model.enums.OrderStatus;
+import org.springframework.web.servlet.resource.ResourceUrlProvider;
+
 import java.math.BigDecimal;
 
 @Service
@@ -319,5 +317,52 @@ public class AdminServiceImpl implements AdminService {
         result.setSize(size);
         return result;
     }
+
+    @Override
+    public List<Map<String, Object>> getOrderAddressMap(Date startTime, Date endTime) {
+        List<Map<String, Object>> mapList = orderMapper.countOrdersByAddress(startTime, endTime);
+        System.out.println("mapList: " + mapList);
+        for (Map<String, Object> m : mapList) {
+            String addr = (String) m.get("address");
+
+            if (addr.contains("维吾尔自治区")) {
+                m.put("address", addr.substring(0, addr.indexOf("维吾尔自治区")));
+            } else if (addr.contains("壮族自治区")) {
+                m.put("address", addr.substring(0, addr.indexOf("壮族自治区")));
+            } else  if (addr.contains("回族自治区")) {
+                m.put("address", addr.substring(0, addr.indexOf("回族自治区")));
+            } else  if (addr.contains("自治区")) {
+                m.put("address", addr.substring(0, addr.indexOf("自治区")));
+            } else if (addr.contains("省")) {
+                m.put("address", addr.substring(0, addr.indexOf("省")));
+            } else if (addr.contains("市")) {
+                m.put("address", addr.substring(0, addr.indexOf("市")));
+            }
+        }
+//        return mapList;
+
+        Map<String, Integer> merged = new HashMap<>();
+        for (Map<String, Object> m : mapList) {
+            String addr = (String) m.get("address");
+            if (addr == null) continue;
+            Integer count = ((Number) m.get("count")).intValue();
+            merged.merge(addr, count, Integer::sum);
+        }
+
+        int max = merged.values().stream().max(Integer::compareTo).orElse(1);
+        int min = merged.values().stream().min(Integer::compareTo).orElse(0);
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Map.Entry<String, Integer> e : merged.entrySet()) {
+            String address = e.getKey();
+            int count = e.getValue();
+            double normalized = (double) (count - min) / (max - min + 1e-9); // 防止除0
+            Map<String, Object> map = new HashMap<>();
+            map.put("address", address); // 恢复为地图可识别形式
+            map.put("count", count);
+            map.put("normalized", normalized);
+            result.add(map);
+        }
+        return result;
+    }
 }
-// 先用ai生成一下，这个后面我自己改
