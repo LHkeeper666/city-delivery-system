@@ -42,4 +42,9 @@ public interface ApiKeyMapper {
      * 反转状态
      */
     void turnStatus(Long keyId);
+
+    /**
+     * 根据应用名称查询
+     */
+    ApiKey selectByAppName(String appName);
 }

@@ -13,7 +13,7 @@ public interface ApiKeyService {
     /**
      * 创建新的 apiKey 并插入到表中
      */
-    String createNewApiKey(String appName);
+    String createNewApiKey(String appName) throws Exception;
 
     /**
      * 分页查询 apikey，支持appname模糊搜索

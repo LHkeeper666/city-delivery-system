@@ -70,7 +70,7 @@
             <if test="keyword != null and keyword != ''">AND app_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')</if>
             <if test="status != null and status != ''">AND status = #{status, jdbcType=VARCHAR}</if>
         </where>
-        ORDER BY create_time DESC
+        ORDER BY key_id ASC
         LIMIT #{start,jdbcType=INTEGER}, #{size,jdbcType=INTEGER}
     </select>
     <select id="countByAppName" resultType="java.lang.Long" parameterType="java.lang.String">
@@ -80,5 +80,10 @@
             <if test="keyword != null and keyword != ''">AND app_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')</if>
             <if test="status != null and status != ''">AND status = #{status, jdbcType=VARCHAR}</if>
         </where>
+    </select>
+    <select id="selectByAppName" resultType="com.thirdgroup.cdms.model.ApiKey">
+        SELECT <include refid="Base_Column_List" />
+        FROM cdms_api_key
+        WHERE app_name = #{appName,jdbcType=VARCHAR}
     </select>
 </mapper>

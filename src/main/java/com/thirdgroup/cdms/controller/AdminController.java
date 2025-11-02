@@ -19,6 +19,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.Date;
@@ -440,10 +441,31 @@ public class AdminController {
     }
 
     @PostMapping("/new-api-key")
-    public String newApiKey(String appName, Model model) {
-        String newApiKey = apiKeyService.createNewApiKey(appName);
-        model.addAttribute("newApiKey", newApiKey);
-        return "admin/newApiKey";
+    public String newApiKey(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @RequestParam(required = false, defaultValue = "10") Integer size,
+            @RequestParam(required = false) String status,
+            @RequestParam String appName,
+            RedirectAttributes redirectAttributes) {
+        try {
+            String newApiKey = apiKeyService.createNewApiKey(appName);
+            redirectAttributes.addFlashAttribute("newKey", newApiKey);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+        }
+        StringBuilder redirectUrl = new StringBuilder("redirect:api-key-list");
+        redirectUrl.append("?page=").append(page)
+                .append("&size=").append(size);
+        if (keyword != null && !keyword.isEmpty()) {
+            redirectUrl.append("&keyword=").append(keyword);
+        }
+        if (status != null && !status.isEmpty()) {
+            redirectUrl.append("&status=").append(status);
+        }
+
+        return redirectUrl.toString();
+//        return "admin/apiKeyList";
     }
 
     // TODO: 页面逻辑待优化
