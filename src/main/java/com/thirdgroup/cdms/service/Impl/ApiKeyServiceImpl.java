@@ -8,6 +8,7 @@ import com.thirdgroup.cdms.utils.ApiKeyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -23,12 +24,18 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
 
     @Override
-    public String createNewApiKey(String appName) {
+    public String createNewApiKey(String appName) throws Exception {
+        if (apiKeyMapper.selectByAppName(appName) != null) {
+            System.out.println("app name is exist");
+            throw new Exception("应用名称已存在！");
+        }
         String newKey = ApiKeyUtil.generateApiKey();
 //        ApiKey newApiKey = new ApiKey(null, appName, newKey, "enabled", null);
         ApiKey newApiKey = new ApiKey();
         newApiKey.setAppName(appName);
         newApiKey.setApiKey(newKey);
+        newApiKey.setCreateTime(new Date());
+        newApiKey.setStatus("enabled");
         apiKeyMapper.insert(newApiKey);
 
         return newKey;
