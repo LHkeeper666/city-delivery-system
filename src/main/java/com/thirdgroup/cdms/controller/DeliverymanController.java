@@ -249,7 +249,7 @@ public class DeliverymanController {
 
     // 16. 跳转【订单详情页】：Long → String（核心修改）
     // 补充：历史订单查看详情接口（路径与JSP一致）
-    @GetMapping("/orderDetail") // 关键：路径必须是/deliveryman/orderDetail
+    @GetMapping("/toOrderDetail") // 关键：路径必须是/deliveryman/orderDetail
     public String toOrderDetail(
             @RequestParam String orderId, // 接收String类型orderId（匹配数据库VARCHAR）
             HttpSession session,
