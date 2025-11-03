@@ -45,7 +45,26 @@
         
         <!-- 错误消息提示 -->
         <c:if test="${not empty error}">
-            <div class="alert alert-danger">${error}</div>
+            <script type="text/javascript">
+                // 使用setTimeout确保在DOM加载完成后显示弹窗
+                window.onload = function() {
+                    setTimeout(function() {
+                        alert('${error}');
+                    }, 100);
+                };
+            </script>
+        </c:if>
+        
+        <!-- 成功消息提示 -->
+        <c:if test="${not empty message}">
+            <script type="text/javascript">
+                // 使用setTimeout确保在DOM加载完成后显示弹窗
+                window.onload = function() {
+                    setTimeout(function() {
+                        alert('${message}');
+                    }, 100);
+                };
+            </script>
         </c:if>
         
         <!-- 搜索表单 -->
