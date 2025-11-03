@@ -117,7 +117,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="expectedMins" class="col-sm-3 control-label">预计配送时效（小时）</label>
+                    <label for="expectedMins" class="col-sm-3 control-label">预计配送时效（分钟）</label>
                     <div class="col-sm-9">
                         <input type="number" id="expectedMins" name="expectedMins" class="form-control" min="1" placeholder="请输入预计配送时效" value="${deliveryOrder.expectedMins}">
                     </div>

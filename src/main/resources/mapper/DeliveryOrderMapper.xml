@@ -161,6 +161,7 @@
                     o.order_id LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')  <!-- 补充VARCHAR类型 -->
                     OR o.sender_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
                     OR o.consignee_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                    OR o.consignee_phone LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
                     OR u.username LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
                 )
             </if>
@@ -184,6 +185,7 @@
                     o.order_id LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')  <!-- 补充VARCHAR类型 -->
                     OR o.sender_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
                     OR o.consignee_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                    OR o.consignee_phone LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
                     OR u.username LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
                 )
             </if>

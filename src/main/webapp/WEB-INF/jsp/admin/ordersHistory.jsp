@@ -47,7 +47,7 @@
                 <div class="form-group">
                     <label for="keyword" class="col-sm-2 control-label">关键词搜索</label>
                     <div class="col-sm-4">
-                        <input type="text" id="keyword" name="keyword" placeholder="订单号/收货人姓名/收货人电话" 
+                        <input type="text" id="keyword" name="keyword" placeholder="订单号/姓名/收货人电话" 
                                value="${searchKeyword != null ? searchKeyword : ''}" class="form-control">
                     </div>
                     <label for="status" class="col-sm-2 control-label">订单状态</label>
