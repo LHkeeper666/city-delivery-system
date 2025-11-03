@@ -55,9 +55,10 @@
                         <select id="status" name="status" class="form-control">
                             <option value="">全部</option>
                             <option value="0" ${searchStatus != null && searchStatus == 0 ? 'selected' : ''}>待接单</option>
-                            <option value="1" ${searchStatus != null && searchStatus == 1 ? 'selected' : ''}>进行中</option>
-                            <option value="2" ${searchStatus != null && searchStatus == 2 ? 'selected' : ''}>已完成</option>
-                            <option value="3" ${searchStatus != null && searchStatus == 3 ? 'selected' : ''}>已取消</option>
+                            <option value="1" ${searchStatus != null && searchStatus == 1 ? 'selected' : ''}>已接单待取货</option>
+                            <option value="2" ${searchStatus != null && searchStatus == 2 ? 'selected' : ''}>配送中</option>
+                            <option value="3" ${searchStatus != null && searchStatus == 3 ? 'selected' : ''}>已完成</option>
+                            <option value="4" ${searchStatus != null && searchStatus == 4 ? 'selected' : ''}>已取消</option>
                         </select>
                     </div>
                 </div>
@@ -119,15 +120,18 @@
                             <td>
                                 <c:choose>
                                     <c:when test="${order.status == 0}">
-                                        <span class="label label-warning">待接单</span>
+                                        <span class="label label-default">待接单</span>
                                     </c:when>
                                     <c:when test="${order.status == 1}">
-                                        <span class="label label-info">进行中</span>
+                                        <span class="label label-warning">已接单待取货</span>
                                     </c:when>
                                     <c:when test="${order.status == 2}">
-                                        <span class="label label-success">已完成</span>
+                                        <span class="label label-success">配送中</span>
                                     </c:when>
                                     <c:when test="${order.status == 3}">
+                                        <span class="label label-primary">已完成</span>
+                                    </c:when>
+                                    <c:when test="${order.status == 4}">
                                         <span class="label label-danger">已取消</span>
                                     </c:when>
                                     <c:otherwise>

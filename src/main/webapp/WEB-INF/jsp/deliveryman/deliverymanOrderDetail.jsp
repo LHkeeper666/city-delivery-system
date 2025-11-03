@@ -41,6 +41,9 @@
     <div class="row">
         <h3>订单 ${order.orderId} 详情
             <c:choose>
+                <c:when test="${order.status == 0}">
+                    <span class="status-tag" style="background-color: #6c757d;">待接单</span>
+                </c:when>
                 <c:when test="${order.status == 1}">
                     <span class="status-tag" style="background-color: #ffc107;">已接单待取货</span>
                 </c:when>
@@ -53,6 +56,9 @@
                 <c:when test="${order.status == 4}">
                     <span class="status-tag" style="background-color: #dc3545;">已取消</span>
                 </c:when>
+                <c:otherwise>
+                    <span class="status-tag" style="background-color: #999;">未知状态</span>
+                </c:otherwise>
             </c:choose>
         </h3>
     </div>
