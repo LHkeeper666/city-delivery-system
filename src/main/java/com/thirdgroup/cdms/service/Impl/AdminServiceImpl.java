@@ -258,6 +258,10 @@ public class AdminServiceImpl implements AdminService {
     public void resetPassword(Long userId, String newPassword) {
         User user = userMapper.selectByPrimaryKey(userId);
         if (user != null) {
+            // 检查新密码是否与原密码相同
+            if (PasswordUtils.matches(newPassword, user.getPassword())) {
+                throw new RuntimeException("重置密码不能与原密码相同");
+            }
             user.setPassword(PasswordUtils.encode(newPassword));
             userMapper.updateByPrimaryKey(user);
         }

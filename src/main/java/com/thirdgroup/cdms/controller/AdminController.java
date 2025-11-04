@@ -424,10 +424,10 @@ public class AdminController {
      * 执行密码重置
      */
     @PostMapping("/accounts/resetPassword")
-    public String resetPassword(@RequestParam Long userId, @RequestParam String newPassword, Model model) {
+    public String resetPassword(@RequestParam Long userId, @RequestParam String newPassword, RedirectAttributes redirectAttributes, Model model) {
         try {
             adminService.resetPassword(userId, newPassword);
-            model.addAttribute("message", "密码重置成功");
+            redirectAttributes.addFlashAttribute("resetSuccess", "true");
             return "redirect:/admin/accounts";
         } catch (Exception e) {
             model.addAttribute("error", "密码重置失败：" + e.getMessage());

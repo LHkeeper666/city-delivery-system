@@ -225,5 +225,12 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
+     
+     // 检查是否有密码重置成功的标志
+     <c:if test="${not empty resetSuccess}">
+         <script>
+             alert('密码重置成功');
+         </script>
+     </c:if>
 </body>
 </html>

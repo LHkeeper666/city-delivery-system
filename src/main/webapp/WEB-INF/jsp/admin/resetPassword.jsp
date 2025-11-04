@@ -81,9 +81,6 @@
                 return false;
             }
             
-            // 显示密码重置成功弹窗
-            alert('密码重置成功');
-            
             return true;
         };
     </script>
