@@ -43,7 +43,6 @@ public class AuthController {
             @ApiResponse(code = 500, message = "服务器内部错误")
     })
     @PostMapping("/login")
-    @ResponseBody
     public String login(
             @ApiParam(value = "用户名", required = true, example = "admin")
             @RequestParam String username,
@@ -58,7 +57,6 @@ public class AuthController {
         System.out.println("start login!!!");
         try {
             String ip = getClientIp(request);
-            System.out.println("ip:" + ip);
             User user = authService.login(username, password, ip);
             session.setAttribute("user", user);
 
@@ -67,11 +65,8 @@ public class AuthController {
             cookie.setMaxAge(7 * 24 * 3600);
             response.addCookie(cookie);
 
-            return "success";
-//            return "redirect:/home";
+            return "redirect:/admin/accounts";
         } catch (LoginException e) {
-            System.out.println("error:" + e.getMessage());
-            
             try {
                 // 重定向并传递错误消息
                 String errorMsg = java.net.URLEncoder.encode(e.getMessage(), "UTF-8");

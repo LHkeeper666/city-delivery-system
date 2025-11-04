@@ -39,15 +39,33 @@ public class RequestLoggingFilter implements Filter {
             System.out.println("   参数: " + name + " = " + req.getParameter(name));
         }
 
-        // 登录校验（排除登录、静态资源）
+        // 登录校验（排除登录）
         String path = req.getRequestURI();
-//        if (!path.startsWith("/login") && !path.startsWith("/css") && !path.startsWith("/js")) {
-//            HttpSession session = req.getSession(false);
-//            if (session == null || session.getAttribute("user") == null) {
-//                resp.sendRedirect("/login");
-//                return;
-//            }
-//        }
+        String contextPath = req.getContextPath();
+        String relativePath = path.substring(contextPath.length());
+
+        HttpSession session = req.getSession(false);
+
+        if (relativePath.startsWith("/deliveryman") && !isLoginging(relativePath)) {
+            if (session == null || session.getAttribute("deliveryman") == null) {
+                resp.sendRedirect(req.getContextPath() + "/deliveryman/toLogin");
+                return;
+            }
+        } else if (relativePath.startsWith("/admin")) {
+            if (session == null || session.getAttribute("user") == null) {
+                resp.sendRedirect(req.getContextPath() + "/login");
+                return;
+            }
+        }
+
+        if ((session == null ||
+                (session.getAttribute("user") == null &&
+                        session.getAttribute("deliveryman") == null)) &&
+                        !isLoginging(relativePath)
+        ) {
+            resp.sendRedirect(req.getContextPath() + "/deliveryman/toLogin");
+            return;
+        }
 
         // 记录请求开始时间，方便响应过滤器统计耗时
         req.setAttribute("startTime", System.currentTimeMillis());
@@ -59,5 +77,13 @@ public class RequestLoggingFilter implements Filter {
     @Override
     public void destroy() {
         System.out.println("Filter destroyed");
+    }
+
+    public boolean isLoginging(String relativePath) {
+        return relativePath.startsWith("/deliveryman/toLogin") ||
+                relativePath.startsWith("/deliveryman/toRegister") ||
+                relativePath.startsWith("/deliveryman/login") ||
+                relativePath.startsWith("/deliveryman/register") ||
+                relativePath.startsWith("/login");
     }
 }
