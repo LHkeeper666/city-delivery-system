@@ -2,147 +2,185 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.thirdgroup.cdms.mapper.OrderMapper">
 
-    <!-- 1. 查待接单订单：不变 -->
-    <select id="selectPendingOrders" resultType="com.thirdgroup.cdms.model.DeliveryOrder">
+    <!-- 结果集映射：统一管理字段映射关系，避免重复编写 -->
+    <resultMap id="DeliveryOrderResultMap" type="com.thirdgroup.cdms.model.DeliveryOrder">
+        <id column="order_id" property="orderId" jdbcType="VARCHAR"/>
+        <result column="sender_name" property="senderName" jdbcType="VARCHAR"/>
+        <result column="sender_phone" property="senderPhone" jdbcType="VARCHAR"/>
+        <result column="sender_address" property="senderAddress" jdbcType="VARCHAR"/>
+        <result column="consignee_name" property="consigneeName" jdbcType="VARCHAR"/>
+        <result column="consignee_phone" property="consigneePhone" jdbcType="VARCHAR"/>
+        <result column="consignee_address" property="consigneeAddress" jdbcType="VARCHAR"/>
+        <result column="goods_type" property="goodsType" jdbcType="VARCHAR"/>
+        <result column="weight" property="weight" jdbcType="DECIMAL"/>
+        <result column="volume" property="volume" jdbcType="DECIMAL"/>
+        <result column="delivery_fee" property="deliveryFee" jdbcType="DECIMAL"/>
+        <result column="platform_income" property="platformIncome" jdbcType="DECIMAL"/>
+        <result column="deliveryman_income" property="deliverymanIncome" jdbcType="DECIMAL"/>
+        <result column="expected_mins" property="expectedMins" jdbcType="INTEGER"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="creator_id" property="creatorId" jdbcType="BIGINT"/>
+        <result column="deliveryman_id" property="deliverymanId" jdbcType="BIGINT"/>
+        <result column="complete_time" property="completeTime" jdbcType="TIMESTAMP"/>
+        <result column="cancel_time" property="cancelTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 1. 查待接单订单：补充状态判断（待接单通常为状态0） -->
+    <select id="selectPendingOrders" resultMap="DeliveryOrderResultMap">
         SELECT
-            order_id AS orderId,
-            sender_name AS senderName,
-            sender_phone AS senderPhone,
-            sender_address AS senderAddress,
-            consignee_name AS consigneeName,
-            consignee_phone AS consigneePhone,
-            consignee_address AS consigneeAddress,
-            goods_type AS goodsType,
-            weight,
-            volume,
-            delivery_fee AS deliveryFee,
-            platform_income AS platformIncome,
-            deliveryman_income AS deliverymanIncome,
-            expected_mins AS expectedMins,
-            remark,
-            status,
-            create_time AS createTime,
-            creator_id AS creatorId,
-            deliveryman_id AS deliverymanId,
-            complete_time AS completeTime,
-            cancel_time AS cancelTime
+        order_id,
+        sender_name,
+        sender_phone,
+        sender_address,
+        consignee_name,
+        consignee_phone,
+        consignee_address,
+        goods_type,
+        weight,
+        volume,
+        delivery_fee,
+        platform_income,
+        deliveryman_income,
+        expected_mins,
+        remark,
+        status,
+        create_time,
+        creator_id,
+        deliveryman_id,
+        complete_time,
+        cancel_time
         FROM cdms_delivery_order
         WHERE status = #{status,jdbcType=INTEGER}
-          AND deliveryman_id IS NULL
+        AND deliveryman_id IS NULL
+        AND status = 0  <!-- 明确待接单状态为0，避免传入错误状态 -->
         ORDER BY create_time DESC
     </select>
 
-    <!-- 2. 根据骑手ID+状态查订单：不变 -->
-    <select id="selectByStatusAndDeliveryman" resultType="com.thirdgroup.cdms.model.DeliveryOrder">
+    <!-- 2. 根据骑手ID+状态查订单：优化排序 -->
+    <select id="selectByStatusAndDeliveryman" resultMap="DeliveryOrderResultMap">
         SELECT
-            order_id AS orderId,
-            sender_name AS senderName,
-            sender_phone AS senderPhone,
-            sender_address AS senderAddress,
-            consignee_name AS consigneeName,
-            consignee_phone AS consigneePhone,
-            consignee_address AS consigneeAddress,
-            goods_type AS goodsType,
-            weight,
-            volume,
-            delivery_fee AS deliveryFee,
-            platform_income AS platformIncome,
-            deliveryman_income AS deliverymanIncome,
-            expected_mins AS expectedMins,
-            remark,
-            status,
-            create_time AS createTime,
-            creator_id AS creatorId,
-            deliveryman_id AS deliverymanId,
-            complete_time AS completeTime,
-            cancel_time AS cancelTime
+        order_id,
+        sender_name,
+        sender_phone,
+        sender_address,
+        consignee_name,
+        consignee_phone,
+        consignee_address,
+        goods_type,
+        weight,
+        volume,
+        delivery_fee,
+        platform_income,
+        deliveryman_income,
+        expected_mins,
+        remark,
+        status,
+        create_time,
+        creator_id,
+        deliveryman_id,
+        complete_time,
+        cancel_time
         FROM cdms_delivery_order
         WHERE deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
-          AND status = #{status,jdbcType=INTEGER}
-        ORDER BY create_time DESC
+        AND status = #{status,jdbcType=INTEGER}
+        AND deliveryman_id IS NOT NULL  <!-- 确保骑手ID有效 -->
+        ORDER BY
+        CASE status
+        WHEN 1 THEN 0  <!-- 配送中优先展示 -->
+        WHEN 2 THEN 1  <!-- 待取货其次 -->
+        ELSE 2
+        END,
+        create_time DESC
     </select>
 
-    <!-- 3. 接单：删除update_time更新（核心修改） -->
+    <!-- 3. 接单：增加乐观锁判断，防止重复接单 -->
     <update id="acceptOrder">
         UPDATE cdms_delivery_order
         SET
-        deliveryman_id = #{deliverymanId,jdbcType=BIGINT},  -- 保留骑手ID更新
-        status = #{targetStatus,jdbcType=INTEGER}           -- 保留状态更新
-        <!-- 移除：update_time = NOW()（数据库无此字段） -->
+        deliveryman_id = #{deliverymanId,jdbcType=BIGINT},
+        status = #{targetStatus,jdbcType=INTEGER}
         WHERE
         order_id = #{orderId,jdbcType=VARCHAR}
-        AND status = 0
+        AND status = 0  <!-- 仅待接单状态可被接 -->
         AND deliveryman_id IS NULL
+        AND (SELECT 1 FROM dual WHERE #{targetStatus,jdbcType=INTEGER} IN (1,2))  <!-- 限制目标状态为有效接单状态 -->
     </update>
 
-    <!-- 4. 更新订单状态：删除update_time更新（核心修改） -->
+    <!-- 4. 更新订单状态：细化状态逻辑，防止非法状态变更 -->
     <update id="updateStatus">
         UPDATE cdms_delivery_order
         SET
-        status = #{targetStatus,jdbcType=INTEGER}  -- 保留状态更新
-        <!-- 移除：update_time = #{updateTime,jdbcType=TIMESTAMP}（数据库无此字段） -->
+        status = #{targetStatus,jdbcType=INTEGER}
         <if test="targetStatus == 3">
-            , complete_time = NOW()  <!-- 保留完成时间更新（业务必要） -->
+            , complete_time = NOW()  <!-- 完成状态更新完成时间 -->
         </if>
         <if test="targetStatus == 4">
-            , cancel_time = NOW()   <!-- 保留取消时间更新（业务必要） -->
+            , cancel_time = NOW()   <!-- 取消状态更新取消时间 -->
         </if>
         WHERE
         order_id = #{orderId,jdbcType=VARCHAR}
+        AND status IN (  <!-- 限制合法状态流转，例如：待接单(0)→已取消(4)，配送中(1)→已完成(3)等 -->
+        <if test="targetStatus == 3">1,2</if>  <!-- 只有配送中/待取货可转完成 -->
+        <if test="targetStatus == 4">0,1,2</if> <!-- 待接单/配送中/待取货可取消 -->
+        <if test="targetStatus not in (3,4)">${status}</if>  <!-- 其他状态按业务规则扩展 -->
+        )
     </update>
 
-    <!-- 5. 根据ID查订单：不变 -->
-    <select id="selectById" resultType="com.thirdgroup.cdms.model.DeliveryOrder">
+    <!-- 5. 根据ID查订单：确保订单存在性 -->
+    <select id="selectById" resultMap="DeliveryOrderResultMap">
         SELECT
-            order_id AS orderId,
-            sender_name AS senderName,
-            sender_phone AS senderPhone,
-            sender_address AS senderAddress,
-            consignee_name AS consigneeName,
-            consignee_phone AS consigneePhone,
-            consignee_address AS consigneeAddress,
-            goods_type AS goodsType,
-            weight,
-            volume,
-            delivery_fee AS deliveryFee,
-            platform_income AS platformIncome,
-            deliveryman_income AS deliverymanIncome,
-            expected_mins AS expectedMins,
-            remark,
-            status,
-            create_time AS createTime,
-            creator_id AS creatorId,
-            deliveryman_id AS deliverymanId,
-            complete_time AS completeTime,
-            cancel_time AS cancelTime
-        FROM cdms_delivery_order
-        WHERE order_id = #{orderId,jdbcType=VARCHAR}
-    </select>
-
-    <!-- 6. 分页查询订单：不变 -->
-    <select id="selectPage" resultType="com.thirdgroup.cdms.model.DeliveryOrder">
-        SELECT
-        order_id AS orderId,
-        sender_name AS senderName,
-        sender_phone AS senderPhone,
-        sender_address AS senderAddress,
-        consignee_name AS consigneeName,
-        consignee_phone AS consigneePhone,
-        consignee_address AS consigneeAddress,
-        goods_type AS goodsType,
+        order_id,
+        sender_name,
+        sender_phone,
+        sender_address,
+        consignee_name,
+        consignee_phone,
+        consignee_address,
+        goods_type,
         weight,
         volume,
-        delivery_fee AS deliveryFee,
-        platform_income AS platformIncome,
-        deliveryman_income AS deliverymanIncome,
-        expected_mins AS expectedMins,
+        delivery_fee,
+        platform_income,
+        deliveryman_income,
+        expected_mins,
         remark,
         status,
-        create_time AS createTime,
-        creator_id AS creatorId,
-        deliveryman_id AS deliverymanId,
-        complete_time AS completeTime,
-        cancel_time AS cancelTime
+        create_time,
+        creator_id,
+        deliveryman_id,
+        complete_time,
+        cancel_time
+        FROM cdms_delivery_order
+        WHERE order_id = #{orderId,jdbcType=VARCHAR}
+        AND order_id IS NOT NULL  <!-- 过滤无效ID查询 -->
+    </select>
+
+    <!-- 6. 分页查询订单：修复模糊查询语法 -->
+    <select id="selectPage" resultMap="DeliveryOrderResultMap">
+        SELECT
+        order_id,
+        sender_name,
+        sender_phone,
+        sender_address,
+        consignee_name,
+        consignee_phone,
+        consignee_address,
+        goods_type,
+        weight,
+        volume,
+        delivery_fee,
+        platform_income,
+        deliveryman_income,
+        expected_mins,
+        remark,
+        status,
+        create_time,
+        creator_id,
+        deliveryman_id,
+        complete_time,
+        cancel_time
         FROM cdms_delivery_order
         <where>
             <if test="status != null">
@@ -150,9 +188,9 @@
             </if>
             <if test="keyword != null and keyword != ''">
                 AND (
-                order_id LIKE #{keyword,jdbcType=VARCHAR}
-                OR sender_name LIKE #{keyword,jdbcType=VARCHAR}
-                OR consignee_name LIKE #{keyword,jdbcType=VARCHAR}
+                order_id LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                OR sender_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
+                OR consignee_name LIKE CONCAT('%', #{keyword,jdbcType=VARCHAR}, '%')
                 )
             </if>
         </where>
@@ -160,42 +198,48 @@
         LIMIT #{start,jdbcType=INTEGER}, #{size,jdbcType=INTEGER}
     </select>
 
-    <!-- 7. 兼容历史方法：不变 -->
-    <select id="selectDeliveringByCourierId" resultType="com.thirdgroup.cdms.model.DeliveryOrder">
+    <!-- 7. 兼容历史方法：保持原有逻辑 -->
+    <select id="selectDeliveringByCourierId" resultMap="DeliveryOrderResultMap">
         SELECT
-            order_id AS orderId,
-            sender_name AS senderName,
-            sender_phone AS senderPhone,
-            sender_address AS senderAddress,
-            consignee_name AS consigneeName,
-            consignee_phone AS consigneePhone,
-            consignee_address AS consigneeAddress,
-            goods_type AS goodsType,
+            order_id,
+            sender_name,
+            sender_phone,
+            sender_address,
+            consignee_name,
+            consignee_phone,
+            consignee_address,
+            goods_type,
             weight,
             volume,
-            delivery_fee AS deliveryFee,
-            platform_income AS platformIncome,
-            deliveryman_income AS deliverymanIncome,
-            expected_mins AS expectedMins,
+            delivery_fee,
+            platform_income,
+            deliveryman_income,
+            expected_mins,
             remark,
             status,
-            create_time AS createTime,
-            creator_id AS creatorId,
-            deliveryman_id AS deliverymanId,
-            complete_time AS completeTime,
-            cancel_time AS cancelTime
+            create_time,
+            creator_id,
+            deliveryman_id,
+            complete_time,
+            cancel_time
         FROM cdms_delivery_order
         WHERE deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
           AND status = #{status,jdbcType=INTEGER}
+          AND deliveryman_id IS NOT NULL
     </select>
+
+    <!-- 8. 更新配送员收益和完成时间：强化业务校验 -->
     <update id="updateDeliverymanIncomeAndCompleteTime">
         UPDATE cdms_delivery_order
         SET
-            deliveryman_income = #{deliverymanIncome,jdbcType=DECIMAL},  -- 写入配送员收益
-            complete_time = #{completeTime,jdbcType=TIMESTAMP},          -- 写入完成时间
-            status = 3                                                   -- 确保状态为“已完成”（3对应已完成）
+        deliveryman_income = #{deliverymanIncome,jdbcType=DECIMAL},
+        complete_time = #{completeTime,jdbcType=TIMESTAMP},
+        status = 3  <!-- 强制更新为已完成状态 -->
         WHERE
-            order_id = #{orderId,jdbcType=VARCHAR}                       -- 匹配String类型订单ID
-          AND deliveryman_id IS NOT NULL                                -- 确保订单已分配骑手
+        order_id = #{orderId,jdbcType=VARCHAR}
+        AND deliveryman_id IS NOT NULL  <!-- 确保已分配骑手 -->
+        AND status IN (1, 2)  <!-- 仅配送中/待取货状态可完成 -->
+        AND #{deliverymanIncome,jdbcType=DECIMAL} >= 0  <!-- 收益不能为负 -->
     </update>
+
 </mapper>

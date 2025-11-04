@@ -1,12 +1,55 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<!DOCTYPE html>
 <html>
 <head>
-    <title>订单历史</title>
+    <title>订单历史 - 同城配送系统</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 70px;
+            background-color: #f4f5f7;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .navbar-inverse {
+            background-color: #333;
+            border-color: #333;
+        }
+        .navbar-inverse .navbar-nav > li > a {
+            color: #fff;
+        }
+        .navbar-inverse .navbar-brand {
+            color: #fff;
+        }
+        table {
+            margin-top: 20px;
+        }
+        .text-center {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
+<!-- 导航栏 -->
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="<c:url value='/'/>">同城配送系统</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li><a href="<c:url value='/deliveryman/toProfile'/>">个人中心</a></li>
+            <li class="active"><a href="<c:url value='/deliveryman/toHistoryOrders'/>">历史订单</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="#">欢迎，${deliveryman.username}</a></li>
+            <li><a href="<c:url value='/logout'/>" onclick="return confirm('确定退出？')">退出登录</a></li>
+        </ul>
+    </div>
+</nav>
+
 <div class="container">
     <!-- 导航栏：返回工作台 -->
     <div class="row" style="margin: 20px 0;">
@@ -51,7 +94,7 @@
                         </td>
                         <td><fmt:formatNumber value="${order.deliverymanIncome == null ? 0 : order.deliverymanIncome}" pattern="0.00" /> 元</td>
                         <td>
-                            <a href="${pageContext.request.contextPath}/deliveryman/orderDetail?orderId=${order.orderId}"
+                            <a href="<c:url value='/deliveryman/toOrderDetail?orderId=${order.orderId}'/>"
                                class="btn btn-sm btn-info">查看详情</a>
                         </td>
                     </tr>
