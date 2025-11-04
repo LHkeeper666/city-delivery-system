@@ -106,7 +106,7 @@
                 </div>
             </c:if>
             
-            <form method="post" action="${pageContext.request.contextPath}/admin/login">
+            <form method="post" action="${pageContext.request.contextPath}/login">
                 <div class="form-group">
                     <label for="username">用户名</label>
                     <input type="text" id="username" name="username" class="form-control"
@@ -119,6 +119,15 @@
                 </div>
                 <button type="submit" class="btn btn-primary">登录</button>
             </form>
+        </div>
+<%--        测试用--%>
+        <div>
+            <p>
+                初始管理员账号：admin
+            </p>
+            <p>
+                密码：1234
+            </p>
         </div>
     </div>
 </body>
