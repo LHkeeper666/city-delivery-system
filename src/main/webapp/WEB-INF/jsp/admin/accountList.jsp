@@ -55,7 +55,26 @@
         
         <!-- 错误消息提示 -->
         <c:if test="${not empty error}">
-            <div class="alert alert-danger">${error}</div>
+            <script type="text/javascript">
+                // 使用setTimeout确保在DOM加载完成后显示弹窗
+                window.onload = function() {
+                    setTimeout(function() {
+                        alert('${error}');
+                    }, 100);
+                };
+            </script>
+        </c:if>
+        
+        <!-- 成功消息提示 -->
+        <c:if test="${not empty message}">
+            <script type="text/javascript">
+                // 使用setTimeout确保在DOM加载完成后显示弹窗
+                window.onload = function() {
+                    setTimeout(function() {
+                        alert('${message}');
+                    }, 100);
+                };
+            </script>
         </c:if>
         
         <!-- 搜索表单 -->
@@ -218,5 +237,12 @@
     <jsp:include page="/WEB-INF/jsp/admin/footer.jsp"/>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
+     
+     // 检查是否有密码重置成功的标志
+     <c:if test="${not empty resetSuccess}">
+         <script>
+             alert('密码重置成功');
+         </script>
+     </c:if>
 </body>
 </html>

@@ -13,6 +13,7 @@ import com.thirdgroup.cdms.utils.Result;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -386,17 +387,26 @@ public class AdminController {
      * 删除账号
      */
     @GetMapping("/accounts/delete/{id}")
-    public String deleteAccount(@PathVariable Long id, Model model) {
+    public String deleteAccount(@PathVariable Long id, RedirectAttributes redirectAttributes, HttpSession session) {
         try {
+            // 获取当前登录用户
+            User currentUser = (User) session.getAttribute("user");
+            
+            // 检查是否要删除当前登录用户
+            if (currentUser != null && currentUser.getUserId().equals(id)) {
+                redirectAttributes.addFlashAttribute("error", "不能删除当前登录的账号");
+                return "redirect:/admin/accounts";
+            }
+            
             boolean success = adminService.deleteAccount(id);
             if (success) {
-                model.addAttribute("message", "账号删除成功");
+                redirectAttributes.addFlashAttribute("message", "账号删除成功");
             } else {
-                model.addAttribute("error", "不能删除最后一个管理员账号或用户不存在");
+                redirectAttributes.addFlashAttribute("error", "不能删除最后一个管理员账号或用户不存在");
             }
         } catch (Exception e) {
             // 捕获可能的数据库异常，提供友好的错误消息
-            model.addAttribute("error", "删除账号失败：" + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "删除账号失败：" + e.getMessage());
         }
         return "redirect:/admin/accounts";
     }
@@ -414,10 +424,10 @@ public class AdminController {
      * 执行密码重置
      */
     @PostMapping("/accounts/resetPassword")
-    public String resetPassword(@RequestParam Long userId, @RequestParam String newPassword, Model model) {
+    public String resetPassword(@RequestParam Long userId, @RequestParam String newPassword, RedirectAttributes redirectAttributes, Model model) {
         try {
             adminService.resetPassword(userId, newPassword);
-            model.addAttribute("message", "密码重置成功");
+            redirectAttributes.addFlashAttribute("resetSuccess", "true");
             return "redirect:/admin/accounts";
         } catch (Exception e) {
             model.addAttribute("error", "密码重置失败：" + e.getMessage());

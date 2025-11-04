@@ -231,7 +231,7 @@ public class AdminServiceImpl implements AdminService {
     public boolean deleteAccount(Long userId) {
         // 检查是否为最后一个管理员账号（避免删除所有管理员）
         List<User> adminUsers = userMapper.selectAll().stream()
-            .filter(user -> user.getRole().equals(0)) // 0表示管理员角色
+            .filter(user -> user.getRole().equals(0) && user.getStatus().equals(0) && !user.getUserId().equals(userId)) // 排除正在被删除的用户
             .collect(Collectors.toList());
         
         User userToDelete = userMapper.selectByPrimaryKey(userId);
@@ -240,12 +240,12 @@ public class AdminServiceImpl implements AdminService {
         }
 
         // 不能删除最后一个管理员
-        if (userToDelete.getRole().equals(0) && adminUsers.size() <= 1) {
+        if (userToDelete.getRole().equals(0) && adminUsers.size() == 0) {
             return false;
         }
         
         // 如果是配送员，先处理相关订单（避免外键约束冲突）
-        if (userToDelete.getRole().equals(2)) { // 假设2表示配送员角色
+        if (userToDelete.getRole().equals(1)) { // 1表示配送员角色
             // 将相关订单的配送员ID设置为null
             orderMapper.updateDeliverymanIdToNull(userId);
         }
@@ -258,6 +258,10 @@ public class AdminServiceImpl implements AdminService {
     public void resetPassword(Long userId, String newPassword) {
         User user = userMapper.selectByPrimaryKey(userId);
         if (user != null) {
+            // 检查新密码是否与原密码相同
+            if (PasswordUtils.matches(newPassword, user.getPassword())) {
+                throw new RuntimeException("重置密码不能与原密码相同");
+            }
             user.setPassword(PasswordUtils.encode(newPassword));
             userMapper.updateByPrimaryKey(user);
         }

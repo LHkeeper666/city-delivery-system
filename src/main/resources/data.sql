@@ -17,7 +17,7 @@ INSERT INTO cdms_user (
     0,             -- 离线
     0,
     TRUE,
-    CURRENT_TIMESTAMP
+    '2025-01-01 09:30:00'
  ), (
      'deliveryman1',
      '{noop}1234',
@@ -27,7 +27,7 @@ INSERT INTO cdms_user (
      1,
      0,
      TRUE,
-     CURRENT_TIMESTAMP
+     '2025-01-02 14:20:00'
 ),
          ('cjh',
           '$2a$10$aLs7OA3oUfTt9TiPCfhr6.XWN0wknOTVa82rfd8nNQEtsyW0knn8S',
@@ -37,7 +37,7 @@ INSERT INTO cdms_user (
           1,
           0,
           TRUE,
-          CURRENT_TIMESTAMP
+          '2025-01-03 16:45:00'
 );
 
 INSERT INTO cdms_api_key (
