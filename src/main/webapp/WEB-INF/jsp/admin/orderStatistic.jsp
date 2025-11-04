@@ -11,9 +11,18 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        body {
-            background-color: #f3f6f9;
-            padding-top: 70px;
+        /*body {*/
+        /*    background-color: #f3f6f9;*/
+        /*    padding-top: 70px;*/
+        /*}*/
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1;
         }
         .container {
             max-width: 1300px;
@@ -57,7 +66,7 @@
 
 <jsp:include page="navbar.jsp"/>
 
-<div class="container">
+<main class="container">
     <h1>数据统计</h1>
 
     <!-- 查询区域 -->
@@ -119,8 +128,11 @@
             </div>
         </div>
     </div>
-</div>
+</main>
 
+<jsp:include page="/WEB-INF/jsp/admin/footer.jsp"/>
+
+</body>
 <!-- 热力图脚本 -->
 <script>
     const heatmapData = [
@@ -232,5 +244,4 @@
     });
 </script>
 
-</body>
 </html>

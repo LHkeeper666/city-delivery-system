@@ -14,9 +14,18 @@
     <title>密钥管理</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-          padding-top: 60px;
-          padding-bottom: 40px;
+        /*body {*/
+        /*  padding-top: 60px;*/
+        /*  padding-bottom: 40px;*/
+        /*}*/
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1;
         }
         .container {
           max-width: 1200px;
@@ -43,7 +52,7 @@
 <!-- 导航栏 -->
 <jsp:include page="navbar.jsp"/>
 
-<div class="container">
+<main class="container">
     <h1>密钥管理</h1>
     <!-- 搜索表单 -->
     <div class="search-form">
@@ -170,7 +179,7 @@
             </ul>
         </nav>
     </c:if>
-</div>
+</main>
 
 <!-- API Key 弹窗 -->
 <div class="modal fade" id="apiKeyModal" tabindex="-1" role="dialog" aria-labelledby="apiKeyModalLabel">
@@ -190,6 +199,8 @@
         </div>
     </div>
 </div>
+
+<jsp:include page="/WEB-INF/jsp/admin/footer.jsp"/>
 
 <!-- 添加 API Key 模态框 -->
 <%--TODO: 美化--%>

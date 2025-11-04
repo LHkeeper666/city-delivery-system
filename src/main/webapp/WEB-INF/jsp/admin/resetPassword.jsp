@@ -5,9 +5,18 @@
     <title>重置密码 - 同城配送系统</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            padding-top: 60px;
-            padding-bottom: 40px;
+        /*body {*/
+        /*    padding-top: 60px;*/
+        /*    padding-bottom: 40px;*/
+        /*}*/
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1;
         }
         .container {
             max-width: 1200px;
@@ -25,7 +34,7 @@
     <!-- 导航栏 -->
     <jsp:include page="navbar.jsp"/>
 
-    <div class="container">
+    <main class="container">
         <div class="form-container">
         <h2>重置密码</h2>
         
@@ -60,7 +69,9 @@
             </div>
         </form>
         </div>
-    </div>
+    </main>
+
+    <jsp:include page="/WEB-INF/jsp/admin/footer.jsp"/>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
     <script>
