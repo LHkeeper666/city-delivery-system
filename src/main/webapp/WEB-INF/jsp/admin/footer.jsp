@@ -6,42 +6,29 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<footer class="footer bg-dark text-light text-center mt-auto">
+<footer class="footer text-center mt-auto">
     <div class="container py-3">
-        <p class="mb-1">
+        <p class="mb-1 text-muted">
             🚚 <strong>同城配送后台管理系统</strong>
         </p>
-        <p class="mb-1">
+        <p class="mb-1 text-secondary">
             © <%= java.time.Year.now() %> 同城配送团队 | 版本 v1.0.0
         </p>
-        <p class="small text-secondary mb-0">
+        <p class="small text-muted mb-0">
             建议使用现代浏览器（Chrome / Edge / Firefox）以获得最佳体验
         </p>
     </div>
 </footer>
 
 <style>
-    /*html, body {*/
-    /*    height: 100%;*/
-    /*    margin: 0;*/
-    /*    display: flex;*/
-    /*    flex-direction: column;*/
-    /*}*/
-
-    /*!* 页面主要内容区域（需包裹你的主体部分） *!*/
-    /*main {*/
-    /*    flex: 1;*/
-    /*    background-color: #f7f8fa; !* 可选 *!*/
-    /*    padding-top: 60px; !* 防止被顶部导航栏挡住 *!*/
-    /*}*/
-
     .footer {
-        background-color: #222;
-        color: #ccc;
+        background-color: #fff;      /* 白色背景 */
+        color: #555;                /* 深灰文字 */
         font-size: 14px;
-        border-top: 1px solid #333;
         width: 100%;
         margin-top: auto;
+        border-top: none;           /* 去除上边框 */
+        box-shadow: 0 -1px 3px rgba(0,0,0,0.05); /* 微阴影更自然 */
     }
 
     .footer p {
@@ -50,12 +37,13 @@
     }
 
     .footer a {
-        color: #66b3ff;
+        color: #007bff;
         text-decoration: none;
+        transition: color 0.2s ease;
     }
 
     .footer a:hover {
-        color: #fff;
+        color: #0056b3;
         text-decoration: underline;
     }
 </style>
