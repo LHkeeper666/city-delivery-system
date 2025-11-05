@@ -60,8 +60,8 @@ public class RequestLoggingFilter implements Filter {
 
         if ((session == null ||
                 (session.getAttribute("user") == null &&
-                        session.getAttribute("deliveryman") == null)) &&
-                        !isLoginging(relativePath)
+                session.getAttribute("deliveryman") == null)) &&
+                !isLoginging(relativePath)
         ) {
             resp.sendRedirect(req.getContextPath() + "/deliveryman/toLogin");
             return;

@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="my" uri="/mytags" %>
 
 <html>
 <head>
@@ -113,20 +114,22 @@
     <h3 class="section-title">📊 趋势与分布</h3>
     <div class="row align-items-stretch">
         <!-- 热力图 -->
-        <div class="col-md-7">
-            <div class="info-card h-100">
-                <h4 class="text-center fw-bold mb-3">各地区订单热力图</h4>
-                <div id="orderHeatmap" style="width:100%;height:500px;"></div>
-            </div>
-        </div>
+<%--        <div class="col-md-7">--%>
+<%--            <div class="info-card h-100">--%>
+<%--                <h4 class="text-center fw-bold mb-3">各地区订单热力图</h4>--%>
+<%--                <div id="orderHeatmap" style="width:100%;height:500px;"></div>--%>
+<%--            </div>--%>
+<%--        </div>--%>
+        <my:heatmap id="orderHeatmap" title="各地区订单热力图" data="${heatmapData}" />
 
         <!-- 折线图 -->
-        <div class="col-md-5">
-            <div class="info-card h-100">
-                <h4 class="text-center fw-bold mb-3">历史订单趋势图</h4>
-                <canvas id="ordersChart" style="width:100%;height:500px;"></canvas>
-            </div>
-        </div>
+<%--        <div class="col-md-5">--%>
+<%--            <div class="info-card h-100">--%>
+<%--                <h4 class="text-center fw-bold mb-3">历史订单趋势图</h4>--%>
+<%--                <canvas id="ordersChart" style="width:100%;height:500px;"></canvas>--%>
+<%--            </div>--%>
+<%--        </div>--%>
+        <my:orderTrend data="${trendList}" />
     </div>
 </main>
 
@@ -134,82 +137,82 @@
 
 </body>
 <!-- 热力图脚本 -->
-<script>
-    const heatmapData = [
-        <c:forEach var="item" items="${heatmapData}" varStatus="loop">
-        {
-            name: '${item.address}',
-            value: ${item.normalized}, // 用归一化值来决定颜色
-            realValue: ${item.count}   // 保存真实订单数用于提示显示
-        }<c:if test="${!loop.last}">,</c:if>
-        </c:forEach>
-    ];
+<%--<script>--%>
+<%--    const heatmapData = [--%>
+<%--        <c:forEach var="item" items="${heatmapData}" varStatus="loop">--%>
+<%--        {--%>
+<%--            name: '${item.address}',--%>
+<%--            value: ${item.normalized}, // 用归一化值来决定颜色--%>
+<%--            realValue: ${item.count}   // 保存真实订单数用于提示显示--%>
+<%--        }<c:if test="${!loop.last}">,</c:if>--%>
+<%--        </c:forEach>--%>
+<%--    ];--%>
 
-    console.log(heatmapData);
+<%--    console.log(heatmapData);--%>
 
-    const heatChart = echarts.init(document.getElementById('orderHeatmap'));
-    heatChart.setOption({
-        tooltip: {
-            trigger: 'item',
-            formatter: function (params) {
-                <%--return `${params.name}<br/>订单数: ${params.data.realValue}`;--%>
-                return params.name + '<br/>订单数：' + params.data.realValue;
-            }
-        },
-        visualMap: {
-            min: 0,
-            max: 1, // 因为 value 是归一化值
-            left: 'left',
-            bottom: '10%',
-            text: ['高', '低'],
-            inRange: { color: ['#e4d9c2', '#fabb7d', '#f49506'] },
-            calculable: true
-        },
-        series: [{
-            name: '订单量',
-            type: 'map',
-            map: 'china',
-            roam: true,
-            label: { show: false },
-            data: heatmapData
-        }]
-    });
-</script>
+<%--    const heatChart = echarts.init(document.getElementById('orderHeatmap'));--%>
+<%--    heatChart.setOption({--%>
+<%--        tooltip: {--%>
+<%--            trigger: 'item',--%>
+<%--            formatter: function (params) {--%>
+<%--                &lt;%&ndash;return `${params.name}<br/>订单数: ${params.data.realValue}`;&ndash;%&gt;--%>
+<%--                return params.name + '<br/>订单数：' + params.data.realValue;--%>
+<%--            }--%>
+<%--        },--%>
+<%--        visualMap: {--%>
+<%--            min: 0,--%>
+<%--            max: 1, // 因为 value 是归一化值--%>
+<%--            left: 'left',--%>
+<%--            bottom: '10%',--%>
+<%--            text: ['高', '低'],--%>
+<%--            inRange: { color: ['#e4d9c2', '#fabb7d', '#f49506'] },--%>
+<%--            calculable: true--%>
+<%--        },--%>
+<%--        series: [{--%>
+<%--            name: '订单量',--%>
+<%--            type: 'map',--%>
+<%--            map: 'china',--%>
+<%--            roam: true,--%>
+<%--            label: { show: false },--%>
+<%--            data: heatmapData--%>
+<%--        }]--%>
+<%--    });--%>
+<%--</script>--%>
 
 <!-- 折线图脚本 -->
 <script>
-    const trendData = [
-        <c:forEach var="t" items="${trendList}" varStatus="loop">
-        {
-            date: '${t.date}',
-            orderCount: ${t.orderCount},
-            totalIncome: ${t.totalIncome},
-            avgDeliveryTime: ${t.avgDeliveryTime}
-        }<c:if test="${!loop.last}">,</c:if>
-        </c:forEach>
-    ];
+    <%--const trendData = [--%>
+    <%--    <c:forEach var="t" items="${trendList}" varStatus="loop">--%>
+    <%--    {--%>
+    <%--        date: '${t.date}',--%>
+    <%--        orderCount: ${t.orderCount},--%>
+    <%--        totalIncome: ${t.totalIncome},--%>
+    <%--        avgDeliveryTime: ${t.avgDeliveryTime}--%>
+    <%--    }<c:if test="${!loop.last}">,</c:if>--%>
+    <%--    </c:forEach>--%>
+    <%--];--%>
 
-    const dates = trendData.map(item => new Date(item.date).toLocaleDateString('zh-CN'));
-    const orderCounts = trendData.map(item => item.orderCount);
-    const incomes = trendData.map(item => item.totalIncome);
-    const avgTimes = trendData.map(item => item.avgDeliveryTime);
+    <%--const dates = trendData.map(item => new Date(item.date).toLocaleDateString('zh-CN'));--%>
+    <%--const orderCounts = trendData.map(item => item.orderCount);--%>
+    <%--const incomes = trendData.map(item => item.totalIncome);--%>
+    <%--const avgTimes = trendData.map(item => item.avgDeliveryTime);--%>
 
-    new Chart(document.getElementById('ordersChart'), {
-        type: 'line',
-        data: {
-            labels: dates,
-            datasets: [
-                { label: '订单数', data: orderCounts, borderColor: '#28a745', backgroundColor: 'rgba(40,167,69,0.15)', tension: 0.3, fill: true },
-                { label: '总收入（元）', data: incomes, borderColor: '#007bff', backgroundColor: 'rgba(0,123,255,0.15)', tension: 0.3, fill: true },
-                { label: '平均配送时长（分钟）', data: avgTimes, borderColor: '#dc3545', backgroundColor: 'rgba(220,53,69,0.15)', tension: 0.3, fill: true }
-            ]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { position: 'top' } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
+    <%--new Chart(document.getElementById('ordersChart'), {--%>
+    <%--    type: 'line',--%>
+    <%--    data: {--%>
+    <%--        labels: dates,--%>
+    <%--        datasets: [--%>
+    <%--            { label: '订单数', data: orderCounts, borderColor: '#28a745', backgroundColor: 'rgba(40,167,69,0.15)', tension: 0.3, fill: true },--%>
+    <%--            { label: '总收入（元）', data: incomes, borderColor: '#007bff', backgroundColor: 'rgba(0,123,255,0.15)', tension: 0.3, fill: true },--%>
+    <%--            { label: '平均配送时长（分钟）', data: avgTimes, borderColor: '#dc3545', backgroundColor: 'rgba(220,53,69,0.15)', tension: 0.3, fill: true }--%>
+    <%--        ]--%>
+    <%--    },--%>
+    <%--    options: {--%>
+    <%--        responsive: true,--%>
+    <%--        plugins: { legend: { position: 'top' } },--%>
+    <%--        scales: { y: { beginAtZero: true } }--%>
+    <%--    }--%>
+    <%--});--%>
 
     // ⏱时间范围选择逻辑
     document.getElementById("timeRange").addEventListener("change", function() {
