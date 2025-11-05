@@ -10,6 +10,7 @@ import java.util.List;
 
 @Mapper
 public interface OrderMapper {
+
     // 1. 查待接单订单
     List<DeliveryOrder> selectPendingOrders(@Param("status") int status);
 
@@ -44,19 +45,19 @@ public interface OrderMapper {
             @Param("size") int size
     );
 
-    // 7. 兼容历史方法：查询配送中订单
+    // 7. 查询配送中订单
     List<DeliveryOrder> selectDeliveringByCourierId(
             @Param("deliverymanId") Long deliverymanId,
             @Param("status") int status
     );
 
-    // 8. 更新配送员收益和完成时间
+    // 8. 更新收益与完成时间
     int updateDeliverymanIncomeAndCompleteTime(
             @Param("orderId") String orderId,
             @Param("deliverymanIncome") BigDecimal deliverymanIncome,
             @Param("completeTime") Date completeTime
     );
 
-    // 9. 统计骑手完成的订单数
+    // 9. 统计骑手完成订单数（供统计方法使用）
     int countCompletedByDeliverymanId(@Param("deliverymanId") Long deliverymanId);
 }

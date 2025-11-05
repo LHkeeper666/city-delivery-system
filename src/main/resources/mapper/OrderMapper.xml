@@ -241,5 +241,12 @@
         AND status IN (1, 2)  <!-- 仅配送中/待取货状态可完成 -->
         AND #{deliverymanIncome,jdbcType=DECIMAL} >= 0  <!-- 收益不能为负 -->
     </update>
+    <!-- ✅ 9. 新增：统计骑手完成订单数量 -->
+    <select id="countCompletedByDeliverymanId" resultType="int">
+        SELECT COUNT(*)
+        FROM cdms_delivery_order
+        WHERE deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
+        AND status = 3  <!-- 假设 3 表示“已完成” -->
+    </select>
 
 </mapper>

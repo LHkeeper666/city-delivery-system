@@ -2,12 +2,14 @@ package com.thirdgroup.cdms.controller;
 
 import com.thirdgroup.cdms.model.DeliveryOrder;
 import com.thirdgroup.cdms.model.Deliveryman;
+import com.thirdgroup.cdms.model.OrderStatisticsDTO;
 import com.thirdgroup.cdms.model.enums.DeliverymanStatus;
 import com.thirdgroup.cdms.model.enums.OrderStatus;
 import com.thirdgroup.cdms.service.Interface.DeliveryManService;
 import com.thirdgroup.cdms.service.Interface.OrderService;
 import com.thirdgroup.cdms.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -300,4 +302,23 @@ public class DeliverymanController {
             return Result.error(400, "手机号修改失败，可能已被占用或格式错误");
         }
     }
+    // 18. 获取当前外卖员的订单统计信息（新增）
+    @GetMapping("/stats")
+    @ResponseBody
+    public Result<OrderStatisticsDTO> getDeliverymanStats(HttpSession session) {
+        Deliveryman deliveryman = (Deliveryman) session.getAttribute("deliveryman");
+        if (deliveryman == null) {
+            return Result.error(401, "未登录，请先登录");
+        }
+
+        OrderStatisticsDTO stats = deliverymanService.getCurrentStats(deliveryman.getUserId());
+
+        if (stats == null) {
+            stats = new OrderStatisticsDTO();
+        }
+
+        return Result.success(stats);
+
+    }
+
 }

@@ -27,9 +27,7 @@
             background-color: #333;
             border-color: #333;
         }
-        .navbar-inverse .navbar-nav > li > a {
-            color: #fff;
-        }
+        .navbar-inverse .navbar-nav > li > a,
         .navbar-inverse .navbar-brand {
             color: #fff;
         }
@@ -74,9 +72,15 @@
                     <td>当前状态</td>
                     <td>
                         <c:choose>
-                            <c:when test="${deliveryman.workStatus == 1}"><span style="color: green; font-weight: bold;">在线</span></c:when>
-                            <c:when test="${deliveryman.workStatus == 2}"><span style="color: orange; font-weight: bold;">休息中</span></c:when>
-                            <c:otherwise><span style="color: gray;">离线</span></c:otherwise>
+                            <c:when test="${deliveryman.workStatus == 1}">
+                                <span style="color: green; font-weight: bold;">在线</span>
+                            </c:when>
+                            <c:when test="${deliveryman.workStatus == 2}">
+                                <span style="color: orange; font-weight: bold;">休息中</span>
+                            </c:when>
+                            <c:otherwise>
+                                <span style="color: gray;">离线</span>
+                            </c:otherwise>
                         </c:choose>
                     </td>
                 </tr>
@@ -89,9 +93,16 @@
         <div class="panel-heading">工作统计</div>
         <div class="panel-body">
             <table class="table">
-                <tr><td>总完成订单</td><td>${empty stats ? 0 : stats.totalCompleted}</td></tr>
-                <tr><td>本月完成订单</td><td>${empty stats ? 0 : stats.monthCompleted}</td></tr>
-                <tr><td>本月收益</td><td><fmt:formatNumber value="${empty stats ? 0.00 : stats.monthIncome}" pattern="0.00"/> 元</td></tr>
+                <tr>
+                    <th>总完成订单</th>
+                    <th>本月完成订单</th>
+                    <th>本月收益</th>
+                </tr>
+                <tr>
+                    <td id="totalOrders">0</td>
+                    <td id="monthOrders">0</td>
+                    <td id="monthEarnings">0.00 元</td>
+                </tr>
             </table>
         </div>
     </div>
@@ -117,7 +128,9 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
                 <h4 class="modal-title">修改手机号</h4>
             </div>
             <div class="modal-body">
@@ -148,13 +161,15 @@
 <!-- 依赖JS -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
+
 <script>
+    // 修改手机号
     function updatePhone() {
-        const newPhone = $("#newPhone").val();
-        const confirmPhone = $("#confirmPhone").val();
+        const newPhone = $("#newPhone").val().trim();
+        const confirmPhone = $("#confirmPhone").val().trim();
         const phoneMsg = $("#phoneMsg");
 
-        if (!/^1[3-9]\\d{9}$/.test(newPhone)) {
+        if (!/^1[3-9]\d{9}$/.test(newPhone)) {
             phoneMsg.removeClass("hidden alert-success").addClass("alert-danger").text("请输入正确的11位手机号");
             return;
         }
@@ -171,9 +186,7 @@
             success: function(res) {
                 if (res.code === 200) {
                     phoneMsg.removeClass("hidden alert-danger").addClass("alert-success").text(res.msg);
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000);
+                    setTimeout(() => location.reload(), 1500);
                 } else {
                     phoneMsg.removeClass("hidden alert-success").addClass("alert-danger").text(res.msg);
                 }
@@ -183,6 +196,28 @@
             }
         });
     }
+
+    // ★ 新增：动态刷新工作统计数据
+    function refreshStats() {
+        fetch("${pageContext.request.contextPath}/deliveryman/stats")
+            .then(resp => resp.json())
+            .then(res => {
+                if (res.code === 200 && res.data) {
+                    const data = res.data;
+                    document.getElementById("totalOrders").textContent = data.completedOrders ?? 0;
+                    document.getElementById("monthOrders").textContent = data.completedCount ?? 0;
+                    const amount = data.totalAmount ?? 0;
+                    document.getElementById("monthEarnings").textContent =
+                        (typeof amount === 'number' ? amount.toFixed(2) : amount) + " 元";
+                } else {
+                    console.warn("获取工作统计失败:", res);
+                }
+            })
+            .catch(err => console.error("调用接口异常:", err));
+    }
+
+    // 页面加载时刷新统计
+    window.onload = refreshStats;
 </script>
 </body>
 </html>

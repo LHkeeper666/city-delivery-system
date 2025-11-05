@@ -25,6 +25,8 @@ public class Deliveryman extends User {
     private Date createTime;
     private Long creatorId; // 创建人ID（如管理员ID）
     private Date updateTime;
+    private String email; // 确保这个属性存在
+    private String emergencyContact; // 确保这个属性存在
 
     // 辅助方法：把workStatus转成枚举（页面显示状态用，原statusEnum可能对应错字段）
     public DeliverymanStatus getWorkStatusEnum() {

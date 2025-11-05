@@ -76,7 +76,6 @@ public class OrderController {
         }
         return Result.success(orderService.getMyOrders(deliveryman.getUserId()));
     }
-
     // 4. 获取订单详情：orderId从Long改为String
     @GetMapping("/detail")
     public Result<DeliveryOrder> getOrderDetail(@RequestParam String orderId) { // Long → String
