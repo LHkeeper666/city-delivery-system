@@ -70,12 +70,17 @@ public class DeliverymanController {
         }
     }
 
-    // 5. 跳转【外卖员工作台】（不变）
+    // 5. 跳转【外卖员工作台】（添加密码重置成功消息显示）
     @GetMapping("/workbench")
-    public String toWorkbench(HttpSession session, Model model) {
+    public String toWorkbench(HttpSession session, Model model, @RequestParam(required = false) String resetSuccess) {
         Deliveryman deliveryman = (Deliveryman) session.getAttribute("deliveryman");
         if (deliveryman == null) {
             return "redirect:/deliveryman/toLogin";
+        }
+
+        // 显示密码重置成功消息
+        if ("true".equals(resetSuccess)) {
+            model.addAttribute("successMessage", "密码重置成功！");
         }
 
         List<DeliveryOrder> pendingOrders = deliveryOrderService.getPendingOrders();
@@ -106,20 +111,23 @@ public class DeliverymanController {
         return exists ? Result.error(400, "该手机号已注册") : Result.success(null);
     }
 
-    // 8. 重置密码接口（不变）
+    // 8. 重置密码接口（修改为页面跳转而不是返回JSON）
     @PostMapping("/resetPassword")
-    @ResponseBody
-    public Result<?> resetPassword(
+    public String resetPassword(
             @RequestParam String phone,
             @RequestParam String newPwd,
             @RequestParam String confirmPwd,
-            HttpSession session) {
+            HttpSession session,
+            Model model,
+            HttpServletResponse response) throws IOException {
         if (!newPwd.equals(confirmPwd)) {
-            return Result.error(400, "两次密码不一致");
+            model.addAttribute("error", "两次密码不一致");
+            return "deliveryman/deliverymanResetPassword";
         }
         Deliveryman loginUser = (Deliveryman) session.getAttribute("deliveryman");
         if (loginUser != null && !loginUser.getPhoneNo().equals(phone)) {
-            return Result.error(403, "只能修改当前登录账号的密码");
+            model.addAttribute("error", "只能修改当前登录账号的密码");
+            return "deliveryman/deliverymanResetPassword";
         }
         boolean success = deliverymanService.resetPassword(phone, newPwd);
         if (success) {
@@ -127,9 +135,12 @@ public class DeliverymanController {
                 loginUser.setPassword(newPwd);
                 session.setAttribute("deliveryman", loginUser);
             }
-            return Result.success("密码重置成功");
+            // 重置成功后重定向到工作台，并显示成功消息
+            response.sendRedirect(session.getServletContext().getContextPath() + "/deliveryman/workbench?resetSuccess=true");
+            return null;
         } else {
-            return Result.error(500, "重置失败，请检查手机号");
+            model.addAttribute("error", "重置失败，请检查手机号");
+            return "deliveryman/deliverymanResetPassword";
         }
     }
 
@@ -275,8 +286,9 @@ public class DeliverymanController {
             return "deliveryman/deliverymanWorkbench";
         }
 
-        // 4. 传递订单数据到详情页JSP
+        // 4. 传递订单数据和配送员信息到详情页JSP
         model.addAttribute("order", order);
+        model.addAttribute("deliveryman", deliveryman); // 将配送员信息添加到model中，用于工作状态验证
         return "deliveryman/deliverymanOrderDetail"; // 跳订单详情页（确保该JSP存在）
     }
     // 17. 修改手机号接口（不变）

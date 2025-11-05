@@ -105,7 +105,7 @@
         order_id = #{orderId,jdbcType=VARCHAR}
         AND status = 0  <!-- 仅待接单状态可被接 -->
         AND deliveryman_id IS NULL
-        AND (SELECT 1 FROM dual WHERE #{targetStatus,jdbcType=INTEGER} IN (1,2))  <!-- 限制目标状态为有效接单状态 -->
+        AND #{targetStatus,jdbcType=INTEGER} IN (1,2)  <!-- 限制目标状态为有效接单状态 -->
     </update>
 
     <!-- 4. 更新订单状态：细化状态逻辑，防止非法状态变更 -->
@@ -114,18 +114,27 @@
         SET
         status = #{targetStatus,jdbcType=INTEGER}
         <if test="targetStatus == 3">
-            , complete_time = NOW()  <!-- 完成状态更新完成时间 -->
+            , complete_time = CURRENT_TIMESTAMP  <!-- 完成状态更新完成时间 -->
         </if>
         <if test="targetStatus == 4">
-            , cancel_time = NOW()   <!-- 取消状态更新取消时间 -->
+            , cancel_time = CURRENT_TIMESTAMP   <!-- 取消状态更新取消时间 -->
         </if>
         WHERE
         order_id = #{orderId,jdbcType=VARCHAR}
-        AND status IN (  <!-- 限制合法状态流转，例如：待接单(0)→已取消(4)，配送中(1)→已完成(3)等 -->
-        <if test="targetStatus == 3">1,2</if>  <!-- 只有配送中/待取货可转完成 -->
-        <if test="targetStatus == 4">0,1,2</if> <!-- 待接单/配送中/待取货可取消 -->
-        <if test="targetStatus not in (3,4)">${status}</if>  <!-- 其他状态按业务规则扩展 -->
-        )
+        <choose>
+            <when test="targetStatus == 2">
+                AND status = 1  <!-- 只有已接单待取货可转配送中 -->
+            </when>
+            <when test="targetStatus == 3">
+                AND status IN (1, 2)  <!-- 只有已接单待取货/配送中可转完成 -->
+            </when>
+            <when test="targetStatus == 4">
+                AND status IN (0, 1, 2)  <!-- 待接单/已接单待取货/配送中可取消 -->
+            </when>
+            <otherwise>
+                AND status = status  <!-- 其他状态允许当前状态更新 -->
+            </otherwise>
+        </choose>
     </update>
 
     <!-- 5. 根据ID查订单：确保订单存在性 -->
@@ -228,7 +237,7 @@
           AND deliveryman_id IS NOT NULL
     </select>
 
-    <!-- 8. 更新配送员收益和完成时间：强化业务校验 -->
+    <!-- 8. 更新收益与完成时间 -->
     <update id="updateDeliverymanIncomeAndCompleteTime">
         UPDATE cdms_delivery_order
         SET

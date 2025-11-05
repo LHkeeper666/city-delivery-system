@@ -83,6 +83,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         if (targetStatus == OrderStatus.COMPLETED) {
+            // 对于完成状态，使用updateDeliverymanIncomeAndCompleteTime方法，该方法已包含状态更新
             BigDecimal platformCommission = new BigDecimal("2.00");
             BigDecimal deliverymanIncome = order.getDeliveryFee().subtract(platformCommission);
 
@@ -100,17 +101,18 @@ public class OrderServiceImpl implements OrderService {
             }
 
             order.setDeliverymanIncome(deliverymanIncome);
+            return true; // 直接返回，避免重复更新状态
+        } else {
+            // 对于其他状态（如配送中），使用updateStatus方法
+            int rows = orderMapper.updateStatus(
+                    orderId,
+                    targetStatus.getCode()
+            );
+            if (rows <= 0) {
+                throw new RuntimeException("状态更新失败");
+            }
+            return true;
         }
-
-        int rows = orderMapper.updateStatus(
-                orderId,
-                targetStatus.getCode(),
-                new Date()
-        );
-        if (rows <= 0) {
-            throw new RuntimeException("状态更新失败");
-        }
-        return true;
     }
 
     @Override

@@ -56,7 +56,7 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <li><a href="#">欢迎，用户</a></li>
-            <li><a href="<c:url value='/logout'/>">退出登录</a></li>
+            <li><a href="<c:url value='/deliveryman/logout'/>">退出登录</a></li>
         </ul>
     </div>
 </nav>

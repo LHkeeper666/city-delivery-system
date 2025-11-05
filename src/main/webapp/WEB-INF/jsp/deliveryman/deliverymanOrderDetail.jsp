@@ -5,6 +5,7 @@
 <head>
     <title>订单${order.orderId}详情</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         .map-box {
             height: 350px;
@@ -136,9 +137,15 @@
 
 <script type="text/javascript">
     const contextPath = "${pageContext.request.contextPath}";
+    // 存储当前外卖员工作状态（1=在线，2=休息，3=离线）
+    const currentWorkStatus = ${deliveryman.workStatus};
 
     // 确认取货（状态改为“配送中”）
     function confirmTakeGoods(orderId) {
+        if (currentWorkStatus !== 1) {
+            alert("⚠️ 只有【在线】状态才能操作订单，请先切换到在线状态！");
+            return;
+        }
         if (confirm("确定已从商家取货吗？取货后将开始配送计时~")) {
             updateOrderStatus(orderId, 2, "取货成功，开始配送！");
         }
@@ -146,6 +153,10 @@
 
     // 确认送达（状态改为“已完成”）
     function confirmComplete(orderId) {
+        if (currentWorkStatus !== 1) {
+            alert("⚠️ 只有【在线】状态才能操作订单，请先切换到在线状态！");
+            return;
+        }
         if (confirm("确定已将订单送达收货人手中吗？")) {
             updateOrderStatus(orderId, 3, "送达成功，订单已完成！");
         }
@@ -153,6 +164,10 @@
 
     // 取消订单（状态改为“已取消”）
     function cancelOrder(orderId) {
+        if (currentWorkStatus !== 1) {
+            alert("⚠️ 只有【在线】状态才能操作订单，请先切换到在线状态！");
+            return;
+        }
         if (confirm("确定要取消订单吗？取消可能影响您的接单评分~")) {
             updateOrderStatus(orderId, 4, "订单已取消");
         }
@@ -160,22 +175,36 @@
 
     // 通用：更新订单状态
     function updateOrderStatus(orderId, statusCode, successMsg) {
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", contextPath + "/order/updateStatus", true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-                const result = JSON.parse(xhr.responseText);
-                if (result.code === 200) {
+        console.log("发送状态更新请求：", {
+            url: contextPath + "/order/updateStatus",
+            orderId: orderId,
+            statusCode: statusCode
+        });
+        
+        // 使用jQuery的ajax方法，添加更完善的错误处理
+        $.ajax({
+            url: contextPath + "/order/updateStatus",
+            type: "POST",
+            data: { orderId: orderId, statusCode: statusCode },
+            dataType: "json",
+            success: function(res) {
+                console.log("请求成功响应：", res);
+                if (res.code === 200) {
                     alert("✅ " + successMsg);
                     // 跳转回工作台
                     window.location.href = contextPath + "/deliveryman/workbench";
                 } else {
-                    alert("❌ " + result.msg);
+                    alert("❌ " + res.msg);
                 }
+            },
+            error: function(xhr, status, error) {
+                console.log("请求失败：");
+                console.log("状态码：", xhr.status);
+                console.log("响应内容：", xhr.responseText);
+                console.log("错误原因：", error);
+                alert("❌ 请求失败，状态码：" + xhr.status + "，请查看控制台详情");
             }
-        };
-        xhr.send(`orderId=${orderId}&statusCode=${statusCode}`);
+        });
     }
 </script>
 </body>

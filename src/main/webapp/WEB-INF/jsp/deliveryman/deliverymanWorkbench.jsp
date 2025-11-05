@@ -52,12 +52,13 @@
         </div>
         <ul class="nav navbar-nav">
             <li><a href="<c:url value='/deliveryman/toProfile'/>">个人中心</a></li>
+            <li class="active"><a href="<c:url value='/deliveryman/workbench'/>">外卖员工作台</a></li>
             <li><a href="<c:url value='/deliveryman/toHistoryOrders'/>">历史订单</a></li>
             <!-- 假设没有 dashboard 页面，你可以参考这个格式来添加额外的页面链接 -->
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <li><a href="#">欢迎，${deliveryman.username}</a></li>
-            <li><a href="<c:url value='/logout'/>" onclick="return confirm('确定退出？')">退出登录</a></li>
+            <li><a href="<c:url value='/deliveryman/logout'/>" onclick="return confirm('确定退出？')">退出登录</a></li>
         </ul>
     </div>
 </nav>
@@ -128,7 +129,7 @@
         <c:choose>
             <c:when test="${not empty myOrders}">
                 <c:forEach items="${myOrders}" var="order">
-                    <div class="order-item" onclick="window.location.href='<c:url value="/WEB-INF/jsp/deliveryman/deliverymanOrderDetail.jsp?orderId=${order.orderId}" />'">
+                    <div class="order-item" onclick="window.location.href='<c:url value="/deliveryman/toOrderDetail?orderId=${order.orderId}" />'">
                         <div>订单号：${order.orderId}</div>
                         <div>订单状态：
                             <c:choose>

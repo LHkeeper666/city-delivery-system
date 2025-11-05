@@ -30,8 +30,7 @@ public interface OrderMapper {
     // 4. 更新订单状态
     int updateStatus(
             @Param("orderId") String orderId,
-            @Param("targetStatus") int targetStatus,
-            @Param("updateTime") Date updateTime
+            @Param("targetStatus") int targetStatus
     );
 
     // 5. 根据ID查订单
