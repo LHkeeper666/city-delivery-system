@@ -65,6 +65,8 @@ CREATE TABLE cdms.cdms_delivery_order (
                                           delivery_fee     DECIMAL(10,2) NOT NULL COMMENT '配送费用（单位：元，外卖员收益以此为基础）',
                                           expected_mins    INT DEFAULT NULL COMMENT '预计配送时效（单位：分钟，超时会提醒）',
                                           remark           VARCHAR(255) DEFAULT NULL COMMENT '订单备注（如“放门口”“电话保持畅通”）',
+                                          abandon_reason VARCHAR(100) DEFAULT NULL COMMENT '放弃原因',
+                                          abandon_description TEXT DEFAULT NULL COMMENT '放弃详细说明',
 
     -- 订单状态流转字段
                                           status           TINYINT DEFAULT 0 COMMENT '订单状态：0=待接单，1=已接单待取货，2=配送中，3=已完成，4=已取消，5=放弃待审核',

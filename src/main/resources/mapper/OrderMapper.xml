@@ -258,4 +258,17 @@
         AND status = 3  <!-- 假设 3 表示“已完成” -->
     </select>
 
+    <!-- 10. 更新订单状态和放弃信息 -->
+    <update id="updateOrderWithAbandonInfo">
+        UPDATE cdms_delivery_order
+        SET
+        status = #{targetStatus,jdbcType=INTEGER},
+        abandon_reason = #{abandonReason,jdbcType=VARCHAR},
+        abandon_description = #{abandonDescription,jdbcType=VARCHAR},
+        cancel_time = CURRENT_TIMESTAMP
+        WHERE
+        order_id = #{orderId,jdbcType=VARCHAR}
+        AND status IN (1, 2)  <!-- 只有配送中或待取货状态的订单可以被放弃 -->
+    </update>
+
 </mapper>

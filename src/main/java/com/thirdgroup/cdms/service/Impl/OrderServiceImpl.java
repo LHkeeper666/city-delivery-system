@@ -115,6 +115,40 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public boolean updateOrderStatus(String orderId, OrderStatus targetStatus, Long userId, String abandonReason, String abandonDescription) {
+        DeliveryOrder order = orderMapper.selectById(orderId);
+        if (order == null) {
+            throw new RuntimeException("订单不存在");
+        }
+        if (!userId.equals(order.getDeliverymanId())) {
+            throw new RuntimeException("无权操作他人订单");
+        }
+
+        if (!isStatusTransitionValid(order.getStatus(), targetStatus.getCode())) {
+            throw new RuntimeException("状态流转不合法，当前状态：" + OrderStatus.fromCode(order.getStatus()).getDesc());
+        }
+
+        // 只有放弃待审核状态才需要保存放弃原因和说明
+        if (targetStatus == OrderStatus.ABANDONED_PENDING) {
+            int rows = orderMapper.updateOrderWithAbandonInfo(
+                    orderId,
+                    targetStatus.getCode(),
+                    abandonReason,
+                    abandonDescription,
+                    new Date()
+            );
+            if (rows <= 0) {
+                throw new RuntimeException("订单放弃失败，可能同时被其他操作修改");
+            }
+            return true;
+        } else {
+            // 对于其他状态，调用原有的updateOrderStatus方法
+            return updateOrderStatus(orderId, targetStatus, userId);
+        }
+    }
+
     @Override
     public List<DeliveryOrder> getMyOrders(Long userId) {
         if (deliveryManService.getById(userId) == null) {
@@ -127,8 +161,12 @@ public class OrderServiceImpl implements OrderService {
         List<DeliveryOrder> deliveringOrders = orderMapper.selectByStatusAndDeliveryman(
                 userId, OrderStatus.DELIVERING.getCode()
         );
+        List<DeliveryOrder> abandonedOrders = orderMapper.selectByStatusAndDeliveryman(
+                userId, OrderStatus.ABANDONED_PENDING.getCode()
+        );
 
         acceptedOrders.addAll(deliveringOrders);
+        acceptedOrders.addAll(abandonedOrders);
         return acceptedOrders;
     }
 
@@ -155,7 +193,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private boolean isStatusTransitionValid(int currentStatus, int targetStatus) {
-        if (targetStatus == OrderStatus.CANCELLED.getCode()) {
+        // 允许取消订单或放弃订单
+        if (targetStatus == OrderStatus.CANCELLED.getCode() || targetStatus == OrderStatus.ABANDONED_PENDING.getCode()) {
             return true;
         }
         return (currentStatus == OrderStatus.PENDING.getCode() && targetStatus == OrderStatus.ACCEPTED.getCode())

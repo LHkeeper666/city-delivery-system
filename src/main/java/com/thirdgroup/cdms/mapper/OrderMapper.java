@@ -59,4 +59,13 @@ public interface OrderMapper {
 
     // 9. 统计骑手完成订单数（供统计方法使用）
     int countCompletedByDeliverymanId(@Param("deliverymanId") Long deliverymanId);
+    
+    // 10. 更新订单状态和放弃信息
+    int updateOrderWithAbandonInfo(
+            @Param("orderId") String orderId,
+            @Param("targetStatus") int targetStatus,
+            @Param("abandonReason") String abandonReason,
+            @Param("abandonDescription") String abandonDescription,
+            @Param("cancelTime") Date cancelTime
+    );
 }

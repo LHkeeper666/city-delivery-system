@@ -60,6 +60,8 @@ CREATE TABLE cdms_delivery_order (
     deliveryman_id BIGINT,
     complete_time TIMESTAMP,
     cancel_time TIMESTAMP,
+    abandon_reason VARCHAR(100) DEFAULT NULL,       -- 放弃原因
+    abandon_description TEXT DEFAULT NULL,          -- 放弃详细说明,
 
     FOREIGN KEY (creator_id) REFERENCES cdms_user(user_id),
     FOREIGN KEY (deliveryman_id) REFERENCES cdms_user(user_id),

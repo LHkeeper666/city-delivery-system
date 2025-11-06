@@ -28,6 +28,8 @@ public class DeliveryOrder {
     private Long deliverymanId;
     private Date completeTime;  // 仅保留数据库存在的时间字段
     private Date cancelTime;    // 仅保留数据库存在的时间字段
+    private String abandonReason;    // 放弃原因
+    private String abandonDescription; // 放弃说明
 
     // 辅助方法：转订单状态枚举
     public OrderStatus getStatusEnum() {

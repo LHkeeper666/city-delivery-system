@@ -82,4 +82,36 @@ public class OrderController {
         DeliveryOrder order = orderService.getOrderById(orderId); // 传String
         return order != null ? Result.success(order) : Result.error(404, "订单不存在");
     }
+    
+    // 5. 放弃订单接口，支持放弃原因和说明
+    @PostMapping("/abandon")
+    public Result<?> abandonOrder(
+            @RequestParam String orderId,
+            @RequestParam String abandonReason,
+            @RequestParam String abandonDescription,
+            HttpSession session
+    ) {
+        Deliveryman deliveryman = (Deliveryman) session.getAttribute("deliveryman");
+        if (deliveryman == null) {
+            return Result.error(401, "未登录");
+        }
+        
+        // 参数校验
+        if (abandonReason == null || abandonReason.trim().isEmpty()) {
+            return Result.error(400, "请选择放弃原因");
+        }
+        
+        try {
+            boolean success = orderService.updateOrderStatus(
+                    orderId,
+                    OrderStatus.ABANDONED_PENDING, // 放弃待审核状态
+                    deliveryman.getUserId(),
+                    abandonReason,
+                    abandonDescription
+            );
+            return success ? Result.success("放弃申请已提交，请等待审核") : Result.error(500, "提交失败");
+        } catch (RuntimeException e) {
+            return Result.error(400, e.getMessage());
+        }
+    }
 }

@@ -12,6 +12,9 @@ public interface OrderService {
 
     // 更新状态方法：orderId从Long改为String
     boolean updateOrderStatus(String orderId, OrderStatus targetStatus, Long userId); // Long → String
+    
+    // 更新状态方法（支持放弃原因和说明）
+    boolean updateOrderStatus(String orderId, OrderStatus targetStatus, Long userId, String abandonReason, String abandonDescription);
 
     List<DeliveryOrder> getMyOrders(Long userId);
 

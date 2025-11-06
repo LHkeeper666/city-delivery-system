@@ -85,12 +85,14 @@
                             <c:choose>
                                 <c:when test="${order.status == 3}">已完成</c:when>
                                 <c:when test="${order.status == 4}">已取消</c:when>
+                                <c:when test="${order.status == 5}">配送员放弃</c:when>
                             </c:choose>
                         </td>
                         <td>
                             <c:choose>
                                 <c:when test="${order.status == 3}">${order.completeTime}</c:when>
                                 <c:when test="${order.status == 4}">${order.cancelTime}</c:when>
+                                <c:when test="${order.status == 5}">${order.cancelTime}</c:when>
                             </c:choose>
                         </td>
                         <td><fmt:formatNumber value="${order.deliverymanIncome == null ? 0 : order.deliverymanIncome}" pattern="0.00" /> 元</td>

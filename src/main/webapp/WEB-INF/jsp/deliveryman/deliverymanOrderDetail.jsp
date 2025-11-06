@@ -6,6 +6,7 @@
     <title>订单${order.orderId}详情</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
     <style>
         .map-box {
             height: 350px;
@@ -56,6 +57,9 @@
                 </c:when>
                 <c:when test="${order.status == 4}">
                     <span class="status-tag" style="background-color: #dc3545;">已取消</span>
+                </c:when>
+                <c:when test="${order.status == 5}">
+                    <span class="status-tag" style="background-color: #6c757d;">放弃待审核</span>
                 </c:when>
                 <c:otherwise>
                     <span class="status-tag" style="background-color: #999;">未知状态</span>
@@ -126,12 +130,50 @@
             </c:when>
         </c:choose>
 
-        <!-- 未完成的订单显示“取消订单” -->
-        <c:if test="${order.status != 3 && order.status != 4}">
-            <button class="btn btn-danger" style="margin-left: 20px;" onclick="cancelOrder('${order.orderId}')">
-                取消订单
+        <!-- 未完成的订单显示“放弃订单”按钮 -->
+        <c:if test="${order.status != 3 && order.status != 4 && order.status != 5}">
+            <button class="btn btn-danger" style="margin-left: 20px;" onclick="abandonOrder('${order.orderId}')">
+                放弃订单
             </button>
         </c:if>
+    </div>
+</div>
+
+<!-- 放弃订单模态框 -->
+<div class="modal fade" id="abandonOrderModal" tabindex="-1" role="dialog" aria-labelledby="abandonModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="关闭">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="abandonModalLabel">放弃订单申请</h4>
+            </div>
+            <div class="modal-body">
+                <form id="abandonOrderForm">
+                    <input type="hidden" id="abandonOrderId">
+                    <div class="form-group">
+                        <label for="abandonReason" class="control-label">放弃原因 <span style="color: red;">*</span></label>
+                        <select class="form-control" id="abandonReason" required>
+                            <option value="">请选择放弃原因</option>
+                            <option value="地址错误">地址错误</option>
+                            <option value="突发疾病">突发疾病</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="abandonDescription" class="control-label">详细说明</label>
+                        <textarea class="form-control" id="abandonDescription" rows="3" placeholder="请输入放弃订单的详细说明..."></textarea>
+                    </div>
+                    <div class="alert alert-warning">
+                        <strong>温馨提示：</strong>放弃订单需等待管理员审核，频繁放弃可能影响您的接单评分。
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-danger" onclick="submitAbandonRequest()">提交申请</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -162,15 +204,62 @@
         }
     }
 
-    // 取消订单（状态改为“已取消”）
-    function cancelOrder(orderId) {
+    // 放弃订单（显示模态框）
+    function abandonOrder(orderId) {
         if (currentWorkStatus !== 1) {
             alert("⚠️ 只有【在线】状态才能操作订单，请先切换到在线状态！");
             return;
         }
-        if (confirm("确定要取消订单吗？取消可能影响您的接单评分~")) {
-            updateOrderStatus(orderId, 4, "订单已取消");
+        // 清空并填充模态框
+        $('#abandonOrderId').val(orderId);
+        $('#abandonReason').val('');
+        $('#abandonDescription').val('');
+        // 显示模态框
+        $('#abandonOrderModal').modal('show');
+    }
+    
+    // 提交放弃订单申请
+    function submitAbandonRequest() {
+        const orderId = $('#abandonOrderId').val();
+        const abandonReason = $('#abandonReason').val();
+        const abandonDescription = $('#abandonDescription').val();
+        
+        // 表单验证
+        if (!abandonReason) {
+            alert("请选择放弃原因");
+            return;
         }
+        
+        // 提交请求到新的abandon接口
+        $.ajax({
+            url: contextPath + "/order/abandon",
+            type: "POST",
+            data: {
+                orderId: orderId,
+                abandonReason: abandonReason,
+                abandonDescription: abandonDescription
+            },
+            dataType: "json",
+            success: function(res) {
+                console.log("放弃请求响应：", res);
+                if (res.code === 200) {
+                    alert("✅ " + res.msg);
+                    // 隐藏模态框
+                    $('#abandonOrderModal').modal('hide');
+                    // 跳转回工作台
+                    window.location.href = contextPath + "/deliveryman/workbench";
+                } else {
+                    alert("❌ " + res.msg);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log("请求失败：");
+                console.log("状态码：", xhr.status);
+                console.log("响应内容：", xhr.responseText);
+                console.log("错误原因：", error);
+                alert("❌ 请求失败，状态码：" + xhr.status + "，请查看控制台详情");
+            }
+        });
     }
 
     // 通用：更新订单状态
