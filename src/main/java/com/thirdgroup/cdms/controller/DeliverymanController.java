@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -64,6 +65,11 @@ public class DeliverymanController {
         Deliveryman deliveryman = deliverymanService.login(phone, password);
         if (deliveryman != null) {
             session.setAttribute("deliveryman", deliveryman);
+            // 保存手机号到cookie，实现记忆用户名功能
+            Cookie cookie = new Cookie("deliverymanPhone", phone);
+            cookie.setPath(session.getServletContext().getContextPath());
+            cookie.setMaxAge(7 * 24 * 60 * 60); // 7天有效期
+            response.addCookie(cookie);
             response.sendRedirect(session.getServletContext().getContextPath() + "/deliveryman/workbench");
         } else {
             response.sendRedirect(session.getServletContext().getContextPath() + "/deliveryman/toLogin?error=1");
