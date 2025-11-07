@@ -255,7 +255,38 @@
         SELECT COUNT(*)
         FROM cdms_delivery_order
         WHERE deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
-        AND status = 3  <!-- 假设 3 表示“已完成” -->
+        AND status = 3  <!-- 假设 3 表示"已完成" -->
+    </select>
+    
+    <!-- ✅ 10. 新增：查询指定时间范围内骑手已完成的订单 -->
+    <select id="selectCompletedByDeliverymanIdAndDateRange" resultMap="DeliveryOrderResultMap">
+        SELECT
+        order_id,
+        sender_name,
+        sender_phone,
+        sender_address,
+        consignee_name,
+        consignee_phone,
+        consignee_address,
+        goods_type,
+        weight,
+        volume,
+        delivery_fee,
+        platform_income,
+        deliveryman_income,
+        expected_mins,
+        remark,
+        status,
+        create_time,
+        creator_id,
+        deliveryman_id,
+        complete_time,
+        cancel_time
+        FROM cdms_delivery_order
+        WHERE deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
+        AND status = 3  <!-- 已完成状态 -->
+        AND complete_time BETWEEN #{startTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP}
+        ORDER BY complete_time DESC
     </select>
 
     <!-- 10. 更新订单状态和放弃信息 -->

@@ -60,7 +60,14 @@ public interface OrderMapper {
     // 9. 统计骑手完成订单数（供统计方法使用）
     int countCompletedByDeliverymanId(@Param("deliverymanId") Long deliverymanId);
     
-    // 10. 更新订单状态和放弃信息
+    // 10. 查询指定时间范围内骑手已完成的订单（用于统计本月数据）
+    List<DeliveryOrder> selectCompletedByDeliverymanIdAndDateRange(
+            @Param("deliverymanId") Long deliverymanId,
+            @Param("startTime") Date startTime,
+            @Param("endTime") Date endTime
+    );
+    
+    // 11. 更新订单状态和放弃信息
     int updateOrderWithAbandonInfo(
             @Param("orderId") String orderId,
             @Param("targetStatus") int targetStatus,

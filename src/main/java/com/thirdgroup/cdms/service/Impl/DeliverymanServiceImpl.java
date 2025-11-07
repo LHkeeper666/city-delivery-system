@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -124,14 +125,41 @@ public class DeliverymanServiceImpl implements DeliveryManService {
         return updateStatus(userId, status);
     }
 
-    // ✅ 实现统计逻辑
+    // ✅ 实现统计逻辑，包含本月完成订单和本月收益
     @Override
     public OrderStatisticsDTO getCurrentStats(Long deliverymanId) {
         OrderStatisticsDTO stats = new OrderStatisticsDTO();
-        stats.setCompletedOrders(orderMapper.countCompletedByDeliverymanId(deliverymanId)); // 完成订单统计
+        // 设置总完成订单数
+        stats.setCompletedOrders(orderMapper.countCompletedByDeliverymanId(deliverymanId));
+        
+        // 计算本月完成订单数和本月收益
+        // 获取本月开始时间（月初00:00:00）
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Date monthStart = calendar.getTime();
+        
+        // 查询本月已完成的订单
+        List<DeliveryOrder> monthCompletedOrders = orderMapper.selectCompletedByDeliverymanIdAndDateRange(
+                deliverymanId, monthStart, new Date());
+        
+        // 设置本月完成订单数
+        stats.setCompletedCount((long) monthCompletedOrders.size());
+        
+        // 计算本月总收益
+        double totalAmount = 0;
+        for (DeliveryOrder order : monthCompletedOrders) {
+            if (order.getDeliverymanIncome() != null) {
+                totalAmount += order.getDeliverymanIncome().doubleValue();
+            }
+        }
+        stats.setTotalAmount(totalAmount);
 
-        // 没有专门的待处理统计方法，用 selectByStatusAndDeliveryman 替代
+        // 设置待处理订单数
         stats.setPendingOrders(orderMapper.selectByStatusAndDeliveryman(deliverymanId, 0).size());
+        
         return stats;
     }
 }
