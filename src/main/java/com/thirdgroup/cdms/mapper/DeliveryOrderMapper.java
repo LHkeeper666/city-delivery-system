@@ -156,4 +156,30 @@ public interface DeliveryOrderMapper {
             @Param("startTime") Date startTime,
             @Param("endTime") Date endTime
     );
+
+    /**
+     * 查询状态为5（放弃待审核）的订单列表
+     */
+    List<DeliveryOrder> getAbandonOrdersByPage(
+            @Param("start") Integer start,
+            @Param("size") Integer size
+    );
+
+    /**
+     * 统计状态为5（放弃待审核）的订单数量
+     */
+    long countAbandonOrder();
+
+    /**
+     * 根据订单id获取订单信息
+     */
+    DeliveryOrder getByPrimaryKey(String requestId);
+
+    /**
+     * 更新orderId对应订单的状态为status
+     */
+    int updateStatusByPrimaryKey(
+            @Param("orderId") String orderId,
+            @Param("status") int status
+    );
 }

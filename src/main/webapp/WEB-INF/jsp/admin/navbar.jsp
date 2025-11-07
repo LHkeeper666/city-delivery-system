@@ -66,6 +66,9 @@
                 <li class="${pageContext.request.requestURI.contains('/admin/api-key-list') ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/api-key-list">🔑 密钥管理</a>
                 </li>
+                <li class="${pageContext.request.requestURI.contains('/admin/list-abandon-requests') ? 'active' : ''}">
+                    <a href="${pageContext.request.contextPath}/admin/list-abandon-requests">订单审核</a>
+                </li>
             </ul>
 
             <!-- 右侧用户信息 -->

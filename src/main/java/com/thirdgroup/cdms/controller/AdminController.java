@@ -6,12 +6,9 @@ import com.thirdgroup.cdms.model.enums.UserStatus;
 import com.thirdgroup.cdms.service.Interface.AdminService;
 import com.thirdgroup.cdms.service.Interface.ApiKeyService;
 import com.thirdgroup.cdms.service.Interface.OrderService;
-import com.thirdgroup.cdms.utils.ApiKeyUtil;
 import com.thirdgroup.cdms.utils.DateUtils;
 import com.thirdgroup.cdms.utils.Result;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import io.swagger.annotations.Api;
@@ -22,9 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.IOException;
 import java.util.Date;
-import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -483,5 +478,42 @@ public class AdminController {
     public String apiKeySetStatus(@RequestParam Long keyId, Model model) {
         apiKeyService.turnStatus(keyId);
         return "redirect:api-key-list";
+    }
+
+    // 审核订单放弃申请页面
+    @GetMapping("/list-abandon-requests")
+    public String listAbandonRequests(
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @RequestParam(required = false, defaultValue = "10") Integer size,
+            Model model) {
+        PageResult<DeliveryOrder> abandonRequests = adminService.getAbandonRequests(page, size);
+        if (abandonRequests != null) {
+            model.addAttribute("abandonRequests", abandonRequests);
+            if (abandonRequests.getTotal() > 0) {
+                System.out.println("abandonRequests:" + abandonRequests.getList());
+            }
+        }
+        return "admin/abandonOrderList";
+    }
+
+    @GetMapping("/abandon/{requestId}")
+    public String viewAbandonRequest(
+            @PathVariable(name = "requestId") String requestId, Model model) {
+        DeliveryOrder orderById = adminService.getOrderById(requestId);
+        model.addAttribute("order", orderById);
+        return "admin/abandonOrderDetail";
+    }
+
+    @GetMapping("/reviewAbandonOrder")
+    public String reviewAbandonOrder(
+            String orderId, String result, Model model
+    ) {
+        if (result.equals("pass")) {
+            adminService.approveAbandonRequest(orderId);
+        } else {
+            adminService.rejectAbandonRequest(orderId);
+        }
+
+        return "redirect:abandon/" + orderId;
     }
 }

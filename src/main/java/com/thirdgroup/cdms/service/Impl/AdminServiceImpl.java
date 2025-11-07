@@ -15,7 +15,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import com.thirdgroup.cdms.model.enums.OrderStatus;
-import org.springframework.web.servlet.resource.ResourceUrlProvider;
 
 import java.math.BigDecimal;
 
@@ -368,5 +367,36 @@ public class AdminServiceImpl implements AdminService {
             result.add(map);
         }
         return result;
+    }
+
+    @Override
+    public PageResult<DeliveryOrder> getAbandonRequests(Integer page, Integer size) {
+        int start = (page - 1) * size;
+        List<DeliveryOrder> abandonOrdersByPage = orderMapper.getAbandonOrdersByPage(start, size);
+        PageResult<DeliveryOrder> result = new PageResult<>();
+        long total = orderMapper.countAbandonOrder();
+        result.setList(abandonOrdersByPage);
+        result.setPage(page);
+        result.setSize(size);
+        result.setTotal(total);
+        return result;
+    }
+
+    @Override
+    public DeliveryOrder getOrderById(String requestId) {
+        DeliveryOrder order = orderMapper.getByPrimaryKey(requestId);
+        return order;
+    }
+
+    @Override
+    public boolean approveAbandonRequest(String orderId) {
+        orderMapper.updateStatusByPrimaryKey(orderId, OrderStatus.PENDING.getCode());
+        return true;
+    }
+
+    @Override
+    public boolean rejectAbandonRequest(String orderId) {
+        orderMapper.updateStatusByPrimaryKey(orderId, OrderStatus.ACCEPTED.getCode());
+        return true;
     }
 }

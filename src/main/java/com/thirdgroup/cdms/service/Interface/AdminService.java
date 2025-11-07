@@ -78,4 +78,24 @@ public interface AdminService {
      * 获取地址对应的订单数
      */
     List<Map<String, Object>> getOrderAddressMap(Date startTime, Date endTime);
+
+    /**
+     * 分页获取放弃订单请求
+     */
+    PageResult<DeliveryOrder> getAbandonRequests(Integer page, Integer size);
+
+    /**
+     * 根据订单号获取订单信息
+     */
+    DeliveryOrder getOrderById(String requestId);
+
+    /**
+     * 通过订单放弃申请，更新订单状态为0（待接单）
+     */
+    boolean approveAbandonRequest(String orderId);
+
+    /**
+     * 拒绝订单放弃申请，更新订单状态为放弃前的状态
+     */
+    boolean rejectAbandonRequest(String orderId);
 }

@@ -24,6 +24,8 @@
         <result column="deliveryman_id" property="deliverymanId" jdbcType="BIGINT" />
         <result column="complete_time" property="completeTime" jdbcType="TIMESTAMP" />
         <result column="cancel_time" property="cancelTime" jdbcType="TIMESTAMP" />
+        <result column="abandon_reason" property="abandonReason" jdbcType="VARCHAR" />
+        <result column="abandon_description" property="abandonDescription" jdbcType="VARCHAR" />
     </resultMap>
 
     <!-- 2. 基础字段列表：复用字段定义 -->
@@ -32,7 +34,7 @@
         consignee_address, goods_type, weight, volume, delivery_fee, platform_income,
         deliveryman_income, <!-- 必须包含此字段，否则无法返回收益 -->
         expected_mins, remark, status, create_time, creator_id,
-        deliveryman_id, complete_time, cancel_time
+        deliveryman_id, complete_time, cancel_time, abandon_reason, abandon_description
     </sql>
 
     <!-- 3. 新增订单：补充order_id类型校验 -->
@@ -351,6 +353,11 @@
         SET deliveryman_id = NULL
         WHERE deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
     </update>
+    <update id="updateStatusByPrimaryKey">
+        UPDATE cdms_delivery_order
+        SET status = #{status, jdbcType=TINYINT}
+        WHERE order_id = #{orderId, jdbcType=VARCHAR}
+    </update>
 
     <!-- 19. 根据日期获取最大订单ID -->
     <!-- 用于生成新的订单号 -->
@@ -367,5 +374,24 @@
             <if test="endTime != null">AND create_time &lt;= #{endTime}</if>
         </where>
         GROUP BY consignee_address
+    </select>
+
+    <select id="getAbandonOrdersByPage" resultType="com.thirdgroup.cdms.model.DeliveryOrder">
+        SELECT <include refid="Base_Column_List" />
+        FROM cdms_delivery_order
+        WHERE status = 5
+        ORDER BY create_time DESC
+        LIMIT #{start,jdbcType=INTEGER}, #{size,jdbcType=INTEGER}
+    </select>
+    <select id="countAbandonOrder" resultType="java.lang.Long">
+        SELECT  COUNT(*)
+        FROM cdms_delivery_order
+        WHERE status = 5
+    </select>
+    <select id="getByPrimaryKey" resultType="com.thirdgroup.cdms.model.DeliveryOrder"
+            parameterType="java.lang.String">
+        SELECT <include refid="Base_Column_List" />
+        FROM cdms_delivery_order
+        WHERE order_id = #{orderId, jdbcType=VARCHAR}
     </select>
 </mapper>
