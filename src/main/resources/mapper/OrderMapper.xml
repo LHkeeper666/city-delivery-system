@@ -25,6 +25,7 @@
         <result column="deliveryman_id" property="deliverymanId" jdbcType="BIGINT"/>
         <result column="complete_time" property="completeTime" jdbcType="TIMESTAMP"/>
         <result column="cancel_time" property="cancelTime" jdbcType="TIMESTAMP"/>
+        <result column="original_status" property="originalStatus" jdbcType="INTEGER"/>
     </resultMap>
 
     <!-- 1. 查待接单订单：补充状态判断（待接单通常为状态0） -->
@@ -50,7 +51,8 @@
         creator_id,
         deliveryman_id,
         complete_time,
-        cancel_time
+        cancel_time,
+        original_status
         FROM cdms_delivery_order
         WHERE status = #{status,jdbcType=INTEGER}
         AND deliveryman_id IS NULL
@@ -81,7 +83,8 @@
         creator_id,
         deliveryman_id,
         complete_time,
-        cancel_time
+        cancel_time,
+        original_status
         FROM cdms_delivery_order
         WHERE deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
         AND status = #{status,jdbcType=INTEGER}
@@ -160,7 +163,8 @@
         creator_id,
         deliveryman_id,
         complete_time,
-        cancel_time
+        cancel_time,
+        original_status
         FROM cdms_delivery_order
         WHERE order_id = #{orderId,jdbcType=VARCHAR}
         AND order_id IS NOT NULL  <!-- 过滤无效ID查询 -->
@@ -189,7 +193,8 @@
         creator_id,
         deliveryman_id,
         complete_time,
-        cancel_time
+        cancel_time,
+        original_status
         FROM cdms_delivery_order
         <where>
             <if test="status != null">
@@ -230,7 +235,8 @@
             creator_id,
             deliveryman_id,
             complete_time,
-            cancel_time
+            cancel_time,
+            original_status
         FROM cdms_delivery_order
         WHERE deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
           AND status = #{status,jdbcType=INTEGER}
@@ -281,7 +287,8 @@
         creator_id,
         deliveryman_id,
         complete_time,
-        cancel_time
+        cancel_time,
+        original_status
         FROM cdms_delivery_order
         WHERE deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
         AND status = 3  <!-- 已完成状态 -->
@@ -289,17 +296,18 @@
         ORDER BY complete_time DESC
     </select>
 
-    <!-- 10. 更新订单状态和放弃信息 -->
+    <!-- 11. 更新订单状态和放弃信息 -->
     <update id="updateOrderWithAbandonInfo">
         UPDATE cdms_delivery_order
         SET
         status = #{targetStatus,jdbcType=INTEGER},
+        original_status = status,  <!-- 保存原始状态 -->
         abandon_reason = #{abandonReason,jdbcType=VARCHAR},
         abandon_description = #{abandonDescription,jdbcType=VARCHAR},
-        cancel_time = CURRENT_TIMESTAMP
+        cancel_time = #{cancelTime,jdbcType=TIMESTAMP}
         WHERE
         order_id = #{orderId,jdbcType=VARCHAR}
-        AND status IN (1, 2)  <!-- 只有配送中或待取货状态的订单可以被放弃 -->
+        AND status IN (1, 2)  <!-- 只有已接单或配送中状态可放弃 -->
     </update>
 
 </mapper>

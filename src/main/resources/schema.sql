@@ -55,6 +55,7 @@ CREATE TABLE cdms_delivery_order (
     remark VARCHAR(255),
 
     status TINYINT DEFAULT 0,                       -- 0-待接单, 1-已接单, 2-配送中, 3-已完成, 4-已取消, 5-放弃待审核
+    original_status TINYINT DEFAULT NULL,           -- 放弃前的原始状态，用于审核驳回时恢复
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     creator_id BIGINT NOT NULL,
     deliveryman_id BIGINT,

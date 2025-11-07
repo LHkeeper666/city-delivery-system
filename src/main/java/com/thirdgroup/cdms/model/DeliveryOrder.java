@@ -30,6 +30,7 @@ public class DeliveryOrder {
     private Date cancelTime;    // 仅保留数据库存在的时间字段
     private String abandonReason;    // 放弃原因
     private String abandonDescription; // 放弃说明
+    private Integer originalStatus;  // 放弃前的原始状态，用于审核驳回时恢复
 
     // 辅助方法：转订单状态枚举
     public OrderStatus getStatusEnum() {

@@ -26,6 +26,7 @@
         <result column="cancel_time" property="cancelTime" jdbcType="TIMESTAMP" />
         <result column="abandon_reason" property="abandonReason" jdbcType="VARCHAR" />
         <result column="abandon_description" property="abandonDescription" jdbcType="VARCHAR" />
+        <result column="original_status" property="originalStatus" jdbcType="TINYINT" />
     </resultMap>
 
     <!-- 2. 基础字段列表：复用字段定义 -->
@@ -34,7 +35,7 @@
         consignee_address, goods_type, weight, volume, delivery_fee, platform_income,
         deliveryman_income, <!-- 必须包含此字段，否则无法返回收益 -->
         expected_mins, remark, status, create_time, creator_id,
-        deliveryman_id, complete_time, cancel_time, abandon_reason, abandon_description
+        deliveryman_id, complete_time, cancel_time, abandon_reason, abandon_description, original_status
     </sql>
 
     <!-- 3. 新增订单：补充order_id类型校验 -->
@@ -353,13 +354,17 @@
         SET deliveryman_id = NULL
         WHERE deliveryman_id = #{deliverymanId,jdbcType=BIGINT}
     </update>
+    <!-- 19. 更新订单状态，当状态为待接单(0)时自动将deliveryman_id置为NULL -->
     <update id="updateStatusByPrimaryKey">
         UPDATE cdms_delivery_order
-        SET status = #{status, jdbcType=TINYINT}
-        WHERE order_id = #{orderId, jdbcType=VARCHAR}
+        SET 
+        status = #{status,jdbcType=TINYINT},
+        deliveryman_id = CASE WHEN #{status,jdbcType=TINYINT} = 0 THEN NULL ELSE deliveryman_id END
+        WHERE 
+        order_id = #{orderId,jdbcType=VARCHAR}
     </update>
 
-    <!-- 19. 根据日期获取最大订单ID -->
+    <!-- 20. 根据日期获取最大订单ID -->
     <!-- 用于生成新的订单号 -->
     <select id="getMaxOrderIdByDate" resultType="java.lang.String">
         SELECT MAX(order_id) 

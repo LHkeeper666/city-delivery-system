@@ -390,13 +390,31 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public boolean approveAbandonRequest(String orderId) {
-        orderMapper.updateStatusByPrimaryKey(orderId, OrderStatus.PENDING.getCode());
-        return true;
+        // 使用已有的updateStatusByPrimaryKey方法
+        // 当状态更新为待接单(0)时，SQL会自动将deliveryman_id置为NULL
+        return orderMapper.updateStatusByPrimaryKey(orderId, OrderStatus.PENDING.getCode()) > 0;
     }
 
     @Override
     public boolean rejectAbandonRequest(String orderId) {
-        orderMapper.updateStatusByPrimaryKey(orderId, OrderStatus.ACCEPTED.getCode());
-        return true;
+        // 获取订单信息，以便恢复其原始状态
+        DeliveryOrder order = orderMapper.getByPrimaryKey(orderId);
+        if (order != null) {
+            // 使用originalStatus字段恢复原始状态
+            Integer originalStatus = order.getOriginalStatus();
+            int targetStatus;
+            
+            // 如果originalStatus存在且有效，则使用它，否则默认使用已接单状态
+            if (originalStatus != null && (originalStatus == OrderStatus.ACCEPTED.getCode() || 
+                                           originalStatus == OrderStatus.DELIVERING.getCode())) {
+                targetStatus = originalStatus;
+            } else {
+                // 默认恢复为已接单状态
+                targetStatus = OrderStatus.ACCEPTED.getCode();
+            }
+            
+            return orderMapper.updateStatusByPrimaryKey(orderId, targetStatus) > 0;
+        }
+        return false;
     }
 }

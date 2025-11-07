@@ -177,6 +177,7 @@ public interface DeliveryOrderMapper {
 
     /**
      * 更新orderId对应订单的状态为status
+     * 当status为0(待接单)时，会自动将deliveryman_id置为NULL
      */
     int updateStatusByPrimaryKey(
             @Param("orderId") String orderId,
