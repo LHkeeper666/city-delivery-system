@@ -53,38 +53,11 @@
 
 <main class="container">
     <h1>订单审核</h1>
-    <!-- 搜索表单 -->
-<%--    <div class="search-form">--%>
-<%--        <form action="${pageContext.request.contextPath}/admin/api-key-list" method="get" class="form-inline">--%>
-
-<%--            <div class="form-group">--%>
-<%--                <label for="status">状态：</label>--%>
-<%--                <select name="status" id="status" class="form-control">--%>
-<%--                    <option value="">全部</option>--%>
-<%--                    <option value="enabled" <c:if test="${status eq 'enabled'}">selected</c:if>>启用</option>--%>
-<%--                    <option value="disabled" <c:if test="${status eq 'disabled'}">selected</c:if>>禁用</option>--%>
-<%--                </select>--%>
-<%--            </div>--%>
-
-<%--            <div class="form-group">--%>
-<%--                <label for="keyword">关键词：</label>--%>
-<%--                <input type="text" name="keyword" id="keyword" class="form-control" value="${keyword}" placeholder="应用名称">--%>
-<%--            </div>--%>
-
-<%--            <button type="submit" class="btn btn-primary">搜索</button>--%>
-<%--            <a href="${pageContext.request.contextPath}/admin/api-key-list" class="btn btn-default" style="margin-left: 10px;">重置</a>--%>
-<%--        </form>--%>
-<%--        <button type="button" class="btn btn-primary" onclick="showAddAPIKeyModal()">添加API Key</button>--%>
-<%--    </div>--%>
 
     <!-- 错误提示 -->
     <c:if test="${not empty errorMsg}">
         <div class="alert alert-danger">${errorMsg}</div>
     </c:if>
-
-    <div>
-        list大小：${abandonRequests.total}
-    </div>
 
     <!-- 订单列表 -->
     <table class="table table-striped table-hover">
