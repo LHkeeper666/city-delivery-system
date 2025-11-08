@@ -54,6 +54,13 @@ public class OrderServiceImpl implements OrderService {
         if (deliveryman.getWorkStatus() != DeliverymanStatus.ONLINE.getCode()) {
             throw new RuntimeException("只有在线状态才能接单，请先切换状态");
         }
+        
+        // 检查配送员是否已有进行中订单（已接单或配送中状态）
+        List<DeliveryOrder> acceptedOrders = orderMapper.selectByStatusAndDeliveryman(userId, OrderStatus.ACCEPTED.getCode());
+        List<DeliveryOrder> deliveringOrders = orderMapper.selectByStatusAndDeliveryman(userId, OrderStatus.DELIVERING.getCode());
+        if (!acceptedOrders.isEmpty() || !deliveringOrders.isEmpty()) {
+            throw new RuntimeException("您当前已有进行中的订单，一次只能接一单");
+        }
 
         int orderRows = orderMapper.acceptOrder(
                 orderId,
