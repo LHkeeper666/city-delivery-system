@@ -91,8 +91,10 @@ public class OrderServiceImpl implements OrderService {
 
         if (targetStatus == OrderStatus.COMPLETED) {
             // 对于完成状态，使用updateDeliverymanIncomeAndCompleteTime方法，该方法已包含状态更新
-            BigDecimal platformCommission = new BigDecimal("2.00");
-            BigDecimal deliverymanIncome = order.getDeliveryFee().subtract(platformCommission);
+            // 修改配送员收入计算逻辑：在创建订单时固定
+//            BigDecimal platformCommission = new BigDecimal("2.00");
+//            BigDecimal deliverymanIncome = order.getDeliveryFee().subtract(platformCommission);
+            BigDecimal deliverymanIncome = order.getDeliverymanIncome();
 
             int updateRows = orderMapper.updateDeliverymanIncomeAndCompleteTime(
                     orderId,
