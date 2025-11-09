@@ -93,23 +93,23 @@ CREATE TABLE cdms.cdms_delivery_trace (
 -- =========================
 -- 通知表：notification
 -- =========================
-CREATE TABLE cdms.cdms_notification (
-    id                VARCHAR(32) PRIMARY KEY COMMENT '通知ID（格式：NT + 日期 + 序号）',
-    deliveryman_id    BIGINT NOT NULL COMMENT '配送员ID（外键，关联 delivery_man.id）',
-    content           VARCHAR(500) NOT NULL COMMENT '通知内容（如：您的放弃订单申请已通过，订单已重回待接单池）',
-    type              TINYINT NOT NULL COMMENT '通知类型（0 = 管理员操作通知，1 = 订单状态通知）',
-    is_read           TINYINT NOT NULL DEFAULT 0 COMMENT '是否已读（0 = 未读，1 = 已读）',
-    create_time       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间（默认当前时间）',
-    sms_sent          TINYINT NOT NULL DEFAULT 0 COMMENT '是否发送短信（0 = 未发送，1 = 已发送）',
-
-    FOREIGN KEY (deliveryman_id) REFERENCES cdms_user(user_id)
-       ON UPDATE CASCADE
-       ON DELETE CASCADE,
-
-    CHECK (type IN (0,1)),
-    CHECK (is_read IN (0,1)),
-    CHECK (sms_sent IN (0,1))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='通知表（与配送员表一对一关联，存储通知状态）';
+# CREATE TABLE cdms.cdms_notification (
+#     id                VARCHAR(32) PRIMARY KEY COMMENT '通知ID（格式：NT + 日期 + 序号）',
+#     deliveryman_id    BIGINT NOT NULL COMMENT '配送员ID（外键，关联 delivery_man.id）',
+#     content           VARCHAR(500) NOT NULL COMMENT '通知内容（如：您的放弃订单申请已通过，订单已重回待接单池）',
+#     type              TINYINT NOT NULL COMMENT '通知类型（0 = 管理员操作通知，1 = 订单状态通知）',
+#     is_read           TINYINT NOT NULL DEFAULT 0 COMMENT '是否已读（0 = 未读，1 = 已读）',
+#     create_time       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间（默认当前时间）',
+#     sms_sent          TINYINT NOT NULL DEFAULT 0 COMMENT '是否发送短信（0 = 未发送，1 = 已发送）',
+#
+#     FOREIGN KEY (deliveryman_id) REFERENCES cdms_user(user_id)
+#        ON UPDATE CASCADE
+#        ON DELETE CASCADE,
+#
+#     CHECK (type IN (0,1)),
+#     CHECK (is_read IN (0,1)),
+#     CHECK (sms_sent IN (0,1))
+# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='通知表（与配送员表一对一关联，存储通知状态）';
 
 -- =========================
 -- 操作日志表：operation_log（选做）
