@@ -39,4 +39,9 @@ public class DeliveryTrace {
      * remark
      */
     private String remark;
+
+    /**
+     * 用于前端显示
+     */
+    private String operatorName;
 }

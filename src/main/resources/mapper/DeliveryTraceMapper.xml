@@ -54,11 +54,22 @@
         FROM cdms_delivery_trace
         ORDER BY operate_time DESC
     </select>
-<!--    <select id="selectByOrderId" resultType="com.thirdgroup.cdms.model.DeliveryTrace"-->
-<!--            parameterType="java.lang.String"></select>-->
-    <select id="selectByOrderId" resultMap="BaseResultMap">
-        SELECT <include refid="Base_Column_List" />
-        FROM cdms_delivery_trace
-        WHERE order_id = #{ orderId,jdbcType=VARCHAR }
+    <select id="selectByOrderId" resultType="com.thirdgroup.cdms.model.DeliveryTrace"
+            parameterType="java.lang.String">
+<!--    <select id="selectByOrderId" resultType="com.thirdgroup.cdms.model.DeliveryTrace">-->
+<!--        SELECT <include refid="Base_Column_List" />-->
+<!--        FROM cdms_delivery_trace-->
+<!--        LEFT JOIN cdms_user ON cdms_delivery_trace.operator_id = cdms_user_id-->
+<!--        WHERE order_id = #{ orderId,jdbcType=VARCHAR }-->
+        SELECT
+            ot.trace_id AS traceId,
+            ot.order_id AS orderId,
+            ot.operator_id AS operatorId,
+            ot.status AS status,
+            ot.operate_time AS operateTime,
+            u.username AS operatorName
+        FROM cdms_delivery_trace ot
+        LEFT JOIN cdms_user u ON ot.operator_id = u.user_id
+        WHERE ot.order_id = #{ orderId,jdbcType=VARCHAR }
     </select>
 </mapper>
