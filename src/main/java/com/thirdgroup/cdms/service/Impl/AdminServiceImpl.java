@@ -243,8 +243,23 @@ public class AdminServiceImpl implements AdminService {
             return false;
         }
         
-        // 如果是配送员，先处理相关订单（避免外键约束冲突）
+        // 如果是配送员，检查是否有未完成的订单
         if (userToDelete.getRole().equals(1)) { // 1表示配送员角色
+            // 检查是否有未完成的订单（状态为0-待接单、1-已接单待取货、2-配送中、5-放弃待审核）
+            // 使用countByDeliveryman方法查询未完成订单数量
+            // 注意：接口和SQL实现存在参数不匹配问题，这里直接使用count方法查询
+            Long pendingOrdersCount = orderMapper.count(0, null, userId, null, null); // 待接单
+            Long acceptedOrdersCount = orderMapper.count(1, null, userId, null, null); // 已接单待取货
+            Long deliveringOrdersCount = orderMapper.count(2, null, userId, null, null); // 配送中
+            Long abandonedPendingOrdersCount = orderMapper.count(5, null, userId, null, null); // 放弃待审核
+            
+            // 如果有任何未完成的订单，不允许删除
+            if (pendingOrdersCount > 0 || acceptedOrdersCount > 0 || 
+                deliveringOrdersCount > 0 || abandonedPendingOrdersCount > 0) {
+                // 抛出运行时异常，会触发事务回滚
+                throw new RuntimeException("该配送员有未完成的订单，无法删除账号");
+            }
+            
             // 将相关订单的配送员ID设置为null
             orderMapper.updateDeliverymanIdToNull(userId);
         }
