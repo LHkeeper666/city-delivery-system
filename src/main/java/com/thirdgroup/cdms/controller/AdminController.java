@@ -399,8 +399,11 @@ public class AdminController {
             } else {
                 redirectAttributes.addFlashAttribute("error", "不能删除最后一个管理员账号或用户不存在");
             }
+        } catch (RuntimeException e) {
+            // 捕获RuntimeException并返回相应的错误信息
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         } catch (Exception e) {
-            // 捕获可能的数据库异常，提供友好的错误消息
+            // 捕获其他异常，提供友好的错误消息
             redirectAttributes.addFlashAttribute("error", "删除账号失败：" + e.getMessage());
         }
         return "redirect:/admin/accounts";
