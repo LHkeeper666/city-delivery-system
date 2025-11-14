@@ -118,9 +118,12 @@
                            placeholder="请输入密码" required>
                 </div>
                 <button type="submit" class="btn btn-primary">登录</button>
+                <div class="text-center mt-3">
+                    <a href="${pageContext.request.contextPath}/deliveryman/toLogin">外卖员登录</a>
+                </div>
             </form>
         </div>
-<%--        测试用--%>
+        <%--        测试用--%>
         <div>
             <p>
                 初始管理员账号：admin

@@ -42,24 +42,7 @@
 </head>
 <body>
 
-<!-- 导航栏 -->
-<nav class="navbar navbar-inverse">
-    <div class="container">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="<c:url value='/'/>">同城配送系统</a>
-        </div>
-        <ul class="nav navbar-nav">
-            <li><a href="<c:url value='/'/>">首页</a></li>
-            <li><a href="<c:url value='/deliveryman/toLogin'/>">外卖员登录</a></li>
-            <li><a href="<c:url value='/admin/login'/>">管理员页面</a></li>
-            <!-- Add other page links as needed -->
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">欢迎，用户</a></li>
-            <li><a href="<c:url value='/deliveryman/logout'/>">退出登录</a></li>
-        </ul>
-    </div>
-</nav>
+
 
 <div class="login-box">
     <h2>外卖员登录</h2>
@@ -83,6 +66,8 @@
             <a href="${pageContext.request.contextPath}/deliveryman/toForgotPassword">忘记密码？</a>
             <span style="margin: 0 10px;">|</span>
             <a href="${pageContext.request.contextPath}/deliveryman/toRegister">还没账号？去注册</a>
+            <span style="margin: 0 10px;">|</span>
+            <a href="${pageContext.request.contextPath}/admin/login">管理员登录</a>
         </div>
     </form>
 </div>
