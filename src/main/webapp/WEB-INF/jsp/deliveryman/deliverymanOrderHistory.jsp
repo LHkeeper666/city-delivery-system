@@ -4,15 +4,21 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>订单历史 - 同城配送系统</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            padding-top: 70px;
+            padding-top: 50px;
             background-color: #f4f5f7;
+            font-size: 14px;
         }
         .container {
-            margin-top: 30px;
+            width: 95%;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 10px;
         }
         .navbar-inverse {
             background-color: #333;
@@ -20,15 +26,79 @@
         }
         .navbar-inverse .navbar-nav > li > a {
             color: #fff;
+            font-size: 12px;
         }
         .navbar-inverse .navbar-brand {
             color: #fff;
+            font-size: 14px;
         }
         table {
-            margin-top: 20px;
+            margin-top: 15px;
+            font-size: 12px;
         }
         .text-center {
             text-align: center;
+        }
+        
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 50px;
+                font-size: 13px;
+            }
+            .container {
+                width: 98%;
+                margin-top: 10px;
+                padding: 5px;
+            }
+            .navbar-brand {
+                font-size: 12px !important;
+            }
+            .navbar-nav > li > a {
+                font-size: 11px !important;
+                padding: 8px 5px !important;
+            }
+            table {
+                font-size: 11px;
+                margin-top: 10px;
+            }
+            table th, table td {
+                padding: 5px 3px;
+            }
+            .btn-sm {
+                font-size: 10px;
+                padding: 3px 6px;
+            }
+            h3 {
+                font-size: 16px;
+                margin: 10px 0;
+            }
+        }
+        
+        /* 超小屏幕适配 */
+        @media (max-width: 480px) {
+            .container {
+                width: 100%;
+                padding: 2px;
+            }
+            table {
+                font-size: 10px;
+            }
+            table th, table td {
+                padding: 3px 1px;
+                font-size: 9px;
+            }
+            .btn-sm {
+                font-size: 9px;
+                padding: 2px 4px;
+            }
+            h3 {
+                font-size: 14px;
+                margin: 5px 0;
+            }
+            .row {
+                margin: 10px 0;
+            }
         }
     </style>
 </head>
@@ -37,17 +107,25 @@
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
         <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
             <a class="navbar-brand" href="<c:url value='/'/>">同城配送系统</a>
         </div>
-        <ul class="nav navbar-nav">
-            <li><a href="<c:url value='/deliveryman/toProfile'/>">个人中心</a></li>
-            <li><a href="<c:url value='/deliveryman/workbench'/>">外卖员工作台</a></li>
-            <li class="active"><a href="<c:url value='/deliveryman/toHistoryOrders'/>">历史订单</a></li>
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">欢迎，${deliveryman.username}</a></li>
-            <li><a href="<c:url value='/deliveryman/logout'/>" onclick="return confirm('确定退出？')">退出登录</a></li>
-        </ul>
+        <div class="collapse navbar-collapse" id="navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="<c:url value='/deliveryman/toProfile'/>">个人中心</a></li>
+                <li><a href="<c:url value='/deliveryman/workbench'/>">工作台</a></li>
+                <li class="active"><a href="<c:url value='/deliveryman/toHistoryOrders'/>">历史订单</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">欢迎，${deliveryman.username}</a></li>
+                <li><a href="<c:url value='/deliveryman/logout'/>" onclick="return confirm('确定退出？')">退出</a></li>
+            </ul>
+        </div>
     </div>
 </nav>
 

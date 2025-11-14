@@ -3,15 +3,17 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>订单${order.orderId}详情</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
     <style>
         .map-box {
-            height: 350px;
+            height: 250px;
             border: 1px solid #ddd;
-            margin: 20px 0;
+            margin: 15px 0;
             padding: 15px;
             background-color: #f9f9f9;
         }
@@ -28,48 +30,153 @@
             color: white;
             font-size: 12px;
         }
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 0 10px;
+            }
+            .map-box {
+                height: 200px;
+                padding: 10px;
+                margin: 10px 0;
+            }
+            .info-card {
+                padding: 10px;
+                margin: 8px 0;
+            }
+            h3 {
+                font-size: 18px;
+                margin: 15px 0;
+                white-space: normal;
+                word-break: break-all;
+                line-height: 1.4;
+            }
+            h4 {
+                font-size: 16px;
+                white-space: normal;
+                word-break: break-all;
+                line-height: 1.4;
+            }
+            p {
+                font-size: 14px;
+                margin: 8px 0;
+                word-break: break-all;
+                line-height: 1.4;
+            }
+            .btn {
+                font-size: 14px;
+                padding: 8px 15px;
+                margin: 5px;
+            }
+            .modal-dialog {
+                margin: 20px;
+                width: auto;
+            }
+            .form-group {
+                margin-bottom: 15px;
+            }
+            /* 修复col-md-6在移动端的布局问题 */
+            .col-md-6 {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            /* 修复col-md-4在移动端的布局问题 */
+            .col-md-4 {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+        @media (max-width: 480px) {
+            .container {
+                width: 98%;
+                padding: 0 5px;
+            }
+            .map-box {
+                height: 180px;
+                padding: 8px;
+            }
+            .info-card {
+                padding: 8px;
+            }
+            h3 {
+                font-size: 16px;
+                white-space: normal;
+                word-break: break-all;
+                line-height: 1.3;
+            }
+            h4 {
+                font-size: 14px;
+                white-space: normal;
+                word-break: break-all;
+                line-height: 1.3;
+            }
+            p {
+                font-size: 13px;
+                margin: 5px 0;
+                word-break: break-all;
+                line-height: 1.3;
+            }
+            .btn {
+                font-size: 13px;
+                padding: 6px 12px;
+            }
+            .status-tag {
+                font-size: 10px;
+                padding: 2px 6px;
+            }
+            .col-md-6 {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+            .col-md-4 {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <!-- 头部导航：返回工作台 -->
-    <div class="row" style="margin: 20px 0;">
-        <a href="${pageContext.request.contextPath}/deliveryman/workbench" class="btn btn-default">
+    <div class="row" style="margin: 15px 0;">
+        <a href="${pageContext.request.contextPath}/deliveryman/workbench" class="btn btn-default btn-sm">
             <span class="glyphicon glyphicon-arrow-left"></span> 返回工作台
         </a>
     </div>
 
     <!-- 订单状态 -->
     <div class="row">
-        <h3>订单 ${order.orderId} 详情
-            <c:choose>
-                <c:when test="${order.status == 0}">
-                    <span class="status-tag" style="background-color: #6c757d;">待接单</span>
-                </c:when>
-                <c:when test="${order.status == 1}">
-                    <span class="status-tag" style="background-color: #ffc107;">已接单待取货</span>
-                </c:when>
-                <c:when test="${order.status == 2}">
-                    <span class="status-tag" style="background-color: #28a745;">配送中</span>
-                </c:when>
-                <c:when test="${order.status == 3}">
-                    <span class="status-tag" style="background-color: #007bff;">已完成</span>
-                </c:when>
-                <c:when test="${order.status == 4}">
-                    <span class="status-tag" style="background-color: #dc3545;">已取消</span>
-                </c:when>
-                <c:when test="${order.status == 5}">
-                    <span class="status-tag" style="background-color: #6c757d;">放弃待审核</span>
-                </c:when>
-                <c:otherwise>
-                    <span class="status-tag" style="background-color: #999;">未知状态</span>
-                </c:otherwise>
-            </c:choose>
-        </h3>
+        <div class="col-xs-12 text-center">
+            <h3>订单 ${order.orderId} 详情
+                <c:choose>
+                    <c:when test="${order.status == 0}">
+                        <span class="status-tag" style="background-color: #6c757d;">待接单</span>
+                    </c:when>
+                    <c:when test="${order.status == 1}">
+                        <span class="status-tag" style="background-color: #ffc107;">已接单待取货</span>
+                    </c:when>
+                    <c:when test="${order.status == 2}">
+                        <span class="status-tag" style="background-color: #28a745;">配送中</span>
+                    </c:when>
+                    <c:when test="${order.status == 3}">
+                        <span class="status-tag" style="background-color: #007bff;">已完成</span>
+                    </c:when>
+                    <c:when test="${order.status == 4}">
+                        <span class="status-tag" style="background-color: #dc3545;">已取消</span>
+                    </c:when>
+                    <c:when test="${order.status == 5}">
+                        <span class="status-tag" style="background-color: #6c757d;">放弃待审核</span>
+                    </c:when>
+                    <c:otherwise>
+                        <span class="status-tag" style="background-color: #999;">未知状态</span>
+                    </c:otherwise>
+                </c:choose>
+            </h3>
+        </div>
     </div>
 
     <!-- 地图区域（简化版，后续可集成高德/百度地图API） -->
-    <!-- <p><strong>实时距离：公里（模拟数据）这个有点难我不写了</p>-->
     <div class="map-box">
         <h4>配送路线</h4>
         <p><strong>商家位置：</strong>${order.senderAddress}</p>
@@ -114,25 +221,25 @@
     </div>
 
     <!-- 操作按钮（根据订单状态显示不同按钮） -->
-    <div class="text-center" style="margin: 30px 0;">
+    <div class="text-center" style="margin: 20px 0;">
         <c:choose>
             <c:when test="${order.status == 1}">
-                <!-- 已接单待取货：显示“确认取货” -->
-                <button class="btn btn-primary" onclick="confirmTakeGoods('${order.orderId}')">
+                <!-- 已接单待取货：显示"确认取货" -->
+                <button class="btn btn-primary btn-block" onclick="confirmTakeGoods('${order.orderId}')">
                     确认取货
                 </button>
             </c:when>
             <c:when test="${order.status == 2}">
-                <!-- 配送中：显示“确认送达” -->
-                <button class="btn btn-success" onclick="confirmComplete('${order.orderId}')">
+                <!-- 配送中：显示"确认送达" -->
+                <button class="btn btn-success btn-block" onclick="confirmComplete('${order.orderId}')">
                     确认送达
                 </button>
             </c:when>
         </c:choose>
 
-        <!-- 未完成的订单显示“放弃订单”按钮 -->
+        <!-- 未完成的订单显示"放弃订单"按钮 -->
         <c:if test="${order.status != 3 && order.status != 4 && order.status != 5}">
-            <button class="btn btn-danger" style="margin-left: 20px;" onclick="abandonOrder('${order.orderId}')">
+            <button class="btn btn-danger btn-block" style="margin-top: 10px;" onclick="abandonOrder('${order.orderId}')">
                 放弃订单
             </button>
         </c:if>
@@ -182,7 +289,7 @@
     // 存储当前外卖员工作状态（1=在线，2=休息，3=离线）
     const currentWorkStatus = ${deliveryman.workStatus};
 
-    // 确认取货（状态改为“配送中”）
+    // 确认取货（状态改为"配送中"）
     function confirmTakeGoods(orderId) {
         if (currentWorkStatus !== 1) {
             alert("⚠️ 只有【在线】状态才能操作订单，请先切换到在线状态！");
@@ -193,7 +300,7 @@
         }
     }
 
-    // 确认送达（状态改为“已完成”）
+    // 确认送达（状态改为"已完成"）
     function confirmComplete(orderId) {
         if (currentWorkStatus !== 1) {
             alert("⚠️ 只有【在线】状态才能操作订单，请先切换到在线状态！");

@@ -5,41 +5,128 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>外卖员工作台 - 同城配送系统</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style type="text/css">
         body {
-            padding-top: 70px; /* Ensure content does not overlap with navbar */
+            padding-top: 50px; /* 减少移动端的顶部边距 */
             background-color: #f4f4f9;
+            font-size: 14px;
         }
         .container {
-            width: 90%;
-            max-width: 1200px;
+            width: 95%;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 10px;
         }
-        .header { margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .header { 
+            margin-bottom: 20px; 
+            padding-bottom: 10px; 
+            border-bottom: 1px solid #eee; 
+        }
         .status-online { color: #28a745; font-weight: bold; }
         .status-rest { color: #ffc107; font-weight: bold; }
         .status-offline { color: #6c757d; }
-        .order-list { margin: 20px 0; }
+        .order-list { margin: 15px 0; }
         .order-item {
-            padding: 15px;
-            margin-bottom: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
             border: 1px solid #eee;
             border-radius: 4px;
             background-color: white;
         }
-        .btn { margin-left: 5px; }
+        .btn { 
+            margin: 2px; 
+            font-size: 12px;
+            padding: 5px 10px;
+        }
         .btn-accept { background-color: #28a745; color: white; }
         .btn-refresh { background-color: #007bff; color: white; }
-        .nav-links a { margin-right: 15px; text-decoration: none; }
+        .nav-links a { margin-right: 10px; text-decoration: none; }
         .navbar-inverse {
-            background-color: #222;
-            border-color: #080808;
+            background-color: #333;
+            border-color: #333;
+        }
+        .navbar-inverse .navbar-nav > li > a,
+        .navbar-inverse .navbar-brand {
+            color: #fff;
+            font-size: 12px;
+        }
+        .navbar-inverse .navbar-brand {
+            font-size: 14px;
         }
         .navbar-inverse .navbar-nav > li > a {
             color: #ffffff;
+        }
+        
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 50px;
+                font-size: 13px;
+            }
+            .container {
+                width: 98%;
+                padding: 5px;
+            }
+            .header h2 {
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+            .order-item {
+                padding: 8px;
+                margin-bottom: 5px;
+            }
+            .order-item div {
+                margin-bottom: 3px;
+                font-size: 12px;
+            }
+            .btn {
+                font-size: 11px;
+                padding: 4px 8px;
+                margin: 1px;
+            }
+            .navbar-brand {
+                font-size: 12px !important;
+            }
+            .navbar-nav > li > a {
+                font-size: 11px !important;
+                padding: 8px 5px !important;
+            }
+            .modal-dialog {
+                margin: 10px;
+                width: auto;
+            }
+        }
+        
+        /* 超小屏幕适配 */
+        @media (max-width: 480px) {
+            .container {
+                width: 100%;
+                padding: 2px;
+            }
+            .header h2 {
+                font-size: 16px;
+            }
+            .order-item {
+                padding: 6px;
+            }
+            .order-item div {
+                font-size: 11px;
+            }
+            .btn {
+                font-size: 10px;
+                padding: 3px 6px;
+            }
+            .navbar-brand {
+                font-size: 10px !important;
+            }
+            .navbar-nav > li > a {
+                font-size: 10px !important;
+                padding: 6px 3px !important;
+            }
         }
     </style>
 </head>
@@ -48,18 +135,25 @@
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
         <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
             <a class="navbar-brand" href="<c:url value='/'/>">同城配送系统</a>
         </div>
-        <ul class="nav navbar-nav">
-            <li><a href="<c:url value='/deliveryman/toProfile'/>">个人中心</a></li>
-            <li class="active"><a href="<c:url value='/deliveryman/workbench'/>">外卖员工作台</a></li>
-            <li><a href="<c:url value='/deliveryman/toHistoryOrders'/>">历史订单</a></li>
-            <!-- 假设没有 dashboard 页面，你可以参考这个格式来添加额外的页面链接 -->
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">欢迎，${deliveryman.username}</a></li>
-            <li><a href="<c:url value='/deliveryman/logout'/>" onclick="return confirm('确定退出？')">退出登录</a></li>
-        </ul>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="<c:url value='/deliveryman/toProfile'/>">个人中心</a></li>
+                <li class="active"><a href="<c:url value='/deliveryman/workbench'/>">工作台</a></li>
+                <li><a href="<c:url value='/deliveryman/toHistoryOrders'/>">历史订单</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">欢迎，${deliveryman.username}</a></li>
+                <li><a href="<c:url value='/deliveryman/logout'/>" onclick="return confirm('确定退出？')">退出</a></li>
+            </ul>
+        </div>
     </div>
 </nav>
 

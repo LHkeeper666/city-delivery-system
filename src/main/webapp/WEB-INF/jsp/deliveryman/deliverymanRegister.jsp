@@ -2,6 +2,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>外卖员注册</title>
     <!-- 引入Bootstrap样式，确保表单样式正常 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -10,10 +12,11 @@
         body {
             background-color: #f5f5f5; /* 浅灰背景，提升视觉层次 */
             font-family: "Microsoft YaHei", sans-serif;
+            padding: 20px 0;
         }
         .register-box {
             width: 380px;
-            margin: 60px auto;
+            margin: 30px auto;
             padding: 25px;
             border: 1px solid #e0e0e0;
             border-radius: 8px; /* 圆角设计，更现代 */
@@ -82,6 +85,87 @@
         .form-control:focus {
             border-color: #2f54eb;
             box-shadow: 0 0 0 2px rgba(47, 84, 235, 0.2);
+        }
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px 0;
+            }
+            .register-box {
+                width: 90%;
+                margin: 20px auto;
+                padding: 20px;
+            }
+            .register-box h2 {
+                font-size: 20px;
+                margin-bottom: 20px;
+                padding-bottom: 12px;
+            }
+            .form-group {
+                margin-bottom: 15px;
+            }
+            .form-group label {
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+            .form-control {
+                font-size: 16px;
+                padding: 12px;
+                height: 44px;
+            }
+            .btn-primary {
+                font-size: 16px;
+                padding: 12px;
+            }
+            .alert {
+                padding: 10px;
+                margin-bottom: 15px;
+                font-size: 13px;
+            }
+            .link-area {
+                font-size: 13px;
+                margin-top: 15px;
+            }
+        }
+        @media (max-width: 480px) {
+            body {
+                padding: 5px 0;
+            }
+            .register-box {
+                width: 95%;
+                margin: 15px auto;
+                padding: 15px;
+            }
+            .register-box h2 {
+                font-size: 18px;
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+            }
+            .form-group {
+                margin-bottom: 12px;
+            }
+            .form-group label {
+                font-size: 12px;
+                margin-bottom: 5px;
+            }
+            .form-control {
+                font-size: 14px;
+                padding: 10px;
+                height: 40px;
+            }
+            .btn-primary {
+                font-size: 14px;
+                padding: 10px;
+            }
+            .alert {
+                padding: 8px;
+                margin-bottom: 12px;
+                font-size: 12px;
+            }
+            .link-area {
+                font-size: 12px;
+                margin-top: 12px;
+            }
         }
     </style>
 </head>
