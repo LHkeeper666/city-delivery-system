@@ -12,6 +12,8 @@
     <style type="text/css">
         body {
             padding-top: 50px; /* 减少移动端的顶部边距 */
+            margin-left: 3%;
+            margin-right: 3%;
             background-color: #f4f4f9;
             font-size: 14px;
         }
@@ -21,10 +23,10 @@
             margin: 0 auto;
             padding: 10px;
         }
-        .header { 
-            margin-bottom: 20px; 
-            padding-bottom: 10px; 
-            border-bottom: 1px solid #eee; 
+        .header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
         }
         .status-online { color: #28a745; font-weight: bold; }
         .status-rest { color: #ffc107; font-weight: bold; }
@@ -37,8 +39,50 @@
             border-radius: 4px;
             background-color: white;
         }
-        .btn { 
-            margin: 2px; 
+        .order-card {
+            background: #fff;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .order-id {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .order-section {
+            display: flex;
+            margin: 4px 0;
+        }
+
+        .label-title {
+            width: 40px;
+            font-weight: bold;
+            color: #007bff;
+            flex-shrink: 0;
+        }
+
+        .order-bottom {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .fee {
+            color: #ff5722;
+            font-weight: bold;
+        }
+
+        .time {
+            color: #666;
+            font-size: 13px;
+        }
+        .btn {
+            margin: 2px;
             font-size: 12px;
             padding: 5px 10px;
         }
@@ -60,7 +104,7 @@
         .navbar-inverse .navbar-nav > li > a {
             color: #ffffff;
         }
-        
+
         /* 移动端适配 */
         @media (max-width: 768px) {
             body {
@@ -89,7 +133,7 @@
                 margin: 1px;
             }
             .navbar-brand {
-                font-size: 12px !important;
+                font-size: 15px !important;
             }
             .navbar-nav > li > a {
                 font-size: 11px !important;
@@ -100,7 +144,7 @@
                 width: auto;
             }
         }
-        
+
         /* 超小屏幕适配 */
         @media (max-width: 480px) {
             .container {
@@ -121,7 +165,7 @@
                 padding: 3px 6px;
             }
             .navbar-brand {
-                font-size: 10px !important;
+                font-size: 15px !important;
             }
             .navbar-nav > li > a {
                 font-size: 10px !important;
@@ -132,30 +176,7 @@
 </head>
 <body>
 <!-- 导航栏 -->
-<nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="<c:url value='/'/>">同城配送系统</a>
-        </div>
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
-                <li><a href="<c:url value='/deliveryman/toProfile'/>">个人中心</a></li>
-                <li class="active"><a href="<c:url value='/deliveryman/workbench'/>">工作台</a></li>
-                <li><a href="<c:url value='/deliveryman/toHistoryOrders'/>">历史订单</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="#">欢迎，${deliveryman.username}</a></li>
-                <li><a href="<c:url value='/deliveryman/logout'/>" onclick="return confirm('确定退出？')">退出</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<%@include file="banner.jsp"%>
 
 <div class="container">
     <!-- 消息提示 -->
@@ -168,7 +189,7 @@
 
     <!-- 头部：用户信息+导航 -->
     <div class="header">
-        <h2>外卖员工作台</h2>
+        <h2>配送员工作台</h2>
         <div>
             欢迎，${deliveryman.username}（工号：${deliveryman.userId}）<br>
             工作状态：
@@ -182,39 +203,6 @@
             <button class="btn btn-warning" onclick="switchWorkStatus(2)">切换休息</button>
             <button class="btn btn-danger" onclick="switchWorkStatus(0)">切换离线</button>
         </div>
-    </div>
-
-    <!-- 待接单订单列表 -->
-    <div class="order-list">
-        <h3>待接单订单
-            <button class="btn btn-refresh" onclick="refreshPendingOrders()">刷新列表</button>
-        </h3>
-        <c:choose>
-            <c:when test="${not empty pendingOrders}">
-                <c:forEach items="${pendingOrders}" var="order">
-                    <div class="order-item">
-                        <div>订单号：${order.orderId}</div>
-                        <div>商家信息：${order.senderName}（${order.senderPhone}）</div>
-                        <div>商家地址：${order.senderAddress}</div>
-                        <div>收货信息：${order.consigneeName}（${order.consigneePhone}）</div>
-                        <div>收货地址：${order.consigneeAddress}</div>
-                        <div>货物类型：<c:choose>
-                            <c:when test="${order.goodsType == 'fragile'}">易碎品</c:when>
-                            <c:when test="${order.goodsType == 'normal'}">普通货物</c:when>
-                            <c:otherwise>${order.goodsType}</c:otherwise>
-                        </c:choose></div>
-                        <div>配送费：<fmt:formatNumber value="${order.deliveryFee}" pattern="0.00" /> 元</div>
-                        <div>预计时间：${order.expectedMins} 分钟</div>
-                        <button class="btn btn-accept" onclick="acceptOrder('${order.orderId}')">接单</button>
-                    </div>
-                </c:forEach>
-            </c:when>
-            <c:otherwise>
-                <div style="padding: 20px; color: #6c757d; border: 1px dashed #eee; text-align: center;">
-                    暂无待接单订单，请稍后刷新
-                </div>
-            </c:otherwise>
-        </c:choose>
     </div>
 
     <!-- 我的在途订单 -->
@@ -256,6 +244,43 @@
             <c:otherwise>
                 <div style="padding: 20px; color: #6c757d; border: 1px dashed #eee; text-align: center;">
                     暂无在途订单，快去接新单吧！
+                </div>
+            </c:otherwise>
+        </c:choose>
+    </div>
+
+    <!-- 待接单订单列表 -->
+    <div class="order-list">
+        <h3>待接单订单
+            <button class="btn btn-refresh" onclick="refreshPendingOrders()">刷新列表</button>
+        </h3>
+        <c:choose>
+            <c:when test="${not empty pendingOrders}">
+                <c:forEach items="${pendingOrders}" var="order">
+                    <div class="order-card">
+                        <div class="order-id">订单号：${order.orderId}</div>
+
+                        <div class="order-section">
+                            <span class="label-title">取货</span>
+                            <span class="text">${order.senderName} · ${order.senderAddress}</span>
+                        </div>
+
+                        <div class="order-section">
+                            <span class="label-title">送至</span>
+                            <span class="text">${order.consigneeAddress}</span>
+                        </div>
+
+                        <div class="order-bottom">
+                            <span class="fee">配送费：<fmt:formatNumber value="${order.deliveryFee}" pattern="0.00"/> 元</span>
+                            <span class="time">${order.expectedMins} 分钟</span>
+                            <button class="btn btn-accept" onclick="acceptOrder('${order.orderId}')">接单</button>
+                        </div>
+                    </div>
+                </c:forEach>
+            </c:when>
+            <c:otherwise>
+                <div style="padding: 20px; color: #6c757d; border: 1px dashed #eee; text-align: center;">
+                    暂无待接单订单，请稍后刷新
                 </div>
             </c:otherwise>
         </c:choose>
@@ -412,19 +437,19 @@
         // 显示模态框
         $('#abandonOrderModal').modal('show');
     }
-    
+
     // 提交放弃订单申请
     function submitAbandonRequest() {
         const orderId = $('#abandonOrderId').val();
         const abandonReason = $('#abandonReason').val();
         const abandonDescription = $('#abandonDescription').val();
-        
+
         // 表单验证
         if (!abandonReason) {
             alert("请选择放弃原因");
             return;
         }
-        
+
         // 提交请求到新的abandon接口
         $.ajax({
             url: contextPath + "/order/abandon",

@@ -19,7 +19,7 @@
             border-radius: 0;
         }
         .login-box {
-            width: 100%;
+            width: 90%;
             max-width: 400px;
             padding: 40px;
             border-radius: 8px;
@@ -63,12 +63,18 @@
             <label>密码</label>
             <input type="password" name="password" class="form-control" placeholder="请输入密码" required>
         </div>
-        <button type="submit" class="btn btn-primary btn-block">登录</button>
-        <div class="text-center mt-2">
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 10%">登录</button>
+        <div class="text-center mt-2" style="margin: 3%">
             <a href="${pageContext.request.contextPath}/deliveryman/toForgotPassword">忘记密码？</a>
-            <span style="margin: 0 10px;">|</span>
+<%--            <span style="margin: 0 10px;">|</span>--%>
+<%--            <a href="${pageContext.request.contextPath}/deliveryman/toRegister">还没账号？去注册</a>--%>
+<%--            <span style="margin: 0 10px;">|</span>--%>
+<%--            <a href="${pageContext.request.contextPath}/admin/login">管理员登录</a>--%>
+        </div>
+        <div class="text-center mt-2" style="margin: 3%">
             <a href="${pageContext.request.contextPath}/deliveryman/toRegister">还没账号？去注册</a>
-            <span style="margin: 0 10px;">|</span>
+        </div>
+        <div class="text-center mt-2" style="margin: 3%">
             <a href="${pageContext.request.contextPath}/admin/login">管理员登录</a>
         </div>
     </form>

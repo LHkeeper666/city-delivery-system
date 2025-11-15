@@ -2,248 +2,207 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<!DOCTYPE html>
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>订单${order.orderId}详情</title>
+    <title>订单 ${order.orderId} 详情</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
     <style>
-        .map-box {
-            height: 250px;
-            border: 1px solid #ddd;
-            margin: 15px 0;
-            padding: 15px;
-            background-color: #f9f9f9;
+        body {
+            margin-left: 5%;
+            margin-right: 5%;
+            background-color: #f4f5f9;
+            font-size: 14px;
+            padding-bottom: 50px;
         }
-        .info-card {
-            margin: 10px 0;
-            padding: 15px;
-            border: 1px solid #eee;
-            border-radius: 4px;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        .header-btn {
+            margin: 15px 0;
         }
         .status-tag {
             display: inline-block;
-            padding: 3px 8px;
-            border-radius: 4px;
-            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            color: #fff;
             font-size: 12px;
+            margin-left: 10px;
         }
-        /* 移动端适配 */
+        .info-card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .map-box {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            height: 250px;
+            overflow: auto;
+        }
+        h3 {
+            font-weight: 600;
+        }
+        h4 {
+            font-weight: 500;
+            margin-top: 10px;
+        }
+        p {
+            margin: 5px 0;
+        }
+        .btn-block {
+            margin-top: 10px;
+        }
+
+        /* 响应式适配 */
         @media (max-width: 768px) {
-            .container {
-                width: 95%;
-                padding: 0 10px;
-            }
-            .map-box {
-                height: 200px;
-                padding: 10px;
-                margin: 10px 0;
-            }
-            .info-card {
-                padding: 10px;
-                margin: 8px 0;
-            }
-            h3 {
-                font-size: 18px;
-                margin: 15px 0;
-                white-space: normal;
-                word-break: break-all;
-                line-height: 1.4;
-            }
-            h4 {
-                font-size: 16px;
-                white-space: normal;
-                word-break: break-all;
-                line-height: 1.4;
-            }
-            p {
-                font-size: 14px;
-                margin: 8px 0;
-                word-break: break-all;
-                line-height: 1.4;
-            }
-            .btn {
-                font-size: 14px;
-                padding: 8px 15px;
-                margin: 5px;
-            }
-            .modal-dialog {
-                margin: 20px;
-                width: auto;
-            }
-            .form-group {
-                margin-bottom: 15px;
-            }
-            /* 修复col-md-6在移动端的布局问题 */
-            .col-md-6 {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-            /* 修复col-md-4在移动端的布局问题 */
-            .col-md-4 {
-                width: 100%;
-                margin-bottom: 10px;
-            }
+            .map-box { height: 200px; padding: 10px; }
+            .info-card { padding: 10px; margin: 8px 0; }
+            h3 { font-size: 18px; }
+            h4 { font-size: 16px; }
+            p { font-size: 14px; }
+            .btn { font-size: 14px; padding: 8px 15px; }
         }
         @media (max-width: 480px) {
-            .container {
-                width: 98%;
-                padding: 0 5px;
-            }
-            .map-box {
-                height: 180px;
-                padding: 8px;
-            }
-            .info-card {
-                padding: 8px;
-            }
-            h3 {
-                font-size: 16px;
-                white-space: normal;
-                word-break: break-all;
-                line-height: 1.3;
-            }
-            h4 {
-                font-size: 14px;
-                white-space: normal;
-                word-break: break-all;
-                line-height: 1.3;
-            }
-            p {
-                font-size: 13px;
-                margin: 5px 0;
-                word-break: break-all;
-                line-height: 1.3;
-            }
-            .btn {
-                font-size: 13px;
-                padding: 6px 12px;
-            }
-            .status-tag {
-                font-size: 10px;
-                padding: 2px 6px;
-            }
-            .col-md-6 {
-                width: 100%;
-                margin-bottom: 8px;
-            }
-            .col-md-4 {
-                width: 100%;
-                margin-bottom: 8px;
-            }
+            .map-box { height: 180px; padding: 8px; }
+            h3 { font-size: 16px; }
+            h4 { font-size: 14px; }
+            p { font-size: 13px; }
+            .btn { font-size: 13px; padding: 6px 12px; }
+            .status-tag { font-size: 11px; padding: 3px 8px; }
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <!-- 头部导航：返回工作台 -->
-    <div class="row" style="margin: 15px 0;">
+
+    <!-- 返回按钮 -->
+    <div class="header-btn">
         <a href="${pageContext.request.contextPath}/deliveryman/workbench" class="btn btn-default btn-sm">
             <span class="glyphicon glyphicon-arrow-left"></span> 返回工作台
         </a>
     </div>
 
     <!-- 订单状态 -->
+    <div class="text-center">
+        <h3>订单 ${order.orderId} 详情
+            <c:choose>
+                <c:when test="${order.status == 0}">
+                    <span class="status-tag" style="background-color: #6c757d;">待接单</span>
+                </c:when>
+                <c:when test="${order.status == 1}">
+                    <span class="status-tag" style="background-color: #ffc107;">已接单待取货</span>
+                </c:when>
+                <c:when test="${order.status == 2}">
+                    <span class="status-tag" style="background-color: #28a745;">配送中</span>
+                </c:when>
+                <c:when test="${order.status == 3}">
+                    <span class="status-tag" style="background-color: #007bff;">已完成</span>
+                </c:when>
+                <c:when test="${order.status == 4}">
+                    <span class="status-tag" style="background-color: #dc3545;">已取消</span>
+                </c:when>
+                <c:when test="${order.status == 5}">
+                    <span class="status-tag" style="background-color: #6c757d;">放弃待审核</span>
+                </c:when>
+                <c:otherwise>
+                    <span class="status-tag" style="background-color: #999;">未知状态</span>
+                </c:otherwise>
+            </c:choose>
+        </h3>
+    </div>
+
+    <!-- 配送路线地图信息 -->
     <div class="row">
-        <div class="col-xs-12 text-center">
-            <h3>订单 ${order.orderId} 详情
-                <c:choose>
-                    <c:when test="${order.status == 0}">
-                        <span class="status-tag" style="background-color: #6c757d;">待接单</span>
-                    </c:when>
-                    <c:when test="${order.status == 1}">
-                        <span class="status-tag" style="background-color: #ffc107;">已接单待取货</span>
-                    </c:when>
-                    <c:when test="${order.status == 2}">
-                        <span class="status-tag" style="background-color: #28a745;">配送中</span>
-                    </c:when>
-                    <c:when test="${order.status == 3}">
-                        <span class="status-tag" style="background-color: #007bff;">已完成</span>
-                    </c:when>
-                    <c:when test="${order.status == 4}">
-                        <span class="status-tag" style="background-color: #dc3545;">已取消</span>
-                    </c:when>
-                    <c:when test="${order.status == 5}">
-                        <span class="status-tag" style="background-color: #6c757d;">放弃待审核</span>
-                    </c:when>
-                    <c:otherwise>
-                        <span class="status-tag" style="background-color: #999;">未知状态</span>
-                    </c:otherwise>
-                </c:choose>
-            </h3>
+        <div class="col-xs-12 col-sm-6 map-box">
+            <p><strong>商家位置：</strong>${order.senderAddress}</p>
+            <p><strong>收货位置：</strong>${order.consigneeAddress}</p>
+            <p><strong>预计配送时效：</strong>${order.expectedMins} 分钟</p>
         </div>
     </div>
+<%--    <div class="map-box">--%>
+<%--        <h4>配送路线</h4>--%>
+<%--        <p><strong>商家位置：</strong>${order.senderAddress}</p>--%>
+<%--        <p><strong>收货位置：</strong>${order.consigneeAddress}</p>--%>
+<%--        <p><strong>预计配送时效：</strong>${order.expectedMins} 分钟</p>--%>
+<%--    </div>--%>
 
-    <!-- 地图区域（简化版，后续可集成高德/百度地图API） -->
-    <div class="map-box">
-        <h4>配送路线</h4>
-        <p><strong>商家位置：</strong>${order.senderAddress}</p>
-        <p><strong>收货位置：</strong>${order.consigneeAddress}</p>
-        <p><strong>预计配送时效：</strong>${order.expectedMins} 分钟</p>
-    </div>
-
-    <!-- 配送信息 -->
+    <!-- 寄件人 & 收货人信息 -->
     <div class="row">
-        <!-- 商家信息 -->
-        <div class="col-md-6 info-card">
+        <div class="col-xs-12 col-sm-6 info-card">
             <h4>寄件人信息</h4>
             <p>名称：${order.senderName}</p>
             <p>电话：${order.senderPhone}</p>
             <p>地址：${order.senderAddress}</p>
         </div>
-        <!-- 收货信息 -->
-        <div class="col-md-6 info-card">
+        <div class="col-xs-12 col-sm-6 info-card">
             <h4>收货人信息</h4>
             <p>姓名：${order.consigneeName}</p>
             <p>电话：${order.consigneePhone}</p>
             <p>地址：${order.consigneeAddress}</p>
         </div>
-    </div>
-
-    <!-- 订单其他信息 -->
-    <div class="info-card">
-        <div class="row">
-            <div class="col-md-4">
-                <p>货物类型：${order.goodsType == 'fragile' ? '易碎品' : '普通货物'}</p>
-                <p>配送费：<fmt:formatNumber value="${order.deliveryFee}" pattern="0.00" /> 元</p>
-            </div>
-            <div class="col-md-4">
-                <p>我的收益：<fmt:formatNumber value="${order.deliverymanIncome}" pattern="0.00" /> 元</p>
-                <p>创建时间：${order.createTime}</p>
-            </div>
-            <div class="col-md-4">
-                <p>预计时间：${order.expectedMins} 分钟</p>
-                <p>备注：${order.remark == null ? '无' : order.remark}</p>
-            </div>
+        <div class="col-xs-12 col-sm-6 info-card">
+            <p>货物类型：${order.goodsType == 'fragile' ? '易碎品' : '普通货物'}</p>
+            <p>配送费：<fmt:formatNumber value="${order.deliveryFee}" pattern="0.00" /> 元</p>
+            <p>我的收益：<fmt:formatNumber value="${order.deliverymanIncome}" pattern="0.00" /> 元</p>
+            <p>创建时间：${order.createTime}</p>
+            <p>预计时间：${order.expectedMins} 分钟</p>
+            <p>备注：${order.remark == null ? '无' : order.remark}</p>
         </div>
     </div>
 
-    <!-- 操作按钮（根据订单状态显示不同按钮） -->
-    <div class="text-center" style="margin: 20px 0;">
+    <!-- 订单详情 -->
+<%--    <div class="info-card">--%>
+<%--        <div class="row">--%>
+<%--            <div class="col-xs-12 col-sm-4">--%>
+<%--                <p>货物类型：${order.goodsType == 'fragile' ? '易碎品' : '普通货物'}</p>--%>
+<%--                <p>配送费：<fmt:formatNumber value="${order.deliveryFee}" pattern="0.00" /> 元</p>--%>
+<%--            </div>--%>
+<%--            <div class="col-xs-12 col-sm-4">--%>
+<%--                <p>我的收益：<fmt:formatNumber value="${order.deliverymanIncome}" pattern="0.00" /> 元</p>--%>
+<%--                <p>创建时间：${order.createTime}</p>--%>
+<%--            </div>--%>
+<%--            <div class="col-xs-12 col-sm-4">--%>
+<%--                <p>预计时间：${order.expectedMins} 分钟</p>--%>
+<%--                <p>备注：${order.remark == null ? '无' : order.remark}</p>--%>
+<%--            </div>--%>
+<%--        </div>--%>
+<%--    </div>--%>
+
+    <!-- 操作按钮 -->
+    <div class="text-center">
         <c:choose>
             <c:when test="${order.status == 1}">
-                <!-- 已接单待取货：显示"确认取货" -->
                 <button class="btn btn-primary btn-block" onclick="confirmTakeGoods('${order.orderId}')">
                     确认取货
                 </button>
             </c:when>
             <c:when test="${order.status == 2}">
-                <!-- 配送中：显示"确认送达" -->
                 <button class="btn btn-success btn-block" onclick="confirmComplete('${order.orderId}')">
                     确认送达
                 </button>
             </c:when>
         </c:choose>
-
-        <!-- 未完成的订单显示"放弃订单"按钮 -->
         <c:if test="${order.status != 3 && order.status != 4 && order.status != 5}">
             <button class="btn btn-danger btn-block" style="margin-top: 10px;" onclick="abandonOrder('${order.orderId}')">
                 放弃订单
             </button>
         </c:if>
     </div>
+
 </div>
 
 <!-- 放弃订单模态框 -->
@@ -260,7 +219,7 @@
                 <form id="abandonOrderForm">
                     <input type="hidden" id="abandonOrderId">
                     <div class="form-group">
-                        <label for="abandonReason" class="control-label">放弃原因 <span style="color: red;">*</span></label>
+                        <label for="abandonReason">放弃原因 <span style="color: red;">*</span></label>
                         <select class="form-control" id="abandonReason" required>
                             <option value="">请选择放弃原因</option>
                             <option value="地址错误">地址错误</option>
@@ -268,7 +227,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="abandonDescription" class="control-label">详细说明</label>
+                        <label for="abandonDescription">详细说明</label>
                         <textarea class="form-control" id="abandonDescription" rows="3" placeholder="请输入放弃订单的详细说明..."></textarea>
                     </div>
                     <div class="alert alert-warning">
@@ -283,6 +242,7 @@
         </div>
     </div>
 </div>
+
 
 <script type="text/javascript">
     const contextPath = "${pageContext.request.contextPath}";

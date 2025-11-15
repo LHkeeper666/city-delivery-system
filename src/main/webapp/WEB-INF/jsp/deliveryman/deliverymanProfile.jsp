@@ -10,7 +10,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            padding-top: 50px;
+            padding-top: 10%;
+            margin-top: 10%;
+            margin-left: 5%;
+            margin-right: 5%;
             background-color: #f4f5f7;
             font-size: 14px;
         }
@@ -69,7 +72,7 @@
                 margin-bottom: 8px;
             }
             .navbar-brand {
-                font-size: 12px !important;
+                font-size: 15px !important;
             }
             .navbar-nav > li > a {
                 font-size: 11px !important;
@@ -107,7 +110,7 @@
                 font-size: 10px;
             }
             .navbar-brand {
-                font-size: 10px !important;
+                font-size: 15px !important;
             }
             .navbar-nav > li > a {
                 font-size: 10px !important;
@@ -121,30 +124,8 @@
 </head>
 <body>
 <!-- 导航栏 -->
-<nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#profile-navbar" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="<c:url value='/'/>">同城配送系统</a>
-        </div>
-        <div class="collapse navbar-collapse" id="profile-navbar">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="<c:url value='/deliveryman/toProfile'/>">个人中心</a></li>
-                <li><a href="<c:url value='/deliveryman/workbench'/>">工作台</a></li>
-                <li><a href="<c:url value='/deliveryman/toHistoryOrders'/>">历史订单</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="#">欢迎，${deliveryman.username}</a></li>
-                <li><a href="<c:url value='/deliveryman/logout'/>" onclick="return confirm('确定退出？')">退出</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<%@include file="banner.jsp"%>
+
 
 <div class="container">
     <!-- 消息提示 -->
