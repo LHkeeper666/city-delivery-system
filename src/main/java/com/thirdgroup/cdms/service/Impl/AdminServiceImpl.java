@@ -45,7 +45,7 @@ public class AdminServiceImpl implements AdminService {
 
             // 计算平台收入和配送员收入（假设平台抽取20%）
             if (order.getDeliveryFee() != null) {
-                BigDecimal platformRate = new BigDecimal(0.2); // 20%平台抽成
+                BigDecimal platformRate = new BigDecimal("0.2"); // 20%平台抽成
                 order.setPlatformIncome(order.getDeliveryFee().multiply(platformRate));
                 order.setDeliverymanIncome(order.getDeliveryFee().subtract(order.getPlatformIncome()));
             }

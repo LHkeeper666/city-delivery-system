@@ -27,7 +27,6 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    // TODO：状态码要对齐一下
     /**
      * 显示登录页面
      */
