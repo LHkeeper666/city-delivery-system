@@ -63,7 +63,8 @@ public class RequestLoggingFilter implements Filter {
                 session.getAttribute("deliveryman") == null)) &&
                 !isLoginging(relativePath)
         ) {
-            resp.sendRedirect(req.getContextPath() + "/deliveryman/toLogin");
+//            resp.sendRedirect(req.getContextPath() + "/deliveryman/toLogin");
+            resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 
@@ -84,6 +85,7 @@ public class RequestLoggingFilter implements Filter {
                 relativePath.startsWith("/deliveryman/toRegister") ||
                 relativePath.startsWith("/deliveryman/login") ||
                 relativePath.startsWith("/deliveryman/register") ||
-                relativePath.startsWith("/login");
+                relativePath.startsWith("/login") ||
+                relativePath.startsWith("/deliveryman/toForgotPassword");
     }
 }
