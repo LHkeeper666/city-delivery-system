@@ -42,15 +42,15 @@ public class DataSourceConfig {
         // 参数：-Dcdms.config=path\to\db.properties
         String configPath = System.getProperty("cdms.config");
 
-//        if (configPath == null) {
-//            throw new RuntimeException("外部配置未指定，请设置 -Dcdms.config=/path/to/config");
-//        }
+        if (configPath == null) {
+            throw new RuntimeException("外部配置未指定，请设置 -Dcdms.config=/path/to/config");
+        }
         Properties props = new Properties();
 
         // 外部配置，部署用
-//        props.load(Files.newInputStream(Paths.get(configPath)));
+        props.load(Files.newInputStream(Paths.get(configPath)));
         // 内部配置，开发用
-        props.load(this.getClass().getClassLoader().getResourceAsStream("db.properties"));
+//        props.load(this.getClass().getClassLoader().getResourceAsStream("db.properties"));
 
         DruidDataSource ds = new DruidDataSource();
         ds.setDriverClassName(props.getProperty("db.driver"));
