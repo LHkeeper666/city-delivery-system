@@ -1,11 +1,37 @@
-# UML 类图说明文档
+---
+title: |
+   \begin{center}
+   \textbf{同城配送管理系统}\\
+   \textbf{UML类图说明文档}
+   \end{center}
+date: "2025年11月"
+
+# 页面排版
+fontsize: 12pt
+geometry: margin=2.5cm
+linestretch: 1.5
+
+# 目录设置
+toc: true
+toc-depth: 3
+
+# 超链接颜色
+colorlinks: true
+linkcolor: blue
+
+# LaTeX 宏包与设置
+header-includes:
+  - \input{fontsetup.tex}
+---
+
+\newpage
+
+[//]: # (# UML 类图说明文档)
 
 ## 一、系统概述
 
 本系统为**同城配送管理系统**的核心类图，描述了用户（管理员与配送员）、订单、配送轨迹以及系统 API 密钥等核心实体及其关系。  
 主要功能包括：下单、配送、追踪、用户登录管理等。
-
----
 
 ## 二、类说明
 
@@ -28,7 +54,8 @@
 | createTime       | DateTime | 创建时间                      |
 | updateTime       | DateTime | 更新时间                      |
 
-说明：
+**说明：**
+
 User 为系统的抽象父类，不直接实例化，由 CommonUser 和 Deliveryman 继承。
 
 ### 2. 类 `CommonUser`
@@ -37,10 +64,12 @@ User 为系统的抽象父类，不直接实例化，由 CommonUser 和 Delivery
 - 描述：系统的普通下单用户，可以创建配送订单。
 
 **主要职责：**
+
 - 下单（创建 DeliveryOrder）
 - 查询订单状态与历史记录
 
 **关联关系：**
+
 - `CommonUser 1 → 0..* DeliveryOrder`：一个用户可以创建多个订单。
 
 ### 3. 类 `Deliveryman`
@@ -49,10 +78,12 @@ User 为系统的抽象父类，不直接实例化，由 CommonUser 和 Delivery
 - 描述：系统中的配送员，负责接单和配送。
 
 **主要职责：**
+
 - 接受并执行配送任务（DeliveryOrder）
 - 更新订单的配送轨迹（DeliveryTrace）
 
 **关联关系：**
+
 - `Deliveryman 1 → 0..* DeliveryOrder`：一个配送员可配送多个订单。
 
 ### 4. 类 `DeliveryOrder`
@@ -78,6 +109,7 @@ User 为系统的抽象父类，不直接实例化，由 CommonUser 和 Delivery
 | cancelTime       | DateTime | 取消时间                        |
 
 **关联关系：**
+
 - `DeliveryOrder 1 → 0..* DeliveryTrace`：一个订单有多条配送轨迹。
 - 由 `CommonUser` 创建。
 - 由 `Deliveryman` 执行。
@@ -107,4 +139,5 @@ User 为系统的抽象父类，不直接实例化，由 CommonUser 和 Delivery
 | createTime | DateTime | 创建时间      |
 
 **说明：**
+
 - `ApiKey` 用于系统API接口调用验证，确保外部系统访问安全。

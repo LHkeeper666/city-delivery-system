@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS cdms.cdms_delivery_trace (
 # ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统操作日志表';
 
 -- =========================
--- 第三方接口密钥表：api_key（选做）
+-- 第三方接口密钥表：api_key
 -- =========================
 CREATE TABLE IF NOT EXISTS cdms.cdms_api_key (
     key_id        BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT 'API密钥ID',

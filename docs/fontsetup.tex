@@ -1,0 +1,112 @@
+% --------------------------
+% 中文字体
+% --------------------------
+\usepackage{xeCJK}
+% 中文默认字体：宋体，粗体以黑体代替，斜体以楷书代替
+\setCJKmainfont   { SimSun } [ BoldFont = SimHei , ItalicFont = KaiTi ]
+% 中文无衬线字体：微软雅黑，粗体为对应的微软雅黑粗体
+\setCJKsansfont   { Microsoft~YaHei } [ BoldFont = *~Bold ]
+% 中文等宽字体：仿宋
+\setCJKmonofont   { FangSong }
+
+% --------------------------
+% 英文字体
+% --------------------------
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\setmonofont{Consolas}
+
+% --------------------------
+% 图片支持
+% --------------------------
+\usepackage{graphicx}
+\usepackage{float}
+
+% --------------------------
+% 页眉页脚
+% --------------------------
+\usepackage{fancyhdr}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyhead[L]{同城配送管理系统}
+  \fancyfoot[C]{\thepage}
+  \renewcommand{\headrulewidth}{0.4pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{同城配送管理系统}
+\fancyfoot[C]{第~\thepage~页}
+
+% --------------------------
+% 封面页不显示页码
+% --------------------------
+\usepackage{etoolbox}
+\AtBeginDocument{\thispagestyle{empty}}
+
+% ---------------------------
+% 层级标号设置（listings）
+% ---------------------------
+\usepackage{enumitem}
+% \setlist{nosep}
+\setlistdepth{4}
+\setlist[itemize,1]{label=\textbullet}
+\setlist[itemize,2]{label=\textopenbullet}
+\setlist[itemize,3]{label=\(\triangleright\)}
+
+% ---------------------------
+% 代码块背景设置（listings）
+% ---------------------------
+\usepackage{listings}
+\usepackage{xcolor}
+
+% 定义代码框背景色
+\definecolor{codebg}{RGB}{240,240,240}  % 浅灰色背景
+
+\lstset{
+    backgroundcolor=\color{codebg},      % 背景色
+    basicstyle=\ttfamily\small,          % 字体与字号
+    breaklines=true,                     % 自动换行
+    frame=single,                        % 框线
+    frameround=tttt,                     % 四角圆角
+    numbers=left,                        % 行号位置
+    numberstyle=\tiny\color{gray},       % 行号样式
+    keywordstyle=\color{blue},           % 关键字颜色
+    commentstyle=\color{green!60!black}, % 注释颜色
+    stringstyle=\color{red!60!black},    % 字符串颜色
+    showstringspaces=false                % 不显示空格下划线
+}
+
+% \usepackage{xcolor}    % 为了渲染颜色，需要使用 xcolor 包
+% \usepackage{listings}  % 渲染代码块
+%
+% % 定义颜色
+% \definecolor{codegreen}{rgb}{0,0.6,0}
+% \definecolor{codegray}{rgb}{0.5,0.5,0.5}
+% \definecolor{codepurple}{rgb}{0.58,0,0.82}
+% \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+%
+% % 定义 listings 风格，可以定义多个
+% \lstdefinestyle{mystyle}{
+%     backgroundcolor=\color{backcolour},  % 背景色
+%     commentstyle= \color{red!50!green!50!blue!50},  % 注释的颜色
+%     keywordstyle= \color{blue!70},  % 关键字/程序语言中的保留字颜色
+%     numberstyle=\tiny\color{codegray},  % 左侧行号显示的颜色
+%     stringstyle=\color{codepurple},
+%     basicstyle=\ttfamily\footnotesize,
+%     breakatwhitespace=false,
+%     breaklines=true,  % 对过长的代码自动换行
+%     captionpos=b,
+%     keepspaces=true,
+%     numbers=left,  % 在左侧显示行号
+%     numbersep=5pt,
+%     showspaces=false,
+%     showstringspaces=false,  % 不显示字符串中的空格下划线
+%     showtabs=false,
+%     tabsize=2,
+%     frame=single  % [none | single | shadowbox] 显示边框
+% }
+%
+% \lstset{style=mystyle}  % 使用 listings 风格
+
